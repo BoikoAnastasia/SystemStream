@@ -1,12 +1,17 @@
 # Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Для установки
+### `yarn` 
+или 
+### `npm i` 
 
 ## Available Scripts
 
 In the project directory, you can run:
 
 ### `npm start`
+или
+### `yarn start`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
