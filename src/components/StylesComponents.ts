@@ -43,15 +43,22 @@ export const StyledButtonLogIn = styled(Button)(() => ({
   backgroundColor: 'var(--button-dark)',
 }));
 
-export const StyledButtonSearch = styled(TextField)(() => ({
-  width: '160px',
+interface StyledButtonSearchProps {
+  h?: string;
+}
+
+export const StyledButtonSearch = styled(TextField, {
+  shouldForwardProp: (prop) => prop !== 'h',
+})<StyledButtonSearchProps>(({ h }) => ({
+  width: '100%',
+  height: h || '40px',
   maxWidth: '100%',
   backgroundColor: 'var(--button-dark)',
-  borderRadius: '20px',
+  borderRadius: '12px',
   '& .MuiInputBase-root': {
     minWidth: '160px',
-    height: '40px',
-    borderRadius: '20px',
+    height: '100%',
+    borderRadius: '12px',
     color: 'white',
     padding: '8px 0 8px 35px',
   },

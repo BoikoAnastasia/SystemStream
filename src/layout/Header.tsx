@@ -34,7 +34,7 @@ export const Header = () => {
           )}
         </div>
         <div className="header__block">
-          {isMobile ? <></> : <SearchInput />}
+          {isMobile ? <></> : <SearchInput width={'160px'} />}
           <ButtonLogIn onClick={handleOpen} />
           <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
         </div>

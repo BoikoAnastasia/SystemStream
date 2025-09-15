@@ -1,26 +1,14 @@
-import { FC, JSX, useEffect, useRef } from 'react';
+import { FC, JSX } from 'react';
 import { appLayout } from '../../layout/index';
-// import Hls from 'hls.js';
+import { SearchInput } from '../../components/ui/searchInput/SearchInput';
+import { TabsComponent } from '../../components/ui/tabs/TabsComponent';
 
 export const MainPage: FC = appLayout((): JSX.Element => {
-  // const videoRef = useRef<HTMLVideoElement>(null);
-  // useEffect(() => {
-  //   const video = videoRef.current;
-  //   const hls = new Hls();
-  //   if (video) {
-  //     const hls = new Hls();
-
-  //     hls.loadSource('https://example.com/stream.m3u8'); // укажи реальный URL
-  //     hls.attachMedia(video);
-
-  //     hls.on(Hls.Events.MANIFEST_PARSED, () => {
-  //       video.play().catch((err) => {
-  //         console.error('Autoplay failed:', err);
-  //       });
-  //     });
-  //   }
-  //   return () => hls.destroy();
-  // }, []);
-
-  return <div className="page container">{/* <video ref={videoRef} controls autoPlay /> */}</div>;
+  const arrTest = [1, 2, 3, 4, 5];
+  return (
+    <div className="page container__main">
+      <SearchInput width={'100%'} height={'48px'} />
+      <TabsComponent propsChild={arrTest} propTabsTitle={['Все', 'Live каналы', 'Видео', 'Клипы', 'Пользователи']} />
+    </div>
+  );
 });
