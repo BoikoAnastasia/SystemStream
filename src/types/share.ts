@@ -13,13 +13,37 @@ export interface IStyledIButtonForm {
   c?: string;
 }
 
-export interface TabPanelProps {
+export interface IStyledListVideo {
+  columns?: string;
+  columnsMb?: string;
+}
+
+export interface ITabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
 }
 
-export interface TabsComponentProps {
-  propsChild: ReactNode[];
+export interface ITabsComponentProps {
+  propsChild: (ReactNode | (() => ReactNode))[];
   propTabsTitle: string[];
 }
+
+export interface IVideoItem {
+  id: string;
+  video: string;
+  href: string;
+  name: string;
+  users: string;
+}
+
+export interface IUserItem {
+  id: string;
+  img: string;
+  href: string;
+  name: string;
+  users: string;
+}
+
+export type IListVideo = IVideoItem[];
+export type IListUsers = IUserItem[];

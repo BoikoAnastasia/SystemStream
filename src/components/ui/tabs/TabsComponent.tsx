@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
-import { StyledTabs } from '../../StylesComponents';
+// mui
 import { Box, Tab } from '@mui/material';
-import { TabPanelProps, TabsComponentProps } from '../../../types/share';
+// styles
+import { StyledTabs } from '../../StylesComponents';
+// types
+import { ITabPanelProps, ITabsComponentProps } from '../../../types/share';
 
-export const TabsComponent = ({ propsChild, propTabsTitle }: TabsComponentProps) => {
+export const TabsComponent = ({ propsChild, propTabsTitle }: ITabsComponentProps) => {
   const [value, setValue] = useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
-  const CustomTabPanel = (props: TabPanelProps) => {
+  const CustomTabPanel = (props: ITabPanelProps) => {
     const { children, value, index, ...other } = props;
     return (
       <div
@@ -52,7 +55,7 @@ export const TabsComponent = ({ propsChild, propTabsTitle }: TabsComponentProps)
       </StyledTabs>
       {propsChild.map((item, index) => (
         <CustomTabPanel value={value} index={index} key={index}>
-          {item}
+          {typeof item === 'function' ? item() : item}
         </CustomTabPanel>
       ))}
     </>

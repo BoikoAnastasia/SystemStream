@@ -1,12 +1,23 @@
 import { useEffect, useState } from 'react';
 
 export const useDeviceDetect = () => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const getDeviceType = () => {
+    const width = window.innerWidth;
+    return {
+      isMobile: width < 768,
+      isLaptop: width >= 768 && width <= 1024,
+    };
+  };
+
+  const [device, setDevice] = useState(getDeviceType);
+
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    const handleResize = () => {
+      setDevice(getDeviceType());
+    };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  return { isMobile };
+  return device;
 };

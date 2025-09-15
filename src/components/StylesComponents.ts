@@ -1,7 +1,7 @@
 import { styled } from '@mui/material/styles';
-import { Box, Button, IconButton, InputLabel, OutlinedInput, Tabs, TextField, Typography } from '@mui/material';
+import { Box, Button, Card, IconButton, InputLabel, OutlinedInput, Tabs, TextField, Typography } from '@mui/material';
 import { keyframes } from '@emotion/react';
-import { IStyledIButtonForm } from '../types/share';
+import { IStyledIButtonForm, IStyledListVideo } from '../types/share';
 
 const Rotate = keyframes`
   from {
@@ -149,5 +149,31 @@ export const StyledIButtonForm = styled(Button, {
   '&:hover': {
     color: hovercolor || 'white',
     backgroundColor: hoverbgcolor || 'var(--button-light-hover)',
+  },
+}));
+
+// ListVideo
+export const StyledBoxListVideo = styled(Box)(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '28px',
+}));
+
+export const StyledListVideo = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'columns' && prop !== 'columnsMb',
+})<IStyledListVideo>(({ columns, columnsMb }) => ({
+  display: 'grid',
+  gridTemplateColumns: `repeat(${columns ? columns : 4}, 1fr)`,
+  gap: '12px',
+  '@media (max-width: 600px)': {
+    gridTemplateColumns: `repeat(${columnsMb ? columnsMb : 2}, 1fr)`,
+  },
+}));
+
+export const StyledCardVideo = styled(Card)(() => ({
+  background: 'none',
+  '&.MuiPaper-root': {
+    border: 'none',
+    boxShadow: 'none',
   },
 }));
