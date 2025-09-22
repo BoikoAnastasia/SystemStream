@@ -39,7 +39,7 @@ export const MainPage: FC = appLayout((): JSX.Element => {
     <SectionListVideo title="Live каналы" list={testVideos} />,
     <SectionListVideo title="Видео" list={testVideos} />,
     <SectionListVideo title="Клипы" list={testVideos} />,
-    <SectionListVideo title="Пользователи" list={testImages} />,
+    <SectionListVideo title="Пользователи" list={testImages} isVideo={false} />,
   ];
 
   return (

@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+// components
+import { CardVideo } from '../cardVideo/CardVideo';
 // hooks
 import { useDeviceDetect } from '../../hooks/useDeviceDetect';
 // mui
@@ -25,6 +27,15 @@ type Props = VideoListProps | UserListProps;
 export const SectionListVideo = (props: Props) => {
   const { isMobile, isLaptop } = useDeviceDetect();
   const { title, isVideo = true, list } = props;
+  const propsStyleImg = {
+    maxWidth: '144px',
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    objectPosition: 'center',
+    borderRadius: '50%',
+    overflow: 'hidden',
+  };
 
   return (
     <StyledBoxListVideo>
@@ -55,37 +66,7 @@ export const SectionListVideo = (props: Props) => {
       ) : (
         <StyledListVideo columns={'5'} columnsMb={'3'}>
           {(list as IUserItem[]).map((item) => (
-            <StyledCardVideo key={item.id}>
-              <Link to={item.href}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '12px',
-                    alignItems: 'center',
-                    textAlign: 'center',
-                  }}
-                >
-                  <img
-                    src={item.img}
-                    alt=""
-                    style={{
-                      maxWidth: '144px',
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      objectPosition: 'center',
-                      borderRadius: '50%',
-                      overflow: 'hidden',
-                    }}
-                  />
-                  <Box>
-                    <h4>{item.name}</h4>
-                    <span style={{ fontSize: '14px', color: 'var(--background-line)' }}>{item.users}</span>
-                  </Box>
-                </Box>
-              </Link>
-            </StyledCardVideo>
+            <CardVideo item={item} styleProps={propsStyleImg} />
           ))}
         </StyledListVideo>
       )}

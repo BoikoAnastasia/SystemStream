@@ -13,6 +13,11 @@ export interface IStyledIButtonForm {
   c?: string;
 }
 
+export interface IStyledButtonDark {
+  h?: string;
+  br?: string;
+}
+
 export interface IStyledListVideo {
   columns?: string;
   columnsMb?: string;
@@ -47,3 +52,12 @@ export interface IUserItem {
 
 export type IListVideo = IVideoItem[];
 export type IListUsers = IUserItem[];
+
+// Message
+export interface IMessage {
+  id: string | number;
+  nickname: string;
+  message: string;
+  currentUser: boolean;
+  avatar: null | string;
+}

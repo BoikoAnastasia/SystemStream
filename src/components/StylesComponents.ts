@@ -1,7 +1,18 @@
 import { styled } from '@mui/material/styles';
-import { Box, Button, Card, IconButton, InputLabel, OutlinedInput, Tabs, TextField, Typography } from '@mui/material';
+import {
+  Avatar,
+  Box,
+  Button,
+  Card,
+  IconButton,
+  InputLabel,
+  OutlinedInput,
+  Tabs,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { keyframes } from '@emotion/react';
-import { IStyledIButtonForm, IStyledListVideo } from '../types/share';
+import { IStyledButtonDark, IStyledIButtonForm, IStyledListVideo } from '../types/share';
 
 const Rotate = keyframes`
   from {
@@ -165,7 +176,7 @@ export const StyledListVideo = styled(Box, {
   display: 'grid',
   gridTemplateColumns: `repeat(${columns ? columns : 4}, 1fr)`,
   gap: '12px',
-  '@media (max-width: 600px)': {
+  '@media (max-width: 768px)': {
     gridTemplateColumns: `repeat(${columnsMb ? columnsMb : 2}, 1fr)`,
   },
 }));
@@ -175,5 +186,151 @@ export const StyledCardVideo = styled(Card)(() => ({
   '&.MuiPaper-root': {
     border: 'none',
     boxShadow: 'none',
+  },
+}));
+
+export const StyledUserHeaderBox = styled(Box)(() => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '0 16px 0',
+  gap: '20px',
+  '@media (max-width: 768px)': {
+    flexDirection: 'column',
+    padding: '0',
+  },
+}));
+
+export const StyledButtonLight = styled(Button)(() => ({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '10px',
+  minWidth: '40px',
+  height: '40px',
+  fontWeight: 'bold',
+  color: 'var(--background-block)',
+  padding: '10px 20px',
+  borderRadius: '20px',
+  textTransform: 'none',
+  backgroundColor: 'var(--button-light)',
+}));
+
+export const StyledButtonDark = styled(Button, {
+  shouldForwardProp: (prop) => prop !== 'br' && prop !== 'h',
+})<IStyledButtonDark>(({ br, h }) => ({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '10px',
+  minWidth: h || '40px',
+  height: h || '40px',
+  fontWeight: 'bold',
+  color: 'var(--white)',
+  padding: '10px 20px',
+  borderRadius: br || '20px',
+  textTransform: 'none',
+  backgroundColor: 'var(--button-dark)',
+}));
+
+// StreamPage
+export const StyledStreamBoxAbout = styled(Box)(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '12px',
+  padding: '20px',
+}));
+
+// Chat
+export const StyledChatList = styled(Box)(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '32px',
+  flex: 1,
+  padding: '20px 16px',
+  overflowY: 'auto',
+  '&::-webkit-scrollbar': {
+    width: '5px',
+  },
+  '&::-webkit-scrollbar-track': {
+    background: 'var(--background-block)', // фон трека
+    borderRadius: '5px',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    background: 'var(--button-dark-hover)', // цвет ползунка
+    borderRadius: '5px',
+    border: 'none', // отступ вокруг ползунка
+  },
+  '&::-webkit-scrollbar-thumb:hover': {
+    background: 'var(--black)', // при наведении
+  },
+  // // Для Firefox
+  scrollbarWidth: 'thin',
+  scrollbarColor: 'var(--button-dark-hover) var(--background-block)',
+}));
+
+export const StyledChatCard = styled(Box)(() => ({
+  display: 'grid',
+  gridTemplateAreas: `'img nickname' 'img message'`,
+  alignItems: 'flex-end',
+  justifyContent: 'flex-start',
+  gap: '4px 12px',
+}));
+
+export const StyledChatCardImg = styled(Avatar)(() => ({
+  gridArea: 'img',
+  width: '40px',
+  height: '40px',
+  borderRadius: '50%',
+  objectFit: 'cover',
+  objectPosition: 'center',
+}));
+
+export const StyledChatCardNickname = styled(Box)(() => ({
+  gridArea: 'nickname',
+  fontSize: '13px',
+}));
+
+export const StyledChatCardMessage = styled(Box)(() => ({
+  gridArea: 'message',
+  fontSize: '16px',
+  padding: '12px 16px',
+  borderRadius: '12px',
+  background: 'var(--button-dark)',
+  wordBreak: 'break-word',
+}));
+
+export const StyledChatCardMessageCurrentUser = styled(Box)(() => ({
+  gridArea: 'message',
+  fontSize: '16px',
+  padding: '12px 16px',
+  color: 'var(--input-background)',
+  borderRadius: '12px',
+  background: 'var(--button-light)',
+  wordBreak: 'break-word',
+}));
+
+export const StyledChatTextField = styled(TextField)(() => ({
+  background: 'var(--button-dark)',
+  borderRadius: '12px',
+  width: '100%',
+  // Input text color
+  '& .MuiOutlinedInput-input': {
+    color: 'white',
+    paddingRight: '40px',
+  },
+  '& .MuiFormControl-root': {
+    borderColor: 'white',
+  },
+  // Label color
+  '& .MuiInputLabel-root': {
+    color: 'var(--input-border)',
+    '&.Mui-focused': {
+      color: 'white',
+    },
+  },
+  // Border color (default, hover, focused)
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderRadius: '12px',
   },
 }));
