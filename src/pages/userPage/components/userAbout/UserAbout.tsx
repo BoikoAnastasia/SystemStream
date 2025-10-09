@@ -56,7 +56,7 @@ export const UserAbout = () => {
         <h3>Рекомендованные каналы</h3>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '12px' }}>
           {featureList.map((item) => (
-            <CardVideo item={item} styleProps={propsStyleImg} />
+            <CardVideo item={item} styleProps={propsStyleImg} key={item.id} />
           ))}
         </Box>
       </Box>

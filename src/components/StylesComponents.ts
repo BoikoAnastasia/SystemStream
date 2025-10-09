@@ -106,6 +106,9 @@ export const StyledTextFieldModal = styled(TextField)(() => ({
     borderRadius: '12px',
     borderColor: 'var(--input-border)',
   },
+  '&:hover .MuiOutlinedInput-notchedOutline': {
+    borderColor: 'white',
+  },
   '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
     borderColor: 'white',
   },

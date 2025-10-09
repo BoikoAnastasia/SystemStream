@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 // components
 import { Logo } from '../components/logo/Logo';
@@ -36,7 +37,9 @@ export const Header = () => {
         <div className="header__block">
           {isMobile ? <></> : <SearchInput width={'160px'} />}
           <ButtonLogIn onClick={handleOpen} />
-          <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+          <Link to="/user">
+            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+          </Link>
         </div>
       </div>
       <ModalComponent title="Войти или зарегистироваться" open={open} setOpen={setOpen} />
