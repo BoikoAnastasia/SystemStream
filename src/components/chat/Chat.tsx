@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 // components
 import { ChatCard } from './components/ChatCard';
+// utils
+import { getRandomColor } from '../../utils/getRandomColor';
 //mui
 import { Box, Button } from '@mui/material';
 // styles
-import { StyledChatCardImg, StyledChatList, StyledChatTextField } from '../StylesComponents';
+import { StyledChatList, StyledChatTextField } from '../StylesComponents';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import SendIcon from '@mui/icons-material/Send';
 // types
@@ -70,6 +72,14 @@ export const Chat = ({
     },
   ]);
   const [message, setMessage] = useState('');
+  const colorMap = useRef<{ [key: string]: string }>({});
+
+  const getUserColor = (nickname: string) => {
+    if (!colorMap.current[nickname]) {
+      colorMap.current[nickname] = getRandomColor();
+    }
+    return colorMap.current[nickname];
+  };
 
   const addNewMessage = () => {
     const newM = {
@@ -114,10 +124,12 @@ export const Chat = ({
         <Box sx={{ fontSize: '20px' }}>Чат стрима</Box>
       </Box>
       <StyledChatList ref={listRef}>
-        {listMessages && listMessages.map((message, index) => <ChatCard msg={message} key={index} />)}
+        {listMessages &&
+          listMessages.map((message, index) => (
+            <ChatCard customColor={getUserColor(message.nickname)} msg={message} key={index} />
+          ))}
       </StyledChatList>
       <Box sx={{ position: 'relative', display: 'flex', gap: '12px', alignItems: 'center', marginTop: '20px' }}>
-        <StyledChatCardImg src="./img/users/user-01.jpg" alt="" />
         <StyledChatTextField
           placeholder="Введите сообщение"
           value={message}

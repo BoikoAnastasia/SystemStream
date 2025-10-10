@@ -248,7 +248,7 @@ export const StyledStreamBoxAbout = styled(Box)(() => ({
 export const StyledChatList = styled(Box)(() => ({
   display: 'flex',
   flexDirection: 'column',
-  gap: '32px',
+  gap: '5px',
   flex: 1,
   padding: '20px 16px',
   overflowY: 'auto',
@@ -273,43 +273,27 @@ export const StyledChatList = styled(Box)(() => ({
 }));
 
 export const StyledChatCard = styled(Box)(() => ({
-  display: 'grid',
-  gridTemplateAreas: `'img nickname' 'img message'`,
-  alignItems: 'flex-end',
-  justifyContent: 'flex-start',
-  gap: '4px 12px',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '5px',
 }));
 
-export const StyledChatCardImg = styled(Avatar)(() => ({
-  gridArea: 'img',
-  width: '40px',
-  height: '40px',
-  borderRadius: '50%',
-  objectFit: 'cover',
-  objectPosition: 'center',
-}));
-
-export const StyledChatCardNickname = styled(Box)(() => ({
-  gridArea: 'nickname',
-  fontSize: '13px',
+export const StyledChatCardNickname = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'customColor',
+})(({ customColor }: { customColor: string }) => ({
+  fontSize: '16px',
+  color: customColor || 'white',
 }));
 
 export const StyledChatCardMessage = styled(Box)(() => ({
-  gridArea: 'message',
-  fontSize: '16px',
-  padding: '12px 16px',
-  borderRadius: '12px',
-  background: 'var(--button-dark)',
+  fontSize: '14px',
   wordBreak: 'break-word',
 }));
 
 export const StyledChatCardMessageCurrentUser = styled(Box)(() => ({
   gridArea: 'message',
   fontSize: '16px',
-  padding: '12px 16px',
   color: 'var(--input-background)',
-  borderRadius: '12px',
-  background: 'var(--button-light)',
   wordBreak: 'break-word',
 }));
 
@@ -336,4 +320,41 @@ export const StyledChatTextField = styled(TextField)(() => ({
   '& .MuiOutlinedInput-notchedOutline': {
     borderRadius: '12px',
   },
+}));
+
+export const StyledHeaderStreamPage = styled(Box)(() => ({
+  display: 'flex',
+  alignItems: 'flex-start',
+  justifyContent: 'space-between',
+  padding: '20px 0',
+  '@media (max-width: 768px)': {
+    flexDirection: 'column',
+    gap: '20px',
+  },
+}));
+
+export const StyledButtonLive = styled(Button)(() => ({
+  fontSize: '10px',
+  fontWeight: 'bold',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: 'min-content',
+  whiteSpace: 'nowrap',
+  padding: '5px 10px',
+  color: 'white',
+  background: 'red',
+}));
+
+export const StyledButtonWathers = styled(Button)(() => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '5px',
+  fontSize: '10px',
+  height: 'min-content',
+  minWidth: 'min-content',
+  whiteSpace: 'nowrap',
+  padding: '5px',
+  color: 'white',
+  background: 'var(--modal-background)',
 }));
