@@ -1,4 +1,4 @@
-import { StyledButtonDark } from '../../../../components/StylesComponents';
+import { StyledButtonDark, StyledSpanDark, StyledTitleH3 } from '../../../../components/StylesComponents';
 import { CardVideo } from '../../../../components/cardVideo/CardVideo';
 // mui
 import { Box } from '@mui/material';
@@ -29,14 +29,14 @@ export const UserAbout = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '45px' }}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <h3>Обо мне</h3>
-        <h5>
+        <StyledTitleH3>Обо мне</StyledTitleH3>
+        <StyledSpanDark>
           Hi, I'm Ava Bennett, a full-time streamer from Los Angeles. I love playing RPGs and interacting with my
           community. Join my streams for fun, games, and good vibes!
-        </h5>
+        </StyledSpanDark>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <h3>Соц. сети</h3>
+        <StyledTitleH3>Соц. сети</StyledTitleH3>
         <Box sx={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '12px' }}>
           <StyledButtonDark h="58px" br="8px">
             <InstagramIcon />
@@ -53,7 +53,7 @@ export const UserAbout = () => {
         </Box>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <h3>Рекомендованные каналы</h3>
+        <StyledTitleH3>Рекомендованные каналы</StyledTitleH3>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '12px' }}>
           {featureList.map((item) => (
             <CardVideo item={item} styleProps={propsStyleImg} key={item.id} />

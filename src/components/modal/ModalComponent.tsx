@@ -1,9 +1,13 @@
 import { SetStateAction, Dispatch } from 'react';
-import { Box } from '@mui/material';
-import Modal from '@mui/material/Modal';
+// components
 import { FormLogin } from '../formLogin/FormLogin';
 import { FormAuth } from '../formAuth/FormAuth';
 import { TabsComponent } from '../ui/tabs/TabsComponent';
+// mui
+import { Box } from '@mui/material';
+import Modal from '@mui/material/Modal';
+// style
+import { StyledTitleModal } from '../StylesComponents';
 
 export const ModalComponent = ({
   title,
@@ -47,7 +51,7 @@ export const ModalComponent = ({
       }}
     >
       <Box sx={style}>
-        <h3 style={{ fontSize: '28px', padding: '20px 16px' }}>{title}</h3>
+        <StyledTitleModal>{title}</StyledTitleModal>
         <TabsComponent propsChild={[<FormLogin />, <FormAuth />]} propTabsTitle={['Войти', 'Регистрация']} />
       </Box>
     </Modal>

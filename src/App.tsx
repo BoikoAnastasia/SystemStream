@@ -1,9 +1,9 @@
 import { Suspense } from 'react';
-import './styles/App.sass';
 import { Routes, Route } from 'react-router-dom';
 import { routers } from './routers/routers';
 import { StyledloadingCircle } from './components/StylesComponents';
 import { NotFound } from './pages/NotFound/NotFound';
+import './index.css';
 
 function App() {
   return (

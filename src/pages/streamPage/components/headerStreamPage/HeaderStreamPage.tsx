@@ -4,6 +4,8 @@ import {
   StyledButtonDark,
   StyledButtonLive,
   StyledButtonWathers,
+  StyledTitle,
+  StyledSpanDark,
 } from '../../../../components/StylesComponents';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { ButtonLike } from '../../../../components/ui/button/ButtonLike';
@@ -22,13 +24,15 @@ export const HeaderStreamPage = () => {
       >
         <Avatar sx={{ gridArea: 'avatar' }} src="./img/users/user-01.jpg"></Avatar>
         <Box sx={{ gridArea: 'streamInfo', display: 'flex', alignItems: 'center' }}>
-          <h2 style={{ marginRight: '10px' }}>Ava Bennett</h2>
+          <StyledTitle style={{ marginRight: '10px' }}>Ava Bennett</StyledTitle>
           <StyledButtonLive>В эфире</StyledButtonLive>
           <StyledButtonWathers>
             <VisibilityIcon sx={{ width: '10px', height: '10px' }} /> 10.4т
           </StyledButtonWathers>
         </Box>
-        <h5 style={{ gridArea: 'nameStream' }}>Сейчас в эфире: Новые айфоны - Смотрим презентацию</h5>
+        <StyledSpanDark style={{ gridArea: 'nameStream' }}>
+          Сейчас в эфире: Новые айфоны - Смотрим презентацию
+        </StyledSpanDark>
       </Box>
       <Box sx={{ display: 'flex', gap: '10px' }}>
         <ButtonLike />

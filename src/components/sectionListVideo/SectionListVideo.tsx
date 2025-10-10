@@ -6,7 +6,13 @@ import { useDeviceDetect } from '../../hooks/useDeviceDetect';
 // mui
 import { Box, CardMedia } from '@mui/material';
 // styles
-import { StyledBoxListVideo, StyledCardVideo, StyledListVideo } from '../StylesComponents';
+import {
+  StyledBoxListVideo,
+  StyledCardVideo,
+  StyledListVideo,
+  StyledNameComponents,
+  StyledTitle,
+} from '../StylesComponents';
 // types
 import { IUserItem, IVideoItem } from '../../types/share';
 
@@ -39,7 +45,7 @@ export const SectionListVideo = (props: Props) => {
 
   return (
     <StyledBoxListVideo>
-      <h2>{title}</h2>
+      <StyledTitle>{title}</StyledTitle>
       {isVideo ? (
         <StyledListVideo>
           {(list as IVideoItem[]).map((item) => (
@@ -56,7 +62,7 @@ export const SectionListVideo = (props: Props) => {
                   }}
                 />
                 <Box>
-                  <h4>{item.name}</h4>
+                  <StyledNameComponents>{item.name}</StyledNameComponents>
                   <span style={{ fontSize: '14px', color: 'var(--background-line)' }}>{item.users}</span>
                 </Box>
               </Link>

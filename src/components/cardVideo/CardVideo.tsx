@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 // mui
 import { Box } from '@mui/material';
 // styles
-import { StyledCardVideo } from '../StylesComponents';
+import { StyledCardVideo, StyledNameComponents } from '../StylesComponents';
 // types
 import { IUserItem } from '../../types/share';
 
@@ -21,7 +21,7 @@ export const CardVideo = ({ item, styleProps }: { item: IUserItem; styleProps?: 
         >
           <img src={item.img} alt="" style={styleProps} />
           <Box>
-            <h4>{item.name}</h4>
+            <StyledNameComponents>{item.name}</StyledNameComponents>
             <span style={{ fontSize: '14px', color: 'var(--background-line)' }}>{item.users}</span>
           </Box>
         </Box>

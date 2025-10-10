@@ -1,5 +1,11 @@
 import { Avatar, Box } from '@mui/material';
-import { StyledButtonDark, StyledButtonLight, StyledUserHeaderBox } from '../../../../components/StylesComponents';
+import {
+  StyledButtonDark,
+  StyledButtonLight,
+  StyledSpanDark,
+  StyledTitle,
+  StyledUserHeaderBox,
+} from '../../../../components/StylesComponents';
 import { useDeviceDetect } from '../../../../hooks/useDeviceDetect';
 
 export const UserHeader = () => {
@@ -13,8 +19,8 @@ export const UserHeader = () => {
           style={{ width: '128px', height: '128px', objectPosition: 'center' }}
         />
         <Box>
-          <h2>Ava Bennett</h2>
-          <h5 style={{ color: 'var(--background-line)' }}>Streamer | 1.2M followers</h5>
+          <StyledTitle>Ava Bennett</StyledTitle>
+          <StyledSpanDark>Streamer | 1.2M followers</StyledSpanDark>
         </Box>
       </Box>
       <Box sx={{ display: 'flex', gap: '12px', width: isMobile ? '100%' : 'auto', justifyContent: 'center' }}>

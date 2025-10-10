@@ -16,15 +16,18 @@ import Avatar from '@mui/material/Avatar';
 import { IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
+// style
+import { StyleHeader, StyleHeaderBlock, StyleHeaderContainer } from './StyledLayout';
+
 export const Header = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const { isMobile } = useDeviceDetect();
 
   return (
-    <header className="header">
-      <div className="header__container container">
-        <div className="header__block">
+    <StyleHeader>
+      <StyleHeaderContainer className="container">
+        <StyleHeaderBlock>
           <Logo />
           {isMobile ? (
             <IconButton>
@@ -33,16 +36,16 @@ export const Header = () => {
           ) : (
             <HeaderMenu />
           )}
-        </div>
-        <div className="header__block">
+        </StyleHeaderBlock>
+        <StyleHeaderBlock>
           {isMobile ? <></> : <SearchInput width={'160px'} />}
           <ButtonLogIn onClick={handleOpen} />
           <Link to="/user">
             <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
           </Link>
-        </div>
-      </div>
+        </StyleHeaderBlock>
+      </StyleHeaderContainer>
       <ModalComponent title="Войти или зарегистироваться" open={open} setOpen={setOpen} />
-    </header>
+    </StyleHeader>
   );
 };

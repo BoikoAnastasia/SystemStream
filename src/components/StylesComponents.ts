@@ -1,16 +1,5 @@
 import { styled } from '@mui/material/styles';
-import {
-  Avatar,
-  Box,
-  Button,
-  Card,
-  IconButton,
-  InputLabel,
-  OutlinedInput,
-  Tabs,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Card, IconButton, InputLabel, OutlinedInput, Tabs, TextField, Typography } from '@mui/material';
 import { keyframes } from '@emotion/react';
 import { IStyledButtonDark, IStyledIButtonForm, IStyledListVideo } from '../types/share';
 
@@ -27,9 +16,39 @@ export const StyledloadingCircle = styled(Typography)(() => ({
   height: '60px',
   display: 'block',
   borderRadius: '50%',
-  border: '3px dashed blue',
+  border: '3px dashed white',
   margin: '0 auto',
   animation: `${Rotate} 2.0s infinite linear`,
+}));
+
+export const StyledTitle = styled('h2')(() => ({
+  fontSize: '28px',
+  fontWeight: 'bold',
+  color: 'var(--white)',
+}));
+
+export const StyledTitleH3 = styled('h3')(() => ({
+  fontSize: '22px',
+  fontWeight: 'bold',
+  marginBottom: '20px',
+}));
+
+export const StyledTitleModal = styled('h3')(() => ({
+  fontSize: '28px',
+  fontWeight: 'bold',
+  padding: '20px 16px',
+}));
+
+export const StyledNameComponents = styled('h4')(() => ({
+  fontSize: '18px',
+  fontWeight: 500,
+}));
+
+export const StyledSpanDark = styled('span')(() => ({
+  fontSize: '16px',
+  fontWeight: 500,
+  lineHeight: 1.2,
+  color: 'var(--background-line)',
 }));
 
 export const StyledButtonsForm = styled(Box)(() => ({
