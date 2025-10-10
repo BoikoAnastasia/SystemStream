@@ -61,3 +61,9 @@ export interface IMessage {
   currentUser: boolean;
   avatar: null | string;
 }
+
+export interface IModalForm {
+  password: string;
+  username: string;
+  email?: string;
+}

@@ -72,7 +72,7 @@ export const SectionListVideo = (props: Props) => {
       ) : (
         <StyledListVideo columns={'5'} columnsMb={'3'}>
           {(list as IUserItem[]).map((item) => (
-            <CardVideo item={item} styleProps={propsStyleImg} />
+            <CardVideo item={item} styleProps={propsStyleImg} key={item.id} />
           ))}
         </StyledListVideo>
       )}

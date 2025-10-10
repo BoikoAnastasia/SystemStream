@@ -1,6 +1,5 @@
 import { FC, JSX } from 'react';
 import { appLayout } from '../../layout/index';
-import { SearchInput } from '../../components/ui/searchInput/SearchInput';
 import { TabsComponent } from '../../components/ui/tabs/TabsComponent';
 import { SectionListVideo } from '../../components/sectionListVideo/SectionListVideo';
 
@@ -44,7 +43,6 @@ export const MainPage: FC = appLayout((): JSX.Element => {
 
   return (
     <div className="page container__main">
-      <SearchInput width={'100%'} height={'48px'} />
       <TabsComponent
         propsChild={TabsComponents}
         propTabsTitle={['Все', 'Live каналы', 'Видео', 'Клипы', 'Пользователи']}
