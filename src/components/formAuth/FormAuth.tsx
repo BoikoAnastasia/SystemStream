@@ -16,15 +16,10 @@ import {
   StyledOutlinedInputModal,
   StyledTextFieldModal,
 } from '../StylesComponents';
+import { IModalForm } from '../../types/share';
 
 //TODO stepper?
 //TODO datepicker
-
-interface RegFormValues {
-  password: string;
-  username: string;
-  email: string;
-}
 
 export const FormAuth = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -37,8 +32,8 @@ export const FormAuth = () => {
     event.preventDefault();
   };
 
-  const regUser = async (values: RegFormValues) => {
-    const data = await PostReg({ username: values.username, password: values.password, email: values.email });
+  const regUser = async (values: IModalForm) => {
+    const data = await PostReg({ username: values.username, password: values.password, email: values.email! });
     if (data !== null) {
       console.log('успешно');
     }
