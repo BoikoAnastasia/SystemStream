@@ -18,7 +18,7 @@ export const usernameOrEmailSchema = Yup.string()
     return emailRegex.test(value) || usernameRegex.test(value);
   });
 
-export const username = Yup.string().required('Введите логин').min(6, 'минимум 6 символа');
+export const username = Yup.string().required('Введите логин').min(6, 'минимум 6 символов');
 
 export const email = Yup.string()
   .required('Введите email')

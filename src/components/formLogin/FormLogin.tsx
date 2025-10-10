@@ -42,7 +42,13 @@ export const FormLogin = () => {
   };
 
   return (
-    <Formik initialValues={{ username: '', password: '' }} validationSchema={validationLogin} onSubmit={authUser}>
+    <Formik
+      initialValues={{ username: '', password: '' }}
+      enableReinitialize={false}
+      validationSchema={validationLogin}
+      onSubmit={authUser}
+      autoComplete="on"
+    >
       {({ values, handleChange, handleBlur, touched, errors }) => (
         <Form
           style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '20px', width: '100%' }}

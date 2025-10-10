@@ -44,6 +44,8 @@ export const FormAuth = () => {
       initialValues={{ username: '', password: '', email: '' }}
       validationSchema={validationRegist}
       onSubmit={regUser}
+      enableReinitialize={false}
+      autoComplete="on"
     >
       {({ values, handleChange, handleBlur, touched, errors }) => (
         <Form
@@ -57,6 +59,10 @@ export const FormAuth = () => {
             label="Имя пользователя"
             error={touched.username && Boolean(errors.username)}
             helperText={touched.username && errors.username}
+            autoComplete="username"
+            inputProps={{
+              autoComplete: 'username',
+            }}
           />
           <StyledTextFieldModal
             onChange={handleChange}
@@ -66,6 +72,10 @@ export const FormAuth = () => {
             label="Электронная почта"
             error={touched.email && Boolean(errors.email)}
             helperText={touched.email && errors.email}
+            autoComplete="email"
+            inputProps={{
+              autoComplete: 'email',
+            }}
           />
           <FormControl variant="outlined" sx={{ width: '100%' }}>
             <StyledInputLabel htmlFor="outlined-adornment-password">Пароль</StyledInputLabel>

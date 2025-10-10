@@ -45,7 +45,7 @@ export const Header = () => {
           </Link>
         </StyleHeaderBlock>
       </StyleHeaderContainer>
-      <ModalComponent title="Войти или зарегистироваться" open={open} setOpen={setOpen} />
+      <ModalComponent title="Войти или зарегистрироваться" open={open} setOpen={setOpen} />
     </StyleHeader>
   );
 };

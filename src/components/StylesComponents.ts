@@ -107,11 +107,48 @@ export const StyledTabs = styled(Tabs)(() => ({
   },
 }));
 
+export const StyleModalContent = styled(Box)(() => ({
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  maxWidth: '100%',
+  minWidth: '360px',
+  backgroundColor: 'var(--background)',
+  border: 'none',
+  padding: '20px 16px',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '20px',
+  fontSize: '28px',
+  borderRadius: '12px',
+}));
+
 export const StyledTextFieldModal = styled(TextField)(() => ({
   width: '100%',
   // Input text color
   '& .MuiOutlinedInput-input': {
     color: 'white',
+    // Стили для автозаполнения
+    '&:-webkit-autofill': {
+      WebkitBoxShadow: '0 0 0 100px var(--background) inset',
+      WebkitTextFillColor: 'white',
+      caretColor: 'white',
+      borderRadius: '12px', // Добавляем скругление
+    },
+    '&:-webkit-autofill:hover': {
+      WebkitBoxShadow: '0 0 0 100px var(--background) inset',
+      WebkitTextFillColor: 'white',
+    },
+    '&:-webkit-autofill:focus': {
+      WebkitBoxShadow: '0 0 0 100px var(--background) inset',
+      WebkitTextFillColor: 'white',
+    },
+    '&:-webkit-autofill:active': {
+      WebkitBoxShadow: '0 0 0 100px var(--background) inset',
+      WebkitTextFillColor: 'white',
+    },
   },
   // Label color
   '& .MuiInputLabel-root': {
@@ -131,6 +168,12 @@ export const StyledTextFieldModal = styled(TextField)(() => ({
   '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
     borderColor: 'white',
   },
+  // Убираем стандартные стили автозаполнения
+  '& .MuiOutlinedInput-root': {
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'white',
+    },
+  },
 }));
 
 export const StyledOutlinedInputModal = styled(OutlinedInput)(() => ({
@@ -138,7 +181,7 @@ export const StyledOutlinedInputModal = styled(OutlinedInput)(() => ({
   '& .MuiInputLabel-root': {
     color: 'var(--input-border)',
     '&.Mui-focused': {
-      color: 'orange', // Focused label color
+      color: 'white',
     },
   },
   '& .MuiOutlinedInput-notchedOutline': {
@@ -148,12 +191,44 @@ export const StyledOutlinedInputModal = styled(OutlinedInput)(() => ({
   // Change input text color
   '& .MuiInputBase-input': {
     color: 'white',
+    // Стили для автозаполнения
+    '&:-webkit-autofill': {
+      WebkitBoxShadow: '0 0 0 100px var(--background) inset',
+      WebkitTextFillColor: 'white',
+      caretColor: 'white',
+      borderRadius: '12px',
+      border: 'none', // Убираем бордер
+      outline: 'none', // Убираем outline
+    },
+    '&:-webkit-autofill:hover': {
+      WebkitBoxShadow: '0 0 0 100px var(--background) inset',
+      WebkitTextFillColor: 'white',
+      border: 'none',
+      outline: 'none',
+    },
+    '&:-webkit-autofill:focus': {
+      WebkitBoxShadow: '0 0 0 100px var(--background) inset',
+      WebkitTextFillColor: 'white',
+      border: 'none',
+      outline: 'none',
+    },
+    '&:-webkit-autofill:active': {
+      WebkitBoxShadow: '0 0 0 100px var(--background) inset',
+      WebkitTextFillColor: 'white',
+      border: 'none',
+      outline: 'none',
+    },
   },
   '&:hover .MuiOutlinedInput-notchedOutline': {
     borderColor: 'white',
   },
   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
     borderColor: 'white',
+  },
+  // Убираем внутренние бордеры
+  '& .MuiOutlinedInput-input': {
+    border: 'none',
+    outline: 'none',
   },
 }));
 
