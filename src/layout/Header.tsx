@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 
 // components
 import { Logo } from '../components/logo/Logo';
@@ -12,12 +11,12 @@ import { ButtonLogIn } from '../components/ui/button/ButtonLogIn';
 import { useDeviceDetect } from '../hooks/useDeviceDetect';
 
 // mui
-import Avatar from '@mui/material/Avatar';
 import { IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
 // style
 import { StyleHeader, StyleHeaderBlock, StyleHeaderContainer } from './StyledLayout';
+import { HeaderMenuAvatar } from '../components/ui/headerMenuAvatar/HeaderMenuAvatar';
 
 export const Header = () => {
   const [open, setOpen] = useState(false);
@@ -40,9 +39,7 @@ export const Header = () => {
         <StyleHeaderBlock>
           {isMobile ? <></> : <SearchInput width={'160px'} />}
           <ButtonLogIn onClick={handleOpen} />
-          <Link to="/user">
-            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-          </Link>
+          <HeaderMenuAvatar />
         </StyleHeaderBlock>
       </StyleHeaderContainer>
       <ModalComponent title="Войти или зарегистрироваться" open={open} setOpen={setOpen} />
