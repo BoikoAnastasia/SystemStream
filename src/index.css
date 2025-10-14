@@ -36,11 +36,17 @@
 
 html,
 body {
-  min-height: 100vh;
-  min-height: 100svh;
-  min-height: 100dvh;
+  height: 100vh;
+  color: var(--white);
+}
+
+#root {
+  height: 100%;
   overscroll-behavior-y: none;
-  background-color: var(--background);
+  background: linear-gradient(315deg, rgb(12, 12, 24) 17%, rgb(25, 21, 56) 60%, rgb(16, 14, 35));
+  background: -webkit-linear-gradient(315deg, rgb(12, 12, 24) 17%, rgb(25, 21, 56) 60%, rgb(16, 14, 35));
+  background: -moz-linear-gradient(315deg, rgb(12, 12, 24) 17%, rgb(25, 21, 56) 60%, rgb(16, 14, 35));
+  background-size: auto;
   color: var(--white);
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
@@ -65,14 +71,4 @@ img {
   max-width: 1440px;
   margin: 0 auto;
   padding: 0 15px;
-}
-
-.container__main {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  width: 100%;
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 32px 15px;
 }

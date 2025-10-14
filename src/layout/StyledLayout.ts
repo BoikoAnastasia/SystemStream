@@ -2,38 +2,41 @@ import { Box, Menu } from '@mui/material';
 import { styled } from '@mui/system';
 
 export const StyleHeader = styled(Box)(() => ({
-  position: 'sticky',
-  backgroundColor: 'var(--background)',
-  borderBottom: '1px solid #E5E8EB',
+  // position: 'sticky',
+  // top: '0',
   minHeight: '65px',
+  width: '100%',
+  zIndex: '1000',
+  backgroundColor: 'transparent',
 }));
 
 export const StyleHeaderContainer = styled(Box)(() => ({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: '10px 20px',
+  padding: '10px 15px',
 }));
 
 export const StyleHeaderBlock = styled(Box)(() => ({
   display: 'flex',
   alignItems: 'center',
-  gap: '32px',
+  gap: '15px',
+  justifyContent: 'flex-end',
+  width: '100%',
 }));
 
 export const StyledMenu = styled(Menu)(() => ({
   '& .MuiMenu-paper': {
-    backgroundColor: '#232323', // фон самого меню
+    backgroundColor: '#232323',
   },
   '& .MuiList-root': {
-    backgroundColor: '#232323', // фон списка
-    color: '##fff', // серый текст по умолчанию
+    backgroundColor: '#232323',
+    color: '##fff',
   },
   '& .MuiMenuItem-root': {
-    color: '#fff', // серый текст
+    color: '#fff',
     '&:hover': {
-      backgroundColor: 'rgba(37, 37, 37, 1)323', // фон при наведении
-      color: '#dadadaff', // текст при наведении
+      backgroundColor: 'rgba(37, 37, 37, 1)323',
+      color: '#dadadaff',
     },
   },
 }));

@@ -67,3 +67,8 @@ export interface IModalForm {
   username: string;
   email?: string;
 }
+
+export type SidebarContextType = {
+  open: boolean;
+  setOpen: (s: boolean) => void;
+};

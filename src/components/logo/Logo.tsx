@@ -5,7 +5,7 @@ export const Logo = () => {
   return (
     <Link to="/" style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
       <LogoImg />
-      <span style={{ fontSize: '18px', fontWeight: 'bold' }}>Streamr</span>
+      <span style={{ fontSize: '20px', fontWeight: 'bold' }}>Streamr</span>
     </Link>
   );
 };

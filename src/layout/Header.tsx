@@ -1,48 +1,30 @@
-import { useState } from 'react';
-
 // components
-import { Logo } from '../components/logo/Logo';
 import { SearchInput } from '../components/ui/searchInput/SearchInput';
-import { ModalComponent } from '../components/modal/ModalComponent';
-import { HeaderMenu } from '../components/headerMenu/HeaderMenu';
-import { ButtonLogIn } from '../components/ui/button/ButtonLogIn';
-
 // hooks
 import { useDeviceDetect } from '../hooks/useDeviceDetect';
-
-// mui
-import { IconButton } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-
 // style
 import { StyleHeader, StyleHeaderBlock, StyleHeaderContainer } from './StyledLayout';
 import { HeaderMenuAvatar } from '../components/ui/headerMenuAvatar/HeaderMenuAvatar';
+import { useDrawer } from '../context/DrawerContext';
+// mui
+import { Button } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
 
 export const Header = () => {
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
   const { isMobile } = useDeviceDetect();
+  const { open, setOpen } = useDrawer();
 
   return (
     <StyleHeader>
       <StyleHeaderContainer className="container">
+        <Button onClick={() => setOpen(!open)} sx={{ display: isMobile ? 'flex' : 'none' }}>
+          <MenuIcon sx={{ color: 'white' }}></MenuIcon>
+        </Button>
         <StyleHeaderBlock>
-          <Logo />
-          {isMobile ? (
-            <IconButton>
-              <MenuIcon sx={{ color: 'white' }} fontSize="large" />
-            </IconButton>
-          ) : (
-            <HeaderMenu />
-          )}
-        </StyleHeaderBlock>
-        <StyleHeaderBlock>
-          {isMobile ? <></> : <SearchInput width={'160px'} />}
-          <ButtonLogIn onClick={handleOpen} />
+          <SearchInput width={'200px'} />
           <HeaderMenuAvatar />
         </StyleHeaderBlock>
       </StyleHeaderContainer>
-      <ModalComponent title="Войти или зарегистрироваться" open={open} setOpen={setOpen} />
     </StyleHeader>
   );
 };

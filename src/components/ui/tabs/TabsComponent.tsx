@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 // mui
-import { Box, Tab } from '@mui/material';
+import { Box } from '@mui/material';
 // styles
-import { StyledTabs } from '../../StylesComponents';
+import { StyledTab, StyledTabs } from '../../StylesComponents';
 // types
 import { ITabPanelProps, ITabsComponentProps } from '../../../types/share';
 
@@ -16,7 +16,7 @@ export const TabsComponent = ({ propsChild, propTabsTitle }: ITabsComponentProps
   const CustomTabPanel = (props: ITabPanelProps) => {
     const { children, value, index, ...other } = props;
     return (
-      <div
+      <Box
         style={{ width: '100%' }}
         role="tabpanel"
         hidden={value !== index}
@@ -25,7 +25,7 @@ export const TabsComponent = ({ propsChild, propTabsTitle }: ITabsComponentProps
         {...other}
       >
         {value === index && <Box>{children}</Box>}
-      </div>
+      </Box>
     );
   };
 
@@ -50,7 +50,7 @@ export const TabsComponent = ({ propsChild, propTabsTitle }: ITabsComponentProps
         aria-label="basic tabs example"
       >
         {propTabsTitle.map((title, index) => (
-          <Tab label={title} {...a11yProps(index)} key={index} />
+          <StyledTab label={title} {...a11yProps(index)} key={index} />
         ))}
       </StyledTabs>
       {propsChild.map((item, index) => (

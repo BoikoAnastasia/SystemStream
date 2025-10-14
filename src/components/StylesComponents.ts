@@ -1,7 +1,22 @@
 import { styled } from '@mui/material/styles';
-import { Box, Button, Card, IconButton, InputLabel, OutlinedInput, Tabs, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  Drawer,
+  IconButton,
+  InputLabel,
+  List,
+  ListItem,
+  OutlinedInput,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { keyframes } from '@emotion/react';
 import { IStyledButtonDark, IStyledIButtonForm, IStyledListVideo } from '../types/share';
+import { Link } from 'react-router-dom';
 
 const Rotate = keyframes`
   from {
@@ -84,29 +99,67 @@ export const StyledButtonSearch = styled(TextField, {
   height: h || '40px',
   maxWidth: '100%',
   backgroundColor: 'var(--button-dark)',
-  borderRadius: '12px',
+  borderRadius: '20px',
   '& .MuiInputBase-root': {
-    minWidth: '160px',
+    minWidth: '200px',
     height: '100%',
-    borderRadius: '12px',
+    borderRadius: '20px',
     color: 'white',
     padding: '8px 0 8px 35px',
   },
 }));
 
-// Modal form
+// Tabs
 export const StyledTabs = styled(Tabs)(() => ({
-  width: '100%',
-  borderBottom: '1px solid',
-  '& .MuiButtonBase-root.Mui-selected': {
-    color: 'white',
+  display: 'inline-flex',
+  justifyContent: 'center',
+  margin: '0 auto',
+  padding: '4px',
+  borderBottom: 'none',
+  borderRadius: '12px',
+  background: 'rgba(255, 255, 255, 0.06)',
+  '&.MuiTabs-root': {
+    width: 'auto',
   },
-  '& .MuiButtonBase-root': {
-    color: 'var(--sidebar)',
-    textTransform: 'none',
+  '& .MuiTabs-indicator': {
+    display: 'none',
+  },
+
+  '& .MuiTabs-flexContainer': {
+    gap: '4px',
+  },
+  '@media (max-width: 768px)': {
+    width: '100% !important',
+    overflowX: 'auto',
+    '& .MuiTabs-scroller': {
+      overflowX: 'auto !important',
+      '&::-webkit-scrollbar': { display: 'none' },
+    },
   },
 }));
 
+export const StyledTab = styled(Tab)(() => ({
+  textTransform: 'none',
+  fontSize: '0.95rem',
+  fontWeight: 500,
+  color: '#A1A1B5',
+  minHeight: 36,
+  minWidth: 90,
+  borderRadius: '10px',
+  transition: 'all 0.25s ease',
+  background: 'transparent',
+  '&:hover': {
+    background: 'rgba(255, 255, 255, 0.1)',
+    color: '#ffffff',
+  },
+
+  '&.Mui-selected': {
+    color: '#fff',
+    background: 'linear-gradient(135deg, #6D5DFB 0%, #8E7BFF 100%)',
+    boxShadow: '0 4px 12px rgba(109, 93, 251, 0.35)',
+  },
+}));
+// modal
 export const StyleModalContent = styled(Box)(() => ({
   position: 'absolute',
   top: '50%',
@@ -451,4 +504,75 @@ export const StyledButtonWathers = styled(Button)(() => ({
   padding: '5px',
   color: 'white',
   background: 'var(--modal-background)',
+}));
+
+// StyledSidebar
+export const StyledSidebar = styled(Box)(() => ({
+  position: 'sticky',
+  top: '0',
+  left: '0',
+  display: 'flex',
+  height: '100%',
+  background: 'linear-gradient(180deg, rgb(5, 5, 17), rgb(3, 5, 17))',
+  zIndex: '1000',
+  overflow: 'hidden',
+  transition: 'all .3s ease',
+}));
+
+export const StyledSidebarName = styled('div')({
+  fontSize: '14px',
+  fontWeight: 600,
+  textTransform: 'uppercase',
+  color: '#6E6E84',
+  letterSpacing: '0.5px',
+  marginTop: '16px',
+  marginBottom: '8px',
+});
+
+export const StyledSidebarList = styled(List)({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '6px',
+});
+
+export const StyledSidebarListItem = styled(ListItem)({
+  padding: '8px 12px',
+  borderRadius: '12px',
+  transition: 'all 0.25s ease',
+  '&:hover': {
+    background: '#13152c',
+  },
+});
+
+export const StyledSidebarLink = styled(Link)({
+  textDecoration: 'none',
+  color: '#A1A1B5',
+  fontSize: '15px',
+  fontWeight: 500,
+  padding: '5px',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '10px',
+  width: '100%',
+  transition: 'color 0.25s ease',
+
+  '&:hover': {
+    color: '#ffffff',
+  },
+  '&.active': {
+    color: '#fff',
+    background: 'linear-gradient(90deg, rgba(109,93,251,0.15) 0%, rgba(142,123,255,0.05) 100%)',
+    borderRadius: '12px',
+  },
+});
+
+// Drawer
+export const StyledDrawer = styled(Drawer)(() => ({
+  '& .MuiDrawer-paper': {
+    width: '40%',
+    height: '100%',
+    minWidth: '250px',
+    padding: '25px 16px 0',
+    background: 'linear-gradient(180deg, rgb(5, 5, 17), rgb(3, 5, 17))',
+  },
 }));

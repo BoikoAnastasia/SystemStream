@@ -2,6 +2,7 @@ import { FC, JSX } from 'react';
 import { appLayout } from '../../layout/index';
 import { TabsComponent } from '../../components/ui/tabs/TabsComponent';
 import { SectionListVideo } from '../../components/sectionListVideo/SectionListVideo';
+import { Box } from '@mui/material';
 
 export const MainPage: FC = appLayout((): JSX.Element => {
   const testVideos = [
@@ -22,31 +23,30 @@ export const MainPage: FC = appLayout((): JSX.Element => {
     { id: '6', img: './img/users/user-03.jpg', href: '/user', name: 'Fitness Instructor', users: '200 followers' },
   ];
 
-  const arrAllCategory = () => {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '80px' }}>
-        <SectionListVideo title="Live каналы" list={testVideos} />
-        <SectionListVideo title="Видео" list={testVideos} />
-        <SectionListVideo title="Клипы" list={testVideos} />
-        <SectionListVideo title="Пользователи" list={testImages} isVideo={false} />
-      </div>
-    );
-  };
-
   const TabsComponents = [
-    arrAllCategory,
-    <SectionListVideo title="Live каналы" list={testVideos} />,
-    <SectionListVideo title="Видео" list={testVideos} />,
-    <SectionListVideo title="Клипы" list={testVideos} />,
-    <SectionListVideo title="Пользователи" list={testImages} isVideo={false} />,
+    <SectionListVideo list={testVideos} />,
+    <SectionListVideo list={testVideos} />,
+    <SectionListVideo list={testVideos} />,
+    <SectionListVideo list={testImages} isVideo={false} />,
   ];
 
   return (
-    <div className="page container__main">
-      <TabsComponent
-        propsChild={TabsComponents}
-        propTabsTitle={['Все', 'Live каналы', 'Видео', 'Клипы', 'Пользователи']}
-      />
-    </div>
+    <>
+      <Box sx={{ display: 'flex', width: '100%', height: '100%' }} className="page">
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '32px',
+            width: '100%',
+            maxWidth: '1440px',
+            margin: '0 auto',
+            padding: '10px 15px',
+          }}
+        >
+          <TabsComponent propsChild={TabsComponents} propTabsTitle={['Live', 'Видео', 'Клипы', 'Пользователи']} />
+        </Box>
+      </Box>
+    </>
   );
 });
