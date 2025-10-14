@@ -36,7 +36,7 @@ export const Sidebar = () => {
                 sx={{
                   color: 'var(--white)',
                   minWidth: 'auto',
-                  transform: open ? 'rotate(-180deg)' : 'rotate(0deg)',
+                  transform: open ? 'rotate(0deg)' : 'rotate(-180deg)',
                   transition: 'all .3s ease',
                 }}
               />
@@ -61,7 +61,7 @@ export const Sidebar = () => {
           <Button onClick={() => setOpen(!open)}>
             <FirstPageIcon
               fontSize="large"
-              sx={{ color: 'var(--white)', minWidth: 'auto', transform: open ? 'rotate(-180deg)' : 'rotate(0deg)' }}
+              sx={{ color: 'var(--white)', minWidth: 'auto', transform: open ? 'rotate(0deg)' : 'rotate(-180deg)' }}
             />
           </Button>
         </Box>
