@@ -1,14 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+// redux
+import { AppDispatch } from '../../../store/store';
+import { useDispatch } from 'react-redux';
+import { logoutUser } from '../../../store/reducers/ActionCreate';
 // components
-import { StyledMenu } from '../../../layout/StyledLayout';
+import { StyledMenu, StyledMenuButton } from '../../../layout/StyledLayout';
 import { ModalComponent } from '../../modal/ModalComponent';
+// utils
+import { checkCookie } from '../../../utils/cookieFunctions';
 // mui
 import { Avatar, Button, MenuItem } from '@mui/material';
 
 export const HeaderMenuAvatar = () => {
+  const dispatch = useDispatch<AppDispatch>();
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openModal, setOpenModal] = useState(false);
+  const [isLogged, setIsLogged] = useState(checkCookie('tokenData'));
 
   const open = Boolean(anchorEl);
 
@@ -16,11 +25,29 @@ export const HeaderMenuAvatar = () => {
     setAnchorEl(event.currentTarget);
   };
 
+  const handleOpenModal = () => {
+    setOpenModal(true);
+    handleClose();
+  };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  const handleOpenModal = () => setOpenModal(true);
+  const logout = async () => {
+    await dispatch(logoutUser());
+    setIsLogged(false);
+    handleClose();
+  };
+
+  useEffect(() => {
+    console.log(isLogged);
+    const interval = setInterval(() => {
+      const cookieExists = checkCookie('tokenData');
+      setIsLogged(cookieExists);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isLogged]);
 
   return (
     <div>
@@ -53,26 +80,15 @@ export const HeaderMenuAvatar = () => {
         <MenuItem>
           <Link to="#">Настройки</Link>
         </MenuItem>
-        <MenuItem>
-          <Button
-            sx={{
-              color: 'white',
-              textTransform: 'none',
-              fontSize: '1rem',
-              width: '100%',
-              padding: 0,
-              justifyContent: 'flex-start',
-              border: 'none',
-              background: 'transparent',
-            }}
-            onClick={handleOpenModal}
-          >
-            Войти
-          </Button>
-        </MenuItem>
-        <MenuItem>
-          <Link to="#">Выйти</Link>
-        </MenuItem>
+        {isLogged ? (
+          <MenuItem>
+            <StyledMenuButton onClick={logout}>Выйти</StyledMenuButton>
+          </MenuItem>
+        ) : (
+          <MenuItem>
+            <StyledMenuButton onClick={handleOpenModal}>Войти</StyledMenuButton>
+          </MenuItem>
+        )}
       </StyledMenu>
       <ModalComponent title="Войти или зарегистрироваться" open={openModal} setOpen={setOpenModal} />
     </div>

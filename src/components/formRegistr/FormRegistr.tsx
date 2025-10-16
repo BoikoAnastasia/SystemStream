@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-// api
-import { PostReg } from '../../API/PostReg';
+import { Dispatch, MouseEvent, SetStateAction, useState } from 'react';
+// reducer
+import { registrationUser } from '../../store/reducers/ActionCreate';
 // formik
 import { Formik, Form } from 'formik';
 import { validationRegist } from '../../validation/validation';
@@ -21,21 +21,34 @@ import { IModalForm } from '../../types/share';
 //TODO stepper?
 //TODO datepicker
 
-export const FormAuth = () => {
+export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<string | null>> }) => {
+  const [errorMessage, setErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMouseDownPassword = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
 
-  const handleMouseUpPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMouseUpPassword = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
 
   const regUser = async (values: IModalForm) => {
-    const data = await PostReg({ username: values.username, password: values.password, email: values.email! });
-    if (data !== null) {
-      console.log('успешно');
+    setErrorMessage('');
+    setMessage('');
+
+    const result = await registrationUser({
+      username: values.username,
+      password: values.password,
+      email: values.email!,
+    });
+
+    if (result.success) {
+      setMessage('Вы успешно прошли регистрацию! Теперь авторизуйтесь.');
+    } else {
+      setMessage(result.message);
+      setErrorMessage(result.message);
     }
   };
 
@@ -105,6 +118,7 @@ export const FormAuth = () => {
             {touched.password && errors.password && (
               <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>{errors.password}</div>
             )}
+            {errorMessage && <div style={{ color: 'red', fontSize: '14px', marginTop: '-10px' }}>{errorMessage}</div>}
           </FormControl>
           <StyledButtonsForm>
             <StyledIButtonForm type="submit">Зарегистрироваться</StyledIButtonForm>

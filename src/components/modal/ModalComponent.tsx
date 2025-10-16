@@ -1,7 +1,7 @@
-import { SetStateAction, Dispatch, memo } from 'react';
+import { SetStateAction, Dispatch, memo, useState, useEffect } from 'react';
 // components
 import { FormLogin } from '../formLogin/FormLogin';
-import { FormAuth } from '../formAuth/FormAuth';
+import { FormAuth } from '../formRegistr/FormRegistr';
 import { TabsComponent } from '../ui/tabs/TabsComponent';
 // mui
 import Modal from '@mui/material/Modal';
@@ -11,6 +11,13 @@ import { StyledTitleModal, StyleModalContent } from '../StylesComponents';
 export const ModalComponent = memo(
   ({ title, open, setOpen }: { title: string; open: boolean; setOpen: Dispatch<SetStateAction<boolean>> }) => {
     const handleClose = () => setOpen(false);
+    const [message, setMessage] = useState<null | string>(null);
+
+    useEffect(() => {
+      if (open) {
+        setMessage(null);
+      }
+    }, [open]);
 
     return (
       <Modal
@@ -26,7 +33,14 @@ export const ModalComponent = memo(
       >
         <StyleModalContent>
           <StyledTitleModal>{title}</StyledTitleModal>
-          <TabsComponent propsChild={[<FormLogin />, <FormAuth />]} propTabsTitle={['Войти', 'Регистрация']} />
+          {message !== null && message}
+          <TabsComponent
+            propsChild={[
+              <FormLogin handleClose={handleClose} setMessage={setMessage} />,
+              <FormAuth setMessage={setMessage} />,
+            ]}
+            propTabsTitle={['Войти', 'Регистрация']}
+          />
         </StyleModalContent>
       </Modal>
     );

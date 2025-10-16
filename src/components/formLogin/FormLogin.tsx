@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+// store
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../store/store';
+import { loginUser, userProfile } from '../../store/reducers/ActionCreate';
 // formik
 import { Formik, Form } from 'formik';
 import { validationLogin } from '../../validation/validation';
-// api
-import { PostAuth } from '../../API/PostAuth';
 // mui
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -17,11 +19,20 @@ import {
   StyledOutlinedInputModal,
   StyledTextFieldModal,
 } from '../StylesComponents';
+// types
 import { IModalForm } from '../../types/share';
 
-export const FormLogin = () => {
+export const FormLogin = ({
+  handleClose,
+  setMessage,
+}: {
+  handleClose: () => void;
+  setMessage: Dispatch<SetStateAction<string | null>>;
+}) => {
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
+  const [errorMessage, setErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -33,11 +44,17 @@ export const FormLogin = () => {
     event.preventDefault();
   };
 
-  const authUser = async (values: IModalForm) => {
-    const data = await PostAuth({ emailOrUsername: values.username, password: values.password });
-    if (data !== null) {
-      console.log('успешно');
+  const CheckUserAuth = async (values: IModalForm) => {
+    setErrorMessage('');
+    const isRight = await loginUser({ emailOrUsername: values.username, password: values.password });
+    if (isRight) {
+      setMessage('Вы успешно вошли!');
+      await dispatch(userProfile());
+      handleClose();
       navigate('/user');
+    } else {
+      setMessage(null);
+      setErrorMessage('Неверный логин или пароль.');
     }
   };
 
@@ -46,7 +63,7 @@ export const FormLogin = () => {
       initialValues={{ username: '', password: '' }}
       enableReinitialize={false}
       validationSchema={validationLogin}
-      onSubmit={authUser}
+      onSubmit={CheckUserAuth}
       autoComplete="on"
     >
       {({ values, handleChange, handleBlur, touched, errors }) => (
@@ -91,6 +108,7 @@ export const FormLogin = () => {
               <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>{errors.password}</div>
             )}
           </FormControl>
+          {errorMessage && <div style={{ color: 'red', fontSize: '14px', marginTop: '-10px' }}>{errorMessage}</div>}
           <StyledButtonsForm>
             <StyledIButtonForm variant="contained" type="submit">
               Войти
