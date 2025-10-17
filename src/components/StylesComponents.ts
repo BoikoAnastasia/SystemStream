@@ -553,6 +553,7 @@ export const StyledSidebar = styled(Box)(() => ({
   top: '0',
   left: '0',
   display: 'flex',
+  flexDirection: 'column',
   minHeight: '100%',
   background: 'linear-gradient(180deg, rgb(5, 5, 17), rgb(3, 5, 17))',
   zIndex: '1000',
@@ -577,6 +578,8 @@ export const StyledSidebarList = styled(List)({
   display: 'flex',
   flexDirection: 'column',
   gap: '6px',
+
+  overflowY: 'auto',
 });
 
 export const StyledSidebarListItem = styled(ListItem)({
@@ -618,12 +621,48 @@ export const StyledDrawer = styled(Drawer)(() => ({
     minWidth: '250px',
     padding: '25px 16px 0',
     background: 'linear-gradient(180deg, rgb(5, 5, 17), rgb(3, 5, 17))',
+    paddingBottom: '200px',
   },
   '@media (max-width: 768px)': {
     '& .MuiDrawer-paper': {
       width: '40%',
     },
   },
+  '& ::-webkit-scrollbar': {
+    width: '5px',
+    background: 'var(--button-dark-hover)',
+    borderRadius: '5px',
+  },
+  scrollbarWidth: 'thin',
+}));
+
+// CardDrawer
+export const CardDrawerBoxWatch = styled(Box)(() => ({
+  position: 'absolute',
+  bottom: 0,
+  fontSize: '8px',
+  width: '100%',
+  padding: '2px',
+  textAlign: 'center',
+  borderRadius: '5px',
+  color: 'white',
+  backgroundColor: 'red',
+}));
+
+interface ICardDrawerTypography {
+  c?: string;
+  fs?: string;
+  isEllipsis: boolean;
+}
+
+export const CardDrawerTypography = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== 'c' && prop !== 'fs' && prop !== 'isEllipsis',
+})<ICardDrawerTypography>(({ c, fs, isEllipsis }) => ({
+  fontSize: fs ? fs : '1rem',
+  color: c ? c : 'white',
+  whiteSpace: 'nowrap',
+  overflow: isEllipsis ? 'hidden' : 'visible',
+  textOverflow: isEllipsis ? 'ellipsis' : 'clip',
 }));
 
 // userProfile

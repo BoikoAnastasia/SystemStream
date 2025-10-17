@@ -72,3 +72,11 @@ export type SidebarContextType = {
   open: boolean;
   setOpen: (s: boolean) => void;
 };
+
+export type CardDrawerType = {
+  avatar: string;
+  views: string;
+  title: string;
+  author: string;
+  category: string;
+};
