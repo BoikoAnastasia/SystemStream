@@ -20,8 +20,8 @@ export const TabsComponent = ({ propsChild, propTabsTitle }: ITabsComponentProps
         style={{ width: '100%' }}
         role="tabpanel"
         hidden={value !== index}
-        id={`simple-tabpanel-${index}`}
-        aria-labelledby={`simple-tab-${index}`}
+        id={`tabpanel-${index}`}
+        aria-labelledby={`tab-${index}`}
         {...other}
       >
         {value === index && <Box>{children}</Box>}
@@ -37,18 +37,7 @@ export const TabsComponent = ({ propsChild, propTabsTitle }: ITabsComponentProps
   };
   return (
     <>
-      <StyledTabs
-        sx={{
-          width: '100%',
-          '& .MuiTabs-list': {
-            overflowX: 'auto',
-            whiteSpace: 'nowrap',
-          },
-        }}
-        value={value}
-        onChange={handleChange}
-        aria-label="basic tabs example"
-      >
+      <StyledTabs value={value} onChange={handleChange} aria-label="tabs">
         {propTabsTitle.map((title, index) => (
           <StyledTab label={title} {...a11yProps(index)} key={index} />
         ))}

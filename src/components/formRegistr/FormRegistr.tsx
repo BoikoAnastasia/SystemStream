@@ -10,7 +10,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import {
   StyledButtonsForm,
-  StyledIButtonForm,
+  StyledButtonForm,
   StyledIconButton,
   StyledInputLabel,
   StyledOutlinedInputModal,
@@ -121,7 +121,7 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
             {errorMessage && <div style={{ color: 'red', fontSize: '14px', marginTop: '-10px' }}>{errorMessage}</div>}
           </FormControl>
           <StyledButtonsForm>
-            <StyledIButtonForm type="submit">Зарегистрироваться</StyledIButtonForm>
+            <StyledButtonForm type="submit">Зарегистрироваться</StyledButtonForm>
           </StyledButtonsForm>
         </Form>
       )}

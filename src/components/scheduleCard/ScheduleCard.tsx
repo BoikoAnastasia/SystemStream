@@ -1,3 +1,4 @@
+import { useState } from 'react';
 // hooks
 import { useCheckedImage } from '../../hooks/checkImgFunctions';
 // mui
@@ -11,7 +12,6 @@ import {
   StyledScheduleCard,
   StyledScheduleCardText,
 } from '../StylesComponents';
-import { useState } from 'react';
 
 export const ScheduleCard = ({ live }: { live: boolean }) => {
   const [activeReminder, setActiveReminder] = useState(false);
@@ -29,7 +29,7 @@ export const ScheduleCard = ({ live }: { live: boolean }) => {
         <StyledScheduleCardText>Игры</StyledScheduleCardText>
         <StyledButtonReminder onClick={() => setActiveReminder(!activeReminder)}>
           <NotificationsIcon fontSize="small" sx={{ color: activeReminder ? 'rgb(229 229 95)' : 'white' }} />
-          Напомнить
+          {activeReminder ? <>Не напоминать</> : <>Напомнить</>}
         </StyledButtonReminder>
       </Box>
     </StyledScheduleCard>

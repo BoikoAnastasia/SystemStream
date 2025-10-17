@@ -19,7 +19,7 @@ import {
   Typography,
 } from '@mui/material';
 import { keyframes } from '@emotion/react';
-import { IStyledButtonDark, IStyledIButtonForm, IStyledListVideo } from '../types/share';
+import { IStyledButtonDark, IStyledButtonForm, IStyledListVideo } from '../types/share';
 
 const Rotate = keyframes`
   from {
@@ -145,11 +145,22 @@ export const StyledButtonSearch = styled(TextField, {
 export const StyledTabs = styled(Tabs)(() => ({
   display: 'inline-flex',
   justifyContent: 'center',
+  width: '100%',
   margin: '0 auto',
   padding: '4px',
   borderBottom: 'none',
   borderRadius: '12px',
   background: 'rgba(255, 255, 255, 0.06)',
+  scrollbarWidth: 'thin',
+  '& .MuiTabs-list': {
+    overflowX: 'auto',
+    whiteSpace: 'nowrap',
+  },
+  '& ::-webkit-scrollbar': {
+    height: '5px',
+    background: 'rgba(5, 5, 17, 0.43)',
+    borderRadius: '5px',
+  },
   '&.MuiTabs-root': {
     width: 'auto',
   },
@@ -158,7 +169,7 @@ export const StyledTabs = styled(Tabs)(() => ({
   },
 
   '& .MuiTabs-flexContainer': {
-    gap: '4px',
+    gap: '10px',
   },
   '@media (max-width: 768px)': {
     width: '100% !important',
@@ -331,9 +342,9 @@ export const StyledIconButton = styled(IconButton)(() => ({
   },
 }));
 
-export const StyledIButtonForm = styled(Button, {
+export const StyledButtonForm = styled(Button, {
   shouldForwardProp: (prop) => prop !== 'bgcolor' && prop !== 'hoverbgcolor' && prop !== 'c' && prop !== 'hovercolor',
-})<IStyledIButtonForm>(({ bgcolor, hovercolor, hoverbgcolor, c }) => ({
+})<IStyledButtonForm>(({ bgcolor, hovercolor, hoverbgcolor, c }) => ({
   fontWeight: '600',
   minHeight: '40px',
   color: c || 'var(--black)',
@@ -602,11 +613,16 @@ export const StyledSidebarLink = styled(Link)({
 // Drawer
 export const StyledDrawer = styled(Drawer)(() => ({
   '& .MuiDrawer-paper': {
-    width: '40%',
+    width: '250px',
     height: '100%',
     minWidth: '250px',
     padding: '25px 16px 0',
     background: 'linear-gradient(180deg, rgb(5, 5, 17), rgb(3, 5, 17))',
+  },
+  '@media (max-width: 768px)': {
+    '& .MuiDrawer-paper': {
+      width: '40%',
+    },
   },
 }));
 

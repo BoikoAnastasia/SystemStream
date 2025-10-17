@@ -13,7 +13,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { FormControl, InputAdornment } from '@mui/material';
 import {
   StyledButtonsForm,
-  StyledIButtonForm,
+  StyledButtonForm,
   StyledIconButton,
   StyledInputLabel,
   StyledOutlinedInputModal,
@@ -110,13 +110,13 @@ export const FormLogin = ({
           </FormControl>
           {errorMessage && <div style={{ color: 'red', fontSize: '14px', marginTop: '-10px' }}>{errorMessage}</div>}
           <StyledButtonsForm>
-            <StyledIButtonForm variant="contained" type="submit">
+            <StyledButtonForm variant="contained" type="submit">
               Войти
-            </StyledIButtonForm>
+            </StyledButtonForm>
             <div style={{ color: 'white', fontSize: '14px' }}>или</div>
-            <StyledIButtonForm bgcolor={'#B2B2B2'} c={'#3c474aff'}>
+            <StyledButtonForm bgcolor={'#B2B2B2'} c={'#3c474aff'}>
               Продолжить с помощью Google
-            </StyledIButtonForm>
+            </StyledButtonForm>
           </StyledButtonsForm>
         </Form>
       )}

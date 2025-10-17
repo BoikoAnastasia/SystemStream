@@ -6,7 +6,7 @@ export interface AllProductsState {
   //     isError: string | null,
 }
 
-export interface IStyledIButtonForm {
+export interface IStyledButtonForm {
   bgcolor?: string;
   hoverbgcolor?: string;
   hovercolor?: string;
