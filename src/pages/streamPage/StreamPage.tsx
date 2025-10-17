@@ -18,7 +18,6 @@ export const StreamPage: FC = appLayout((): JSX.Element => {
       <Box
         sx={{
           display: 'flex',
-          // height: '100%',
           position: 'relative',
           overflow: 'hidden',
           '&::before': {
@@ -36,9 +35,9 @@ export const StreamPage: FC = appLayout((): JSX.Element => {
             position: 'relative',
             display: 'flex',
             flexDirection: 'column',
-            flex: isOpen && !isMobile ? '0 1 70%' : '0 1 95%',
+            flex: isOpen && !isMobile ? '0 1 70%' : '0 1 100%',
             height: '100%',
-            padding: '0 20px',
+            padding: '0 10px',
             zIndex: 1,
             backgroundColor: 'rgba(255,255,255,0.05)',
             backdropFilter: 'blur(16px)',

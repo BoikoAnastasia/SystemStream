@@ -1,14 +1,18 @@
+import { Link } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import {
+  Avatar,
   Box,
   Button,
   Card,
   Drawer,
+  FormControl,
   IconButton,
   InputLabel,
   List,
   ListItem,
   OutlinedInput,
+  Select,
   Tab,
   Tabs,
   TextField,
@@ -16,7 +20,6 @@ import {
 } from '@mui/material';
 import { keyframes } from '@emotion/react';
 import { IStyledButtonDark, IStyledIButtonForm, IStyledListVideo } from '../types/share';
-import { Link } from 'react-router-dom';
 
 const Rotate = keyframes`
   from {
@@ -34,6 +37,34 @@ export const StyledloadingCircle = styled(Typography)(() => ({
   border: '3px dashed white',
   margin: '0 auto',
   animation: `${Rotate} 2.0s infinite linear`,
+}));
+
+export const ContainerBox = styled(Box)(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '32px',
+  width: '100%',
+  maxWidth: '1440px',
+  margin: '0 auto',
+  padding: '10px 15px',
+}));
+
+export const StyledBannerUserName = styled('h1')(() => ({
+  fontSize: '60px',
+  fontWeight: 'bold',
+  color: 'var(--white)',
+  '@media (max-width: 1024px)': {
+    fontSize: '40px',
+  },
+}));
+
+export const StyledBannerUserInfo = styled('h1')(() => ({
+  fontSize: '34px',
+  fontWeight: 400,
+  color: '#bbb',
+  '@media (max-width: 1024px)': {
+    fontSize: '24px',
+  },
 }));
 
 export const StyledTitle = styled('h2')(() => ({
@@ -57,6 +88,7 @@ export const StyledTitleModal = styled('h3')(() => ({
 export const StyledNameComponents = styled('h4')(() => ({
   fontSize: '18px',
   fontWeight: 500,
+  color: 'white',
 }));
 
 export const StyledSpanDark = styled('span')(() => ({
@@ -480,15 +512,13 @@ export const StyledHeaderStreamPage = styled(Box)(() => ({
   },
 }));
 
-export const StyledButtonLive = styled(Button)(() => ({
-  fontSize: '10px',
-  fontWeight: 'bold',
+export const StyledButtonLive = styled(Box)(() => ({
   display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+  fontSize: '14px',
   height: 'min-content',
   whiteSpace: 'nowrap',
   padding: '5px 10px',
+  borderRadius: '5px',
   color: 'white',
   background: 'red',
 }));
@@ -512,11 +542,14 @@ export const StyledSidebar = styled(Box)(() => ({
   top: '0',
   left: '0',
   display: 'flex',
-  height: '100%',
+  minHeight: '100%',
   background: 'linear-gradient(180deg, rgb(5, 5, 17), rgb(3, 5, 17))',
   zIndex: '1000',
   overflow: 'hidden',
   transition: 'all .3s ease',
+  '@media (max-width: 768px)': {
+    display: 'none',
+  },
 }));
 
 export const StyledSidebarName = styled('div')({
@@ -576,3 +609,238 @@ export const StyledDrawer = styled(Drawer)(() => ({
     background: 'linear-gradient(180deg, rgb(5, 5, 17), rgb(3, 5, 17))',
   },
 }));
+
+// userProfile
+
+export const ContainerProfileComponents = styled(Box)(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '30px',
+  padding: '40px 0',
+}));
+
+export const StyledProfileSection = styled(Box)({
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  height: '550px',
+  padding: '20px 60px 40px',
+  borderRadius: '20px',
+  overflow: 'hidden',
+  '@media (max-width: 1024px)': {
+    flexDirection: 'column',
+    padding: '10px',
+  },
+});
+
+export const StyledInfo = styled(Box)({
+  position: 'relative',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  gap: '6px',
+  maxWidth: '50%',
+  zIndex: 2,
+  '@media (max-width: 768px)': {
+    maxWidth: '100%',
+  },
+});
+
+export const StyledBannerAvatar = styled(Avatar)(() => ({
+  position: 'absolute',
+  height: '100%',
+  width: '56%',
+  right: 0,
+  bottom: 0,
+  borderRadius: 0,
+  objectFit: 'cover',
+  '@media (max-width: 1024px)': {
+    height: '70%',
+    width: '73%',
+  },
+  '@media (max-width: 768px)': {
+    height: '65%',
+    width: '100%',
+  },
+}));
+
+export const StyledFollowButton = styled(Button)({
+  fontSize: '0.95rem',
+  fontWeight: 600,
+  marginTop: '10px',
+  padding: '8px 28px',
+  color: 'white',
+  borderRadius: '10px',
+  background: 'linear-gradient(90deg, #6557ff 0%, #8f6eff 100%)',
+  textTransform: 'none',
+  '&:hover': { background: 'linear-gradient(90deg, #786aff 0%, #a88bff 100%)' },
+});
+
+export const StyledAboutSection = styled(Box)({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '10px',
+  lineHeight: 1.6,
+});
+
+export const StyledSocials = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '20px',
+  padding: '0 20px',
+});
+
+export const StyledVideoSection = styled(Box)({
+  display: 'flex',
+  flexDirection: 'column',
+});
+
+export const StyledVideoGrid = styled(Box)({
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+  gap: '20px',
+  padding: '0 20px',
+});
+
+export const StyledBoxEffect = styled(Box)(() => ({
+  position: 'absolute',
+  display: 'block',
+  listStyle: 'none',
+  animation: `${effect} 3s ease-in-out infinite alternate`,
+  backgroundImage: 'linear-gradient(-20deg, #2c2573ff 50%, #0000 50%)',
+  bottom: 0,
+  top: 0,
+  left: '-50%',
+  right: '-50%',
+  opacity: 0.2,
+  zIndex: -1,
+}));
+
+const effect = keyframes`
+  from {
+    transform: translateX(-25%);
+  }
+  to {
+    transform: translateX(25%);
+  }
+}`;
+
+export const StyledVideoCard = styled(Card)({
+  position: 'relative',
+  background: 'rgba(255,255,255,0.05)',
+  borderRadius: '16px',
+  overflow: 'hidden',
+  cursor: 'pointer',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'translateY(-4px)',
+    background: 'rgba(255,255,255,0.08)',
+  },
+});
+
+export const StyledVideoCardLink = styled(Link)({
+  position: 'absolute',
+  width: '100%',
+  height: '100%',
+  zIndex: 1,
+});
+
+// UserSchedule
+
+export const StyledFilters = styled(Box)({
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: '10px',
+});
+
+export const StyledFilterButton = styled(Button)({
+  padding: '4px 12px',
+  background: 'rgba(255, 255, 255, 0.06)',
+  textTransform: 'none',
+  fontSize: '0.95rem',
+  fontWeight: 500,
+  color: '#A1A1B5',
+  height: 45,
+  minWidth: 90,
+  borderRadius: '10px',
+  transition: 'all 0.25s ease',
+  '&:hover': {
+    background: 'rgba(255, 255, 255, 0.1)',
+    color: '#ffffff',
+  },
+  '&.active': {
+    color: '#fff',
+    background: 'linear-gradient(135deg, #6D5DFB 0%, #8E7BFF 100%)',
+    boxShadow: '0 4px 12px rgba(109, 93, 251, 0.35)',
+  },
+});
+
+export const StyledScheduleFormControl = styled(FormControl)({
+  color: '#A1A1B5',
+  borderRadius: '10px',
+  background: 'rgba(255, 255, 255, 0.06)',
+  width: '25%',
+  height: 45,
+  '@media (max-width: 768px)': {
+    width: '100%',
+  },
+});
+
+export const StyledScheduleInputLabel = styled(InputLabel)({
+  width: '100%',
+  color: '#A1A1B5',
+  '&.Mui-focused': {
+    color: '#A1A1B5',
+  },
+  '& MuiOutlinedInput-input': {
+    borderColor: '#A1A1B5',
+  },
+});
+
+export const StyledScheduleSelect = styled(Select)(() => ({
+  width: '100%',
+  color: '#A1A1B5',
+  height: 45,
+  // // Border color (default, hover, focused)
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderRadius: '12px',
+    borderColor: '#A1A1B5 !important',
+  },
+  '& .MuiSelect-icon': {
+    color: '#A1A1B5',
+  },
+}));
+
+export const StyledScheduleCard = styled(Card)({
+  position: 'relative',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '10px',
+  padding: '20px',
+  borderRadius: '12px',
+  overflow: 'hidden',
+  background: 'rgba(255,255,255,0.05)',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    background: 'rgba(255,255,255,0.08)',
+  },
+});
+
+export const StyledButtonReminder = styled(Button)({
+  display: 'inline-flex',
+  gap: '8px',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  fontSize: '1.125rem',
+  color: 'white',
+  borderRadius: '5px',
+  padding: '5px 15px',
+  background: 'rgba(255, 255, 255, 0.03)',
+  textTransform: 'none',
+});
+
+export const StyledScheduleCardText = styled(Typography)({
+  fontSize: '1rem',
+  color: '#cccfd8ff',
+});

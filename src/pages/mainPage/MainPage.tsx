@@ -3,6 +3,7 @@ import { appLayout } from '../../layout/index';
 import { TabsComponent } from '../../components/ui/tabs/TabsComponent';
 import { SectionListVideo } from '../../components/sectionListVideo/SectionListVideo';
 import { Box } from '@mui/material';
+import { ContainerBox } from '../../components/StylesComponents';
 
 export const MainPage: FC = appLayout((): JSX.Element => {
   const testVideos = [
@@ -33,19 +34,9 @@ export const MainPage: FC = appLayout((): JSX.Element => {
   return (
     <>
       <Box sx={{ display: 'flex', width: '100%', height: '100%' }} className="page">
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '32px',
-            width: '100%',
-            maxWidth: '1440px',
-            margin: '0 auto',
-            padding: '10px 15px',
-          }}
-        >
+        <ContainerBox>
           <TabsComponent propsChild={TabsComponents} propTabsTitle={['Live', 'Видео', 'Клипы', 'Пользователи']} />
-        </Box>
+        </ContainerBox>
       </Box>
     </>
   );

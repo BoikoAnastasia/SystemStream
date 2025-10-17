@@ -12,8 +12,11 @@ import {
   StyledSidebarListItem,
   StyledSidebarName,
 } from '../StylesComponents';
+// hooks
+import { useDeviceDetect } from '../../hooks/useDeviceDetect';
 
 export const Sidebar = () => {
+  const { isMobile } = useDeviceDetect();
   const [open, setOpen] = useState(true);
 
   return (
@@ -57,7 +60,7 @@ export const Sidebar = () => {
           <StyledSidebarName>Сейчас в эфире</StyledSidebarName>
         </Box>
       ) : (
-        <Box>
+        <Box sx={{ display: isMobile ? 'none' : 'block' }}>
           <Button onClick={() => setOpen(!open)}>
             <FirstPageIcon
               fontSize="large"

@@ -26,16 +26,18 @@ export const StyleHeaderBlock = styled(Box)(() => ({
 
 export const StyledMenu = styled(Menu)(() => ({
   '& .MuiMenu-paper': {
-    backgroundColor: '#232323',
+    backgroundColor: '#121026c9',
+    backdropFilter: 'blur(10px)',
   },
   '& .MuiList-root': {
-    backgroundColor: '#232323',
-    color: '##fff',
+    backgroundColor: '#121026c9',
+    color: '#A1A1B5',
+    backdropFilter: 'blur(10px)',
   },
   '& .MuiMenuItem-root': {
-    color: '#fff',
+    color: '#A1A1B5',
     '&:hover': {
-      backgroundColor: 'rgba(37, 37, 37, 1)323',
+      backgroundColor: 'rgba(255, 255, 255, 0.1)',
       color: '#dadadaff',
     },
   },

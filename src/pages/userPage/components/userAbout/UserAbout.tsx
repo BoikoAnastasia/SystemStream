@@ -1,65 +1,65 @@
-import { StyledButtonDark, StyledSpanDark, StyledTitleH3 } from '../../../../components/StylesComponents';
-import { CardVideo } from '../../../../components/cardVideo/CardVideo';
+import { VideoCard } from '../../../../components/videoCard/VideoCard';
+import { BannerEffect } from '../../../../components/ui/bannerEffect/BannerEffect';
 // mui
-import { Box } from '@mui/material';
+import { Typography } from '@mui/material';
 import InstagramIcon from '@mui/icons-material/Instagram';
-import XIcon from '@mui/icons-material/X';
 import TwitterIcon from '@mui/icons-material/Twitter';
-// hooks
-import { useDeviceDetect } from '../../../../hooks/useDeviceDetect';
+// styles
+import {
+  ContainerProfileComponents,
+  StyledAboutSection,
+  StyledBannerAvatar,
+  StyledBannerUserInfo,
+  StyledBannerUserName,
+  StyledFollowButton,
+  StyledIconButton,
+  StyledInfo,
+  StyledNameComponents,
+  StyledProfileSection,
+  StyledSocials,
+  StyledTitleModal,
+  StyledVideoGrid,
+  StyledVideoSection,
+} from '../../../../components/StylesComponents';
 
 export const UserAbout = () => {
-  const { isMobile } = useDeviceDetect();
-  const featureList = [
-    { id: '1', img: '../img/users/user-01.jpg', href: '/', name: 'Gaming Streamer', users: '200 followers' },
-    { id: '2', img: '../img/users/user-02.jpg', href: '/', name: 'Tech Reviewer', users: '850 followers' },
-    { id: '3', img: '../img/users/user-03.jpg', href: '/', name: 'Cooking Show Host', users: '600 followers' },
-  ];
-
-  const propsStyleImg = {
-    maxWidth: '160px',
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    objectPosition: 'center',
-    borderRadius: '12px',
-    overflow: 'hidden',
-  };
-
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '45px' }}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <StyledTitleH3>Обо мне</StyledTitleH3>
-        <StyledSpanDark>
+    <ContainerProfileComponents>
+      <StyledProfileSection>
+        <StyledInfo>
+          <StyledBannerUserName>Ava Bennett</StyledBannerUserName>
+          <StyledBannerUserInfo>Streamer</StyledBannerUserInfo>
+          <StyledBannerUserInfo>1.2M followers</StyledBannerUserInfo>
+          <StyledFollowButton>Подписаться</StyledFollowButton>
+        </StyledInfo>
+        <BannerEffect />
+        <StyledBannerAvatar src="./img/banner-user/banner-02.png" />
+      </StyledProfileSection>
+      <StyledAboutSection>
+        <StyledTitleModal>ОБО МНЕ</StyledTitleModal>
+        <StyledNameComponents sx={{ padding: '0 20px' }}>
           Hi, I'm Ava Bennett, a full-time streamer from Los Angeles. I love playing RPGs and interacting with my
           community. Join my streams for fun, games, and good vibes!
-        </StyledSpanDark>
-      </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <StyledTitleH3>Соц. сети</StyledTitleH3>
-        <Box sx={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '12px' }}>
-          <StyledButtonDark h="58px" br="8px">
+        </StyledNameComponents>
+        <StyledSocials>
+          <StyledIconButton>
             <InstagramIcon />
-            @AvaBennett
-          </StyledButtonDark>
-          <StyledButtonDark h="58px" br="8px">
-            <XIcon />
-            @AnaBennett
-          </StyledButtonDark>
-          <StyledButtonDark h="58px" br="8px">
+            <Typography>@AvaBennett</Typography>
+          </StyledIconButton>
+          <StyledIconButton>
             <TwitterIcon />
-            @AnaBennett
-          </StyledButtonDark>
-        </Box>
-      </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <StyledTitleH3>Рекомендованные каналы</StyledTitleH3>
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '12px' }}>
-          {featureList.map((item) => (
-            <CardVideo item={item} styleProps={propsStyleImg} key={item.id} />
+            <Typography>@AnaBennett</Typography>
+          </StyledIconButton>
+        </StyledSocials>
+      </StyledAboutSection>
+      <StyledVideoSection>
+        <StyledTitleModal>ПОСЛЕДНИЕ СТРИМЫ</StyledTitleModal>
+        <StyledVideoGrid>
+          {[1, 2, 3, 4, 5].map((i) => (
+            <VideoCard key={i} index={i} />
           ))}
-        </Box>
-      </Box>
-    </Box>
+        </StyledVideoGrid>
+      </StyledVideoSection>
+    </ContainerProfileComponents>
   );
 };
