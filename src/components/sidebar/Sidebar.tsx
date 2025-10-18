@@ -157,7 +157,7 @@ export const Sidebar = () => {
   ];
 
   return (
-    <StyledSidebar style={{ width: 'auto', padding: '25px 5px 0' }}>
+    <StyledSidebar style={{ width: 'auto', padding: '9px 5px 0' }}>
       <Box>
         <Button onClick={() => setOpen(true)}>
           <FirstPageIcon
@@ -168,11 +168,9 @@ export const Sidebar = () => {
       </Box>
       {drawerCardData && (
         <StyledSidebarList sx={{ height: '100%', overflowX: 'hidden', flex: 1 }}>
-          {drawerCardData.map((card) => (
-            <StyledSidebarListItem>
-              <Link to="#">
-                <CardDrawer card={card} variant="compact" />
-              </Link>
+          {drawerCardData.map((card, i) => (
+            <StyledSidebarListItem key={i}>
+              <CardDrawer card={card} variant="compact" />
             </StyledSidebarListItem>
           ))}
         </StyledSidebarList>

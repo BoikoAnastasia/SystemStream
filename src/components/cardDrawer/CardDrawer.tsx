@@ -15,15 +15,13 @@ export const CardDrawer = ({ card, variant = 'full' }: ICardDrawerProps) => {
   const { author, avatar, category, title, views } = card;
 
   return (
-    <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-      <Link to="/user">
+    <Link to="/user">
+      <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
         <Box sx={{ position: 'relative' }}>
           <Avatar alt="avatar" src={avatar} sx={{ width: '50px', height: '50px' }} />
           <CardDrawerBoxWatch>{views}</CardDrawerBoxWatch>
         </Box>
-      </Link>
-      {variant === 'full' && (
-        <Link to="/user">
+        {variant === 'full' && (
           <Box sx={{ width: '150px' }}>
             <CardDrawerTypography isEllipsis={true}>{title}</CardDrawerTypography>
             <Box sx={{ display: 'flex', gap: '5px' }}>
@@ -35,8 +33,8 @@ export const CardDrawer = ({ card, variant = 'full' }: ICardDrawerProps) => {
               </CardDrawerTypography>
             </Box>
           </Box>
-        </Link>
-      )}
-    </Box>
+        )}
+      </Box>
+    </Link>
   );
 };

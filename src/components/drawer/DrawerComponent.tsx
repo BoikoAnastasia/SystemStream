@@ -206,8 +206,8 @@ export const DrawerComponent = () => {
         </Box>
         <StyledSidebarName>Для вас</StyledSidebarName>
         <StyledSidebarList>
-          {buttonInfo.map((btn: IButtonInfo) => (
-            <StyledSidebarListItem>
+          {buttonInfo.map((btn: IButtonInfo, i) => (
+            <StyledSidebarListItem key={i}>
               <StyledSidebarLink to={btn.href}>
                 <btn.icon /> {btn.value}
               </StyledSidebarLink>
@@ -219,9 +219,7 @@ export const DrawerComponent = () => {
           <StyledSidebarList sx={{ height: '100%', overflowX: 'hidden', flex: 1 }}>
             {drawerCardData.map((card) => (
               <StyledSidebarListItem>
-                <Link to="/">
-                  <CardDrawer card={card} />
-                </Link>
+                <CardDrawer card={card} />
               </StyledSidebarListItem>
             ))}
           </StyledSidebarList>

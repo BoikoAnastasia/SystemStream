@@ -1,3 +1,4 @@
+import { Logo } from '../components/logo/Logo';
 // components
 import { SearchInput } from '../components/ui/searchInput/SearchInput';
 import { HeaderNotificationMenu } from '../components/ui/headerNotificationMenu/HeaderNotificationMenu';
@@ -8,7 +9,7 @@ import { StyleHeader, StyleHeaderBlock, StyleHeaderContainer } from './StyledLay
 import { HeaderMenuAvatar } from '../components/ui/headerMenuAvatar/HeaderMenuAvatar';
 import { useDrawer } from '../context/DrawerContext';
 // mui
-import { Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
 export const Header = () => {
@@ -21,11 +22,15 @@ export const Header = () => {
         <Button onClick={() => setOpen(!open)} sx={{ display: isMobile ? 'flex' : 'none' }}>
           <MenuIcon sx={{ color: 'var(--white)' }}></MenuIcon>
         </Button>
-        <StyleHeaderBlock>
-          <SearchInput width={'200px'} />
-          <HeaderNotificationMenu />
-          <HeaderMenuAvatar />
-        </StyleHeaderBlock>
+        <Box sx={{ display: 'flex', justifyContent: 'space-beetwen', width: '100%' }}>
+          {isMobile ? <></> : <Logo />}
+
+          <StyleHeaderBlock>
+            <SearchInput width={'200px'} />
+            <HeaderNotificationMenu />
+            <HeaderMenuAvatar />
+          </StyleHeaderBlock>
+        </Box>
       </StyleHeaderContainer>
     </StyleHeader>
   );
