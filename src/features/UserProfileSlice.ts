@@ -1,12 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { IProfile, IUserProfile } from '../types/share';
 
-interface UserProfile {
-  data: any[] | null;
-  isError: null | boolean | any;
-  isLoading: boolean;
-}
-
-const initialState: UserProfile = {
+const initialState: IUserProfile = {
   data: null,
   isError: false,
   isLoading: false,
@@ -25,7 +20,7 @@ export const UserProfileSlice = createSlice({
       state.isError = false;
       state.isLoading = false;
     },
-    UserFetchSuccess: (state, action: PayloadAction<any[]>) => {
+    UserFetchSuccess: (state, action: PayloadAction<IProfile>) => {
       state.data = action.payload;
       state.isError = null;
       state.isLoading = false;

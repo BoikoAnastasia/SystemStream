@@ -8,6 +8,7 @@ import { Box, SvgIconTypeMap } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import HistoryIcon from '@mui/icons-material/History';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
+import { OverridableComponent } from '@mui/material/OverridableComponent';
 // styles
 import {
   StyledDrawer,
@@ -16,7 +17,6 @@ import {
   StyledSidebarListItem,
   StyledSidebarName,
 } from '../StylesComponents';
-import { OverridableComponent } from '@mui/material/OverridableComponent';
 // types
 import { CardDrawerType } from '../../types/share';
 

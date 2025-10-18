@@ -1,8 +1,10 @@
+import { Link } from 'react-router-dom';
+// mui
 import { Avatar, Box } from '@mui/material';
+// types
+import { CardDrawerType } from '../../types/share';
 // styles
 import { CardDrawerBoxWatch, CardDrawerTypography } from '../StylesComponents';
-import { CardDrawerType } from '../../types/share';
-import { Link } from 'react-router-dom';
 
 interface ICardDrawerProps {
   card: CardDrawerType;

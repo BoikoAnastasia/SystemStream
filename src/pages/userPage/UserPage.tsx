@@ -2,11 +2,11 @@ import { FC, JSX } from 'react';
 import { appLayout } from '../../layout/index';
 // components
 import { TabsComponent } from '../../components/ui/tabs/TabsComponent';
-import { ContainerBox } from '../../components/StylesComponents';
 import { UserAbout } from './components/userAbout/UserAbout';
-// mui
 import { UserSchedule } from './components/userSchedule/UserSchedule';
 import { SectionListVideo } from '../../components/sectionListVideo/SectionListVideo';
+import { ContainerBox } from '../../components/StylesComponents';
+// share
 import { IVideoItem } from '../../types/share';
 
 const testVideos: IVideoItem[] = [

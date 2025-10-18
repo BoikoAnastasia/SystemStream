@@ -1,11 +1,24 @@
 import { ReactNode } from 'react';
 
-export interface AllProductsState {
-  //     data: IAllData[] | [],
-  //     isLoading: boolean,
-  //     isError: string | null,
+export interface IUserProfile {
+  data: IProfile | null;
+  isLoading: boolean;
+  isError: string | null | boolean;
 }
 
+export interface IProfile {
+  id: number;
+  email: string;
+  nickname: string;
+  profileDescription: string;
+  backgroundImage: string;
+  profileImage: string;
+  registrationDate: Date;
+  isOnline: boolean;
+  cashBalance: number;
+}
+
+// components
 export interface IStyledButtonForm {
   bgcolor?: string;
   hoverbgcolor?: string;

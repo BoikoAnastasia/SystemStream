@@ -8,7 +8,6 @@ import { Box, MenuItem } from '@mui/material';
 // styles
 import {
   ContainerProfileComponents,
-  StyledBannerUserName,
   StyledFilterButton,
   StyledFilters,
   StyledScheduleFormControl,

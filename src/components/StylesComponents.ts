@@ -226,37 +226,39 @@ export const StyleModalContent = styled(Box)(() => ({
 
 export const StyledTextFieldModal = styled(TextField)(() => ({
   width: '100%',
-  // Input text color
   '& .MuiOutlinedInput-input': {
-    color: 'var(--white)',
-    // Стили для автозаполнения
+    color: 'var(--white) !important',
+    caretColor: 'var(--white)',
+
     '&:-webkit-autofill': {
-      WebkitBoxShadow: '0 0 0 100px var(--background) inset',
-      WebkitTextFillcolor: 'var(--white)',
-      caretcolor: 'var(--white)',
-      borderRadius: '12px', // Добавляем скругление
+      WebkitBoxShadow: '0 0 0 100px var(--background) inset !important',
+      WebkitTextFillColor: 'var(--white) !important',
+      caretColor: 'var(--white) !important',
+      borderRadius: '12px',
+      transition: 'background-color 9999s ease-in-out 0s', // подавляет желтую подсветку Chrome
+      backgroundClip: 'content-box !important',
     },
     '&:-webkit-autofill:hover': {
-      WebkitBoxShadow: '0 0 0 100px var(--background) inset',
-      WebkitTextFillcolor: 'var(--white)',
+      WebkitBoxShadow: '0 0 0 100px var(--background) inset !important',
+      WebkitTextFillColor: 'var(--white) !important',
     },
     '&:-webkit-autofill:focus': {
-      WebkitBoxShadow: '0 0 0 100px var(--background) inset',
-      WebkitTextFillcolor: 'var(--white)',
+      WebkitBoxShadow: '0 0 0 100px var(--background) inset !important',
+      WebkitTextFillColor: 'var(--white) !important',
     },
     '&:-webkit-autofill:active': {
-      WebkitBoxShadow: '0 0 0 100px var(--background) inset',
-      WebkitTextFillcolor: 'var(--white)',
+      WebkitBoxShadow: '0 0 0 100px var(--background) inset !important',
+      WebkitTextFillColor: 'var(--white) !important',
     },
   },
-  // Label color
+
   '& .MuiInputLabel-root': {
     color: 'var(--input-border)',
     '&.Mui-focused': {
       color: 'var(--white)',
     },
   },
-  // Border color (default, hover, focused)
+
   '& .MuiOutlinedInput-notchedOutline': {
     borderRadius: '12px',
     borderColor: 'var(--input-border)',
@@ -266,12 +268,6 @@ export const StyledTextFieldModal = styled(TextField)(() => ({
   },
   '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
     borderColor: 'var(--white)',
-  },
-  // Убираем стандартные стили автозаполнения
-  '& .MuiOutlinedInput-root': {
-    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'var(--white)',
-    },
   },
 }));
 

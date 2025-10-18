@@ -1,13 +1,15 @@
+import { Link } from 'react-router-dom';
+// components
+import { CardDrawer } from '../cardDrawer/CardDrawer';
 // mui
 import { Box, Button } from '@mui/material';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
-// styles
-import { StyledSidebar, StyledSidebarList, StyledSidebarListItem } from '../StylesComponents';
 // hooks
 import { useDrawer } from '../../context/DrawerContext';
+// types
 import { CardDrawerType } from '../../types/share';
-import { Link } from 'react-router-dom';
-import { CardDrawer } from '../cardDrawer/CardDrawer';
+// styles
+import { StyledSidebar, StyledSidebarList, StyledSidebarListItem } from '../StylesComponents';
 
 export const Sidebar = () => {
   const { setOpen } = useDrawer();
