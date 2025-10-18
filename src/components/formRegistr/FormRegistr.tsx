@@ -116,9 +116,11 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
               label="Password"
             />
             {touched.password && errors.password && (
-              <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>{errors.password}</div>
+              <div style={{ color: 'var(--error)', fontSize: '12px', marginTop: '4px' }}>{errors.password}</div>
             )}
-            {errorMessage && <div style={{ color: 'red', fontSize: '14px', marginTop: '-10px' }}>{errorMessage}</div>}
+            {errorMessage && (
+              <div style={{ color: 'var(--error)', fontSize: '14px', marginTop: '-10px' }}>{errorMessage}</div>
+            )}
           </FormControl>
           <StyledButtonsForm>
             <StyledButtonForm type="submit">Зарегистрироваться</StyledButtonForm>

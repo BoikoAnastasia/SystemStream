@@ -4,31 +4,87 @@ import { TabsComponent } from '../../components/ui/tabs/TabsComponent';
 import { SectionListVideo } from '../../components/sectionListVideo/SectionListVideo';
 import { Box } from '@mui/material';
 import { ContainerBox } from '../../components/StylesComponents';
+import { CatalogUsers } from '../../components/catalogUsers/CatalogUsers';
+import { IUser, IVideoItem } from '../../types/share';
 
 export const MainPage: FC = appLayout((): JSX.Element => {
-  const testVideos = [
-    { id: '1', video: './video/video-01.mp4', href: '/stream', name: 'Gaming Streamer', users: '1.2K viewers' },
-    { id: '2', video: './video/video-02.mp4', href: '/stream', name: 'Tech Reviewer', users: '850 viewers' },
-    { id: '3', video: './video/video-03.mp4', href: '/stream', name: 'Cooking Show Host', users: '600 viewers' },
-    { id: '4', video: './video/video-01.mp4', href: '/stream', name: 'Indie Game Developer', users: '450 viewers' },
-    { id: '5', video: './video/video-02.mp4', href: '/stream', name: 'Travel Vlogger', users: '300 viewers' },
-    { id: '6', video: './video/video-03.mp4', href: '/stream', name: 'Fitness Instructor', users: '200 viewers' },
+  const testVideos: IVideoItem[] = [
+    {
+      id: '1',
+      video: './video/video-01.mp4',
+      href: '/stream',
+      name: 'Смотрим кофе',
+      users: '1.2K viewers',
+      type: 'Игры',
+      isLive: true,
+    },
+    {
+      id: '2',
+      video: './video/video-02.mp4',
+      href: '/stream',
+      name: 'Смотрим кофе 2',
+      users: '850 viewers',
+      type: 'Игры',
+      isLive: true,
+    },
+    {
+      id: '3',
+      video: './video/video-03.mp4',
+      href: '/stream',
+      name: 'Cooking Show Host',
+      users: '600 viewers',
+      type: 'Игры',
+      isLive: true,
+    },
+    {
+      id: '4',
+      video: './video/video-01.mp4',
+      href: '/stream',
+      name: 'Indie Game Developer',
+      users: '450 viewers',
+      type: 'Киберспорт',
+      isLive: true,
+    },
+    {
+      id: '5',
+      video: './video/video-02.mp4',
+      href: '/stream',
+      name: 'Travel Vlogger',
+      users: '300 viewers',
+      type: 'Киберспорт',
+      isLive: true,
+    },
+    {
+      id: '6',
+      video: './video/video-03.mp4',
+      href: '/stream',
+      name: 'Fitness Instructor',
+      users: '200 viewers',
+      type: 'Киберспорт',
+      isLive: true,
+    },
   ];
 
-  const testImages = [
-    { id: '1', img: './img/users/user-01.jpg', href: '/user', name: 'Gaming Streamer', users: '200 followers' },
-    { id: '2', img: './img/users/user-02.jpg', href: '/user', name: 'Tech Reviewer', users: '850 followers' },
-    { id: '3', img: './img/users/user-03.jpg', href: '/user', name: 'Cooking Show Host', users: '600 followers' },
-    { id: '4', img: './img/users/user-01.jpg', href: '/user', name: 'Indie Game Developer', users: '450 followers' },
-    { id: '5', img: './img/users/user-02.jpg', href: '/user', name: 'Travel Vlogger', users: '300 followers' },
-    { id: '6', img: './img/users/user-03.jpg', href: '/user', name: 'Fitness Instructor', users: '200 followers' },
+  const testUsers: IUser[] = [
+    { id: 'u1', name: 'Olivia Jordan', avatar: './img/users/user-01.jpg', live: true },
+    { id: 'u2', name: 'Grace Phillips', avatar: './img/users/user-02.jpg', live: true },
+    { id: 'u3', name: 'Ewan Watson', avatar: './img/users/user-03.jpg', live: false },
+    { id: 'u4', name: 'Ethan Anderson', avatar: './img/banner-user/banner-01.png', live: true },
+    { id: 'u5', name: 'Mia Kim', avatar: './img/banner-user/banner-02.png', live: false },
+    { id: 'u6', name: 'Noah Campbell', avatar: './img//preview/preview-01.jpg', live: true },
+    { id: 'u7', name: 'Olivia Jordan', avatar: './img/users/user-01.jpg', live: true },
+    { id: 'u8', name: 'Grace Phillips', avatar: './img/users/user-02.jpg', live: true },
+    { id: 'u9', name: 'Ewan Watson', avatar: './img/users/user-03.jpg', live: false },
+    { id: 'u10', name: 'Ethan Anderson', avatar: './img/banner-user/banner-01.png', live: true },
+    { id: 'u11', name: 'Mia Kim', avatar: './img/banner-user/banner-02.png', live: false },
+    { id: 'u12', name: 'Noah Campbell', avatar: './img//preview/preview-01.jpg', live: true },
   ];
 
   const TabsComponents = [
     <SectionListVideo list={testVideos} />,
     <SectionListVideo list={testVideos} />,
     <SectionListVideo list={testVideos} />,
-    <SectionListVideo list={testImages} isVideo={false} />,
+    <CatalogUsers list={testUsers} />,
   ];
 
   return (

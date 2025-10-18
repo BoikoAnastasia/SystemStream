@@ -1,5 +1,6 @@
 // components
 import { SearchInput } from '../components/ui/searchInput/SearchInput';
+import { HeaderNotificationMenu } from '../components/ui/headerNotificationMenu/HeaderNotificationMenu';
 // hooks
 import { useDeviceDetect } from '../hooks/useDeviceDetect';
 // style
@@ -18,10 +19,11 @@ export const Header = () => {
     <StyleHeader>
       <StyleHeaderContainer className="container">
         <Button onClick={() => setOpen(!open)} sx={{ display: isMobile ? 'flex' : 'none' }}>
-          <MenuIcon sx={{ color: 'white' }}></MenuIcon>
+          <MenuIcon sx={{ color: 'var(--white)' }}></MenuIcon>
         </Button>
         <StyleHeaderBlock>
           <SearchInput width={'200px'} />
+          <HeaderNotificationMenu />
           <HeaderMenuAvatar />
         </StyleHeaderBlock>
       </StyleHeaderContainer>

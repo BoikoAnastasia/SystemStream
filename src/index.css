@@ -21,6 +21,46 @@
   --sidebar: #ffffff;
   --sidebar-hover: #738ee5;
   --sidebar-active: #4a70e9ad;
+  --background-tabs: rgba(255, 255, 255, 0.06);
+  --background-card: rgba(255, 255, 255, 0.08);
+  --background-tab: rgba(255, 255, 255, 0.1);
+  --background-scrollbar: #0505116e;
+  --background-header-menu: #121026c9;
+  --hover-header-menu: #dadadaff;
+  --video-card-desc: #aaa;
+  --video-card-name: #777;
+  --color-link: #a1a1b5;
+  --color-sidebar: #6e6e84;
+  --gradient-selected: linear-gradient(135deg, #6d5dfb 0%, #8e7bff 100%);
+  --gradient-selected-hover: linear-gradient(90deg, #786aff 0%, #a88bff 100%);
+  --boxShadowButton: 0 4px 12px rgba(109, 93, 251, 0.35);
+  --gradient-sidebar: linear-gradient(180deg, rgb(5, 5, 17), rgb(3, 5, 17));
+  --gradient-active-link: linear-gradient(90deg, rgba(109, 93, 251, 0.15) 0%, rgba(142, 123, 255, 0.05) 100%);
+  --live-btn: #ff3b3b;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./fonts/Inter/Inter_18pt-Regular.ttf');
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./fonts/Inter/Inter_18pt-Black.ttf');
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./fonts/Inter/Inter_18pt-Medium.ttf');
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./fonts/Inter/Inter_18pt-Bold.ttf');
+  font-weight: bold;
 }
 
 * {
@@ -38,7 +78,7 @@ html,
 body {
   background: linear-gradient(315deg, rgb(12, 12, 24) 17%, rgb(25, 21, 56) 60%, rgb(16, 14, 35));
   color: var(--white);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 body {
@@ -53,7 +93,7 @@ body {
   background: -moz-linear-gradient(315deg, rgb(12, 12, 24) 17%, rgb(25, 21, 56) 60%, rgb(16, 14, 35));
   background-size: auto;
   color: var(--white);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 ul,

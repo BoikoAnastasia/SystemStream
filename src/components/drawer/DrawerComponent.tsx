@@ -219,7 +219,7 @@ export const DrawerComponent = () => {
           <StyledSidebarList sx={{ height: '100%', overflowX: 'hidden', flex: 1 }}>
             {drawerCardData.map((card) => (
               <StyledSidebarListItem>
-                <Link to="#">
+                <Link to="/">
                   <CardDrawer card={card} />
                 </Link>
               </StyledSidebarListItem>

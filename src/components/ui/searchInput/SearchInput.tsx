@@ -11,7 +11,7 @@ export const SearchInput = ({ width, height }: { width?: string; height?: string
           left: '20px',
           top: '50%',
           transform: 'translateY(-65%)',
-          color: 'white',
+          color: 'var(--white)',
           mr: 1,
           my: 0.5,
         }}

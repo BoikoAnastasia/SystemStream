@@ -1,8 +1,8 @@
 import { useCheckedImage } from '../../hooks/checkImgFunctions';
 // mui
-import { CardContent, CardMedia, Typography } from '@mui/material';
+import { CardContent, CardMedia } from '@mui/material';
 // styles
-import { StyledVideoCard, StyledVideoCardLink } from '../StylesComponents';
+import { CardDrawerTypography, StyledVideoCard, StyledVideoCardLink } from '../StylesComponents';
 
 export const VideoCard = ({ index }: { index: number }) => {
   const previewScr = useCheckedImage(`./img/preview/preview-0${index}.jpg`);
@@ -10,16 +10,16 @@ export const VideoCard = ({ index }: { index: number }) => {
     <StyledVideoCard>
       <StyledVideoCardLink to="/stream" />
       <CardMedia component="img" height="180" image={previewScr} alt="video preview" />
-      <CardContent>
-        <Typography variant="subtitle1" sx={{ color: 'white', fontWeight: 600 }}>
+      <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+        <CardDrawerTypography sx={{ fontWeight: 600 }} isEllipsis={false}>
           Latest video
-        </Typography>
-        <Typography variant="body2" sx={{ color: '#aaa' }}>
+        </CardDrawerTypography>
+        <CardDrawerTypography fs={'14px'} c={'var(--video-card-desc)'} isEllipsis={false}>
           Here is a clip from my latest stream
-        </Typography>
-        <Typography variant="body2" sx={{ color: '#777', mt: 0.5 }}>
+        </CardDrawerTypography>
+        <CardDrawerTypography fs={'14px'} c={'var(--video-card-name)'} isEllipsis={false}>
           08:54
-        </Typography>
+        </CardDrawerTypography>
       </CardContent>
     </StyledVideoCard>
   );

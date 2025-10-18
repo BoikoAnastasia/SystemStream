@@ -105,16 +105,18 @@ export const FormLogin = ({
               label="Password"
             />
             {touched.password && errors.password && (
-              <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>{errors.password}</div>
+              <div style={{ color: 'var(--error)', fontSize: '12px', marginTop: '4px' }}>{errors.password}</div>
             )}
           </FormControl>
-          {errorMessage && <div style={{ color: 'red', fontSize: '14px', marginTop: '-10px' }}>{errorMessage}</div>}
+          {errorMessage && (
+            <div style={{ color: 'var(--error)', fontSize: '14px', marginTop: '-10px' }}>{errorMessage}</div>
+          )}
           <StyledButtonsForm>
             <StyledButtonForm variant="contained" type="submit">
               Войти
             </StyledButtonForm>
-            <div style={{ color: 'white', fontSize: '14px' }}>или</div>
-            <StyledButtonForm bgcolor={'#B2B2B2'} c={'#3c474aff'}>
+            <div style={{ color: 'var(--white)', fontSize: '14px' }}>или</div>
+            <StyledButtonForm bgcolor={'var(--background-line)'} c={'var(--input-background)'}>
               Продолжить с помощью Google
             </StyledButtonForm>
           </StyledButtonsForm>

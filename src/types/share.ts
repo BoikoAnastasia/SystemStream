@@ -40,6 +40,8 @@ export interface IVideoItem {
   href: string;
   name: string;
   users: string;
+  type: string;
+  isLive: boolean;
 }
 
 export interface IUserItem {
@@ -80,3 +82,20 @@ export type CardDrawerType = {
   author: string;
   category: string;
 };
+
+export interface ICardDrawerTypography {
+  c?: string;
+  fs?: string;
+  isEllipsis: boolean;
+}
+
+export interface StyledButtonSearchProps {
+  h?: string;
+}
+
+export interface IUser {
+  id: string;
+  name: string;
+  avatar?: string;
+  live?: boolean;
+}

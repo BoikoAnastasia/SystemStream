@@ -2,8 +2,6 @@ import { Box, Button, Menu } from '@mui/material';
 import { styled } from '@mui/system';
 
 export const StyleHeader = styled(Box)(() => ({
-  // position: 'sticky',
-  // top: '0',
   minHeight: '65px',
   width: '100%',
   zIndex: '1000',
@@ -26,25 +24,25 @@ export const StyleHeaderBlock = styled(Box)(() => ({
 
 export const StyledMenu = styled(Menu)(() => ({
   '& .MuiMenu-paper': {
-    backgroundColor: '#121026c9',
+    backgroundColor: 'var(--background-header-menu)',
     backdropFilter: 'blur(10px)',
   },
   '& .MuiList-root': {
-    backgroundColor: '#121026c9',
-    color: '#A1A1B5',
+    backgroundColor: 'var(--background-header-menu)',
+    color: 'var(--color-link)',
     backdropFilter: 'blur(10px)',
   },
   '& .MuiMenuItem-root': {
-    color: '#A1A1B5',
+    color: 'var(--color-link)',
     '&:hover': {
-      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-      color: '#dadadaff',
+      backgroundColor: 'var(--background-tab)',
+      color: 'var(--hover-header-menu)',
     },
   },
 }));
 
 export const StyledMenuButton = styled(Button)(() => ({
-  color: 'white',
+  color: 'var(--white)',
   textTransform: 'none',
   fontSize: '1rem',
   width: '100%',

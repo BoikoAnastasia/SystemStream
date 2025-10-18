@@ -10,7 +10,8 @@ import { ModalComponent } from '../../modal/ModalComponent';
 // utils
 import { checkCookie } from '../../../utils/cookieFunctions';
 // mui
-import { Avatar, Button, MenuItem } from '@mui/material';
+import { IconButton, MenuItem } from '@mui/material';
+import PersonIcon from '@mui/icons-material/Person';
 
 export const HeaderMenuAvatar = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -18,6 +19,20 @@ export const HeaderMenuAvatar = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openModal, setOpenModal] = useState(false);
   const [isLogged, setIsLogged] = useState(checkCookie('tokenData'));
+  const menuData = [
+    {
+      href: '/',
+      value: 'Личный кабинет',
+    },
+    {
+      href: '/user',
+      value: 'Профиль',
+    },
+    {
+      href: '/',
+      value: 'Настройки',
+    },
+  ];
 
   const open = Boolean(anchorEl);
 
@@ -50,16 +65,16 @@ export const HeaderMenuAvatar = () => {
   }, [isLogged]);
 
   return (
-    <div>
-      <Button
+    <>
+      <IconButton
         id="basic-button"
         aria-controls={open ? 'basic-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
       >
-        <Avatar alt="Remy Sharp" src="./img/users/user-01.jpg" />
-      </Button>
+        <PersonIcon sx={{ color: 'var(--white)' }} fontSize="medium" />
+      </IconButton>
       <StyledMenu
         id="basic-menu"
         anchorEl={anchorEl}
@@ -71,15 +86,11 @@ export const HeaderMenuAvatar = () => {
           },
         }}
       >
-        <MenuItem>
-          <Link to="#">Личный кабинет</Link>
-        </MenuItem>
-        <MenuItem>
-          <Link to="/user">Профиль</Link>
-        </MenuItem>
-        <MenuItem>
-          <Link to="#">Настройки</Link>
-        </MenuItem>
+        {menuData.map((item, index) => (
+          <MenuItem key={index}>
+            <Link to={item.href}>{item.value}</Link>
+          </MenuItem>
+        ))}
         {isLogged ? (
           <MenuItem>
             <StyledMenuButton onClick={logout}>Выйти</StyledMenuButton>
@@ -91,6 +102,6 @@ export const HeaderMenuAvatar = () => {
         )}
       </StyledMenu>
       <ModalComponent title="Войти или зарегистрироваться" open={openModal} setOpen={setOpenModal} />
-    </div>
+    </>
   );
 };

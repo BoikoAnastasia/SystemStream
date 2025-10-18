@@ -36,7 +36,6 @@ export const UserSchedule = () => {
 
   return (
     <ContainerProfileComponents>
-      <StyledBannerUserName>Расписание стримов</StyledBannerUserName>
       <Box
         sx={{
           display: 'flex',

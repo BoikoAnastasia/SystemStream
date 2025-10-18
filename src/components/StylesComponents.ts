@@ -7,6 +7,7 @@ import {
   Card,
   Drawer,
   FormControl,
+  Grid,
   IconButton,
   InputLabel,
   List,
@@ -19,7 +20,13 @@ import {
   Typography,
 } from '@mui/material';
 import { keyframes } from '@emotion/react';
-import { IStyledButtonDark, IStyledButtonForm, IStyledListVideo } from '../types/share';
+import {
+  ICardDrawerTypography,
+  IStyledButtonDark,
+  IStyledButtonForm,
+  IStyledListVideo,
+  StyledButtonSearchProps,
+} from '../types/share';
 
 const Rotate = keyframes`
   from {
@@ -88,7 +95,7 @@ export const StyledTitleModal = styled('h3')(() => ({
 export const StyledNameComponents = styled('h4')(() => ({
   fontSize: '18px',
   fontWeight: 500,
-  color: 'white',
+  color: 'var(--white)',
 }));
 
 export const StyledSpanDark = styled('span')(() => ({
@@ -114,15 +121,11 @@ export const StyledButtonsForm = styled(Box)(() => ({
 export const StyledButtonLogIn = styled(Button)(() => ({
   minWidth: '40px',
   height: '40px',
-  color: 'white',
+  color: 'var(--white)',
   padding: '0',
   borderRadius: '50%',
   backgroundColor: 'var(--button-dark)',
 }));
-
-interface StyledButtonSearchProps {
-  h?: string;
-}
 
 export const StyledButtonSearch = styled(TextField, {
   shouldForwardProp: (prop) => prop !== 'h',
@@ -136,7 +139,7 @@ export const StyledButtonSearch = styled(TextField, {
     minWidth: '200px',
     height: '100%',
     borderRadius: '20px',
-    color: 'white',
+    color: 'var(--white)',
     padding: '8px 0 8px 35px',
   },
 }));
@@ -150,7 +153,7 @@ export const StyledTabs = styled(Tabs)(() => ({
   padding: '4px',
   borderBottom: 'none',
   borderRadius: '12px',
-  background: 'rgba(255, 255, 255, 0.06)',
+  background: 'var(--background-tabs)',
   scrollbarWidth: 'thin',
   '& .MuiTabs-list': {
     overflowX: 'auto',
@@ -158,7 +161,7 @@ export const StyledTabs = styled(Tabs)(() => ({
   },
   '& ::-webkit-scrollbar': {
     height: '5px',
-    background: 'rgba(5, 5, 17, 0.43)',
+    background: 'var(--background-scrollb)',
     borderRadius: '5px',
   },
   '&.MuiTabs-root': {
@@ -185,21 +188,21 @@ export const StyledTab = styled(Tab)(() => ({
   textTransform: 'none',
   fontSize: '0.95rem',
   fontWeight: 500,
-  color: '#A1A1B5',
+  color: 'var(--color-link)',
   minHeight: 36,
   minWidth: 90,
   borderRadius: '10px',
   transition: 'all 0.25s ease',
   background: 'transparent',
   '&:hover': {
-    background: 'rgba(255, 255, 255, 0.1)',
-    color: '#ffffff',
+    background: 'var(--background-tab)',
+    color: 'var(--white)',
   },
 
   '&.Mui-selected': {
-    color: '#fff',
-    background: 'linear-gradient(135deg, #6D5DFB 0%, #8E7BFF 100%)',
-    boxShadow: '0 4px 12px rgba(109, 93, 251, 0.35)',
+    color: 'var(--white)',
+    background: 'var(--gradient-selected)',
+    boxShadow: 'var(--boxShadowButton)',
   },
 }));
 // modal
@@ -225,32 +228,32 @@ export const StyledTextFieldModal = styled(TextField)(() => ({
   width: '100%',
   // Input text color
   '& .MuiOutlinedInput-input': {
-    color: 'white',
+    color: 'var(--white)',
     // Стили для автозаполнения
     '&:-webkit-autofill': {
       WebkitBoxShadow: '0 0 0 100px var(--background) inset',
-      WebkitTextFillColor: 'white',
-      caretColor: 'white',
+      WebkitTextFillcolor: 'var(--white)',
+      caretcolor: 'var(--white)',
       borderRadius: '12px', // Добавляем скругление
     },
     '&:-webkit-autofill:hover': {
       WebkitBoxShadow: '0 0 0 100px var(--background) inset',
-      WebkitTextFillColor: 'white',
+      WebkitTextFillcolor: 'var(--white)',
     },
     '&:-webkit-autofill:focus': {
       WebkitBoxShadow: '0 0 0 100px var(--background) inset',
-      WebkitTextFillColor: 'white',
+      WebkitTextFillcolor: 'var(--white)',
     },
     '&:-webkit-autofill:active': {
       WebkitBoxShadow: '0 0 0 100px var(--background) inset',
-      WebkitTextFillColor: 'white',
+      WebkitTextFillcolor: 'var(--white)',
     },
   },
   // Label color
   '& .MuiInputLabel-root': {
     color: 'var(--input-border)',
     '&.Mui-focused': {
-      color: 'white',
+      color: 'var(--white)',
     },
   },
   // Border color (default, hover, focused)
@@ -259,15 +262,15 @@ export const StyledTextFieldModal = styled(TextField)(() => ({
     borderColor: 'var(--input-border)',
   },
   '&:hover .MuiOutlinedInput-notchedOutline': {
-    borderColor: 'white',
+    borderColor: 'var(--white)',
   },
   '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-    borderColor: 'white',
+    borderColor: 'var(--white)',
   },
   // Убираем стандартные стили автозаполнения
   '& .MuiOutlinedInput-root': {
     '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white',
+      borderColor: 'var(--white)',
     },
   },
 }));
@@ -277,7 +280,7 @@ export const StyledOutlinedInputModal = styled(OutlinedInput)(() => ({
   '& .MuiInputLabel-root': {
     color: 'var(--input-border)',
     '&.Mui-focused': {
-      color: 'white',
+      color: 'var(--white)',
     },
   },
   '& .MuiOutlinedInput-notchedOutline': {
@@ -286,40 +289,40 @@ export const StyledOutlinedInputModal = styled(OutlinedInput)(() => ({
   },
   // Change input text color
   '& .MuiInputBase-input': {
-    color: 'white',
+    color: 'var(--white)',
     // Стили для автозаполнения
     '&:-webkit-autofill': {
       WebkitBoxShadow: '0 0 0 100px var(--background) inset',
-      WebkitTextFillColor: 'white',
-      caretColor: 'white',
+      WebkitTextFillColor: 'var(--white)',
+      caretColor: 'var(--white)',
       borderRadius: '12px',
       border: 'none', // Убираем бордер
       outline: 'none', // Убираем outline
     },
     '&:-webkit-autofill:hover': {
       WebkitBoxShadow: '0 0 0 100px var(--background) inset',
-      WebkitTextFillColor: 'white',
+      WebkitTextFillColor: 'var(--white)',
       border: 'none',
       outline: 'none',
     },
     '&:-webkit-autofill:focus': {
       WebkitBoxShadow: '0 0 0 100px var(--background) inset',
-      WebkitTextFillColor: 'white',
+      WebkitTextFillColor: 'var(--white)',
       border: 'none',
       outline: 'none',
     },
     '&:-webkit-autofill:active': {
       WebkitBoxShadow: '0 0 0 100px var(--background) inset',
-      WebkitTextFillColor: 'white',
+      WebkitTextFillColor: 'var(--white)',
       border: 'none',
       outline: 'none',
     },
   },
   '&:hover .MuiOutlinedInput-notchedOutline': {
-    borderColor: 'white',
+    borderColor: 'var(--white)',
   },
   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-    borderColor: 'white',
+    borderColor: 'var(--white)',
   },
   // Убираем внутренние бордеры
   '& .MuiOutlinedInput-input': {
@@ -331,14 +334,14 @@ export const StyledOutlinedInputModal = styled(OutlinedInput)(() => ({
 export const StyledInputLabel = styled(InputLabel)(() => ({
   color: 'var(--input-border)',
   '&.Mui-focused': {
-    color: 'white',
+    color: 'var(--white)',
   },
 }));
 
 export const StyledIconButton = styled(IconButton)(() => ({
   color: 'var(--input-border)',
   '&:hover': {
-    color: 'white',
+    color: 'var(--white)',
   },
 }));
 
@@ -374,7 +377,7 @@ export const StyledListVideo = styled(Box, {
   },
 }));
 
-export const StyledCardVideo = styled(Card)(() => ({
+export const StyledVideoView = styled(Card)(() => ({
   background: 'none',
   '&.MuiPaper-root': {
     border: 'none',
@@ -493,17 +496,17 @@ export const StyledChatTextField = styled(TextField)(() => ({
   width: '100%',
   // Input text color
   '& .MuiOutlinedInput-input': {
-    color: 'white',
+    color: 'var(--white)',
     paddingRight: '40px',
   },
   '& .MuiFormControl-root': {
-    borderColor: 'white',
+    borderColor: 'var(--white)',
   },
   // Label color
   '& .MuiInputLabel-root': {
     color: 'var(--input-border)',
     '&.Mui-focused': {
-      color: 'white',
+      color: 'var(--white)',
     },
   },
   // Border color (default, hover, focused)
@@ -530,8 +533,8 @@ export const StyledButtonLive = styled(Box)(() => ({
   whiteSpace: 'nowrap',
   padding: '5px 10px',
   borderRadius: '5px',
-  color: 'white',
-  background: 'red',
+  color: 'var(--white)',
+  background: 'var(--live-btn)',
 }));
 
 export const StyledButtonWathers = styled(Button)(() => ({
@@ -543,7 +546,7 @@ export const StyledButtonWathers = styled(Button)(() => ({
   minWidth: 'min-content',
   whiteSpace: 'nowrap',
   padding: '5px',
-  color: 'white',
+  color: 'var(--white)',
   background: 'var(--modal-background)',
 }));
 
@@ -555,7 +558,7 @@ export const StyledSidebar = styled(Box)(() => ({
   display: 'flex',
   flexDirection: 'column',
   minHeight: '100%',
-  background: 'linear-gradient(180deg, rgb(5, 5, 17), rgb(3, 5, 17))',
+  background: 'var(--gradient-sidebar)',
   zIndex: '1000',
   overflow: 'hidden',
   transition: 'all .3s ease',
@@ -568,7 +571,7 @@ export const StyledSidebarName = styled('div')({
   fontSize: '14px',
   fontWeight: 600,
   textTransform: 'uppercase',
-  color: '#6E6E84',
+  color: 'var(--color-sidebar)',
   letterSpacing: '0.5px',
   marginTop: '16px',
   marginBottom: '8px',
@@ -587,13 +590,13 @@ export const StyledSidebarListItem = styled(ListItem)({
   borderRadius: '12px',
   transition: 'all 0.25s ease',
   '&:hover': {
-    background: '#13152c',
+    background: 'rgba(19, 21, 44, 1)',
   },
 });
 
 export const StyledSidebarLink = styled(Link)({
   textDecoration: 'none',
-  color: '#A1A1B5',
+  color: 'var(--color-link)',
   fontSize: '15px',
   fontWeight: 500,
   padding: '5px',
@@ -604,11 +607,11 @@ export const StyledSidebarLink = styled(Link)({
   transition: 'color 0.25s ease',
 
   '&:hover': {
-    color: '#ffffff',
+    color: 'var(--white)',
   },
   '&.active': {
-    color: '#fff',
-    background: 'linear-gradient(90deg, rgba(109,93,251,0.15) 0%, rgba(142,123,255,0.05) 100%)',
+    color: 'var(--white)',
+    background: 'var(--gradient-active-link)',
     borderRadius: '12px',
   },
 });
@@ -620,7 +623,7 @@ export const StyledDrawer = styled(Drawer)(() => ({
     height: '100%',
     minWidth: '250px',
     padding: '25px 16px 0',
-    background: 'linear-gradient(180deg, rgb(5, 5, 17), rgb(3, 5, 17))',
+    background: 'var(--gradient-sidebar)',
     paddingBottom: '200px',
   },
   '@media (max-width: 768px)': {
@@ -645,21 +648,15 @@ export const CardDrawerBoxWatch = styled(Box)(() => ({
   padding: '2px',
   textAlign: 'center',
   borderRadius: '5px',
-  color: 'white',
-  backgroundColor: 'red',
+  color: 'var(--white)',
+  backgroundColor: 'var(--live-btn)',
 }));
-
-interface ICardDrawerTypography {
-  c?: string;
-  fs?: string;
-  isEllipsis: boolean;
-}
 
 export const CardDrawerTypography = styled(Typography, {
   shouldForwardProp: (prop) => prop !== 'c' && prop !== 'fs' && prop !== 'isEllipsis',
 })<ICardDrawerTypography>(({ c, fs, isEllipsis }) => ({
   fontSize: fs ? fs : '1rem',
-  color: c ? c : 'white',
+  color: c ? c : 'var(--white)',
   whiteSpace: 'nowrap',
   overflow: isEllipsis ? 'hidden' : 'visible',
   textOverflow: isEllipsis ? 'ellipsis' : 'clip',
@@ -725,11 +722,11 @@ export const StyledFollowButton = styled(Button)({
   fontWeight: 600,
   marginTop: '10px',
   padding: '8px 28px',
-  color: 'white',
+  color: 'var(--white)',
   borderRadius: '10px',
-  background: 'linear-gradient(90deg, #6557ff 0%, #8f6eff 100%)',
+  background: 'var(--gradient-selected)',
   textTransform: 'none',
-  '&:hover': { background: 'linear-gradient(90deg, #786aff 0%, #a88bff 100%)' },
+  '&:hover': { background: 'var(--gradient-selected-hover)' },
 });
 
 export const StyledAboutSection = styled(Box)({
@@ -783,15 +780,29 @@ const effect = keyframes`
 
 export const StyledVideoCard = styled(Card)({
   position: 'relative',
-  background: 'rgba(255,255,255,0.05)',
+  background: 'var(--background-tabs)',
   borderRadius: '16px',
   overflow: 'hidden',
   cursor: 'pointer',
   transition: 'all 0.3s ease',
   '&:hover': {
     transform: 'translateY(-4px)',
-    background: 'rgba(255,255,255,0.08)',
+    background: 'var(--background-card)',
   },
+});
+
+export const StyledVideoCardInfo = styled(Box)({
+  position: 'absolute',
+  bottom: '0',
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  padding: '10px',
+  overflow: 'hidden',
+  background:
+    'linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgb(139 139 139 / 30%) 50%, rgb(151 151 151 / 80%) 100%)',
+  backdropFilter: 'blur(6px)',
+  pointerEvents: 'none',
 });
 
 export const StyledVideoCardLink = styled(Link)({
@@ -811,30 +822,30 @@ export const StyledFilters = styled(Box)({
 
 export const StyledFilterButton = styled(Button)({
   padding: '4px 12px',
-  background: 'rgba(255, 255, 255, 0.06)',
+  background: 'var(--background-tabs)',
   textTransform: 'none',
   fontSize: '0.95rem',
   fontWeight: 500,
-  color: '#A1A1B5',
+  color: 'var(--color-link)',
   height: 45,
   minWidth: 90,
   borderRadius: '10px',
   transition: 'all 0.25s ease',
   '&:hover': {
-    background: 'rgba(255, 255, 255, 0.1)',
-    color: '#ffffff',
+    background: 'var(--background-tab)',
+    color: 'var(--white)',
   },
   '&.active': {
-    color: '#fff',
-    background: 'linear-gradient(135deg, #6D5DFB 0%, #8E7BFF 100%)',
-    boxShadow: '0 4px 12px rgba(109, 93, 251, 0.35)',
+    color: 'var(--white)',
+    background: 'var(--gradient-selected)',
+    boxShadow: 'var(--boxShadowButton)',
   },
 });
 
 export const StyledScheduleFormControl = styled(FormControl)({
-  color: '#A1A1B5',
+  color: 'var(--color-link)',
   borderRadius: '10px',
-  background: 'rgba(255, 255, 255, 0.06)',
+  background: 'var(--background-tabs)',
   width: '25%',
   height: 45,
   '@media (max-width: 768px)': {
@@ -844,26 +855,26 @@ export const StyledScheduleFormControl = styled(FormControl)({
 
 export const StyledScheduleInputLabel = styled(InputLabel)({
   width: '100%',
-  color: '#A1A1B5',
+  color: 'var(--color-link)',
   '&.Mui-focused': {
-    color: '#A1A1B5',
+    color: 'var(--color-link)',
   },
   '& MuiOutlinedInput-input': {
-    borderColor: '#A1A1B5',
+    borderColor: 'var(--color-link)',
   },
 });
 
 export const StyledScheduleSelect = styled(Select)(() => ({
   width: '100%',
-  color: '#A1A1B5',
+  color: 'var(--color-link)',
   height: 45,
   // // Border color (default, hover, focused)
   '& .MuiOutlinedInput-notchedOutline': {
     borderRadius: '12px',
-    borderColor: '#A1A1B5 !important',
+    borderColor: 'var(--color-link) !important',
   },
   '& .MuiSelect-icon': {
-    color: '#A1A1B5',
+    color: 'var(--color-link)',
   },
 }));
 
@@ -875,10 +886,10 @@ export const StyledScheduleCard = styled(Card)({
   padding: '20px',
   borderRadius: '12px',
   overflow: 'hidden',
-  background: 'rgba(255,255,255,0.05)',
+  background: 'var(--background-tabs)',
   transition: 'all 0.3s ease',
   '&:hover': {
-    background: 'rgba(255,255,255,0.08)',
+    background: 'var(--background-card)',
   },
 });
 
@@ -888,7 +899,7 @@ export const StyledButtonReminder = styled(Button)({
   alignItems: 'center',
   justifyContent: 'space-between',
   fontSize: '1.125rem',
-  color: 'white',
+  color: 'var(--white)',
   borderRadius: '5px',
   padding: '5px 15px',
   background: 'rgba(255, 255, 255, 0.03)',
@@ -898,4 +909,63 @@ export const StyledButtonReminder = styled(Button)({
 export const StyledScheduleCardText = styled(Typography)({
   fontSize: '1rem',
   color: '#cccfd8ff',
+});
+
+// CatalogUsers
+export const StyledUsersGrid = styled(Grid)({
+  justifyContent: 'center',
+  '@media (max-width: 768px)': {
+    justifyContent: 'flex-start',
+  },
+});
+
+export const StyledUserCard = styled(Box)({
+  position: 'relative',
+  borderRadius: 12,
+  padding: '20px',
+  background: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))',
+  boxShadow: '0 8px 30px var(--background-scrollbar)',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  textAlign: 'center',
+  transition: 'transform 220ms ease, box-shadow 220ms ease',
+  '&:hover': {
+    transform: 'translateY(-8px)',
+    boxShadow: '0 18px 50px var(--background-header-menu)',
+  },
+});
+
+export const StyledUserName = styled(Link)({
+  marginTop: 12,
+  fontWeight: 600,
+  color: 'var(--white)',
+  fontSize: 18,
+  '@media (max-width: 768px)': {
+    fontSize: 14,
+  },
+});
+
+export const StyledSubscribeButton = styled(Button)({
+  marginTop: 16,
+  width: '100%',
+  textTransform: 'none',
+  background: 'var(--gradient-selected)',
+  color: 'var(--white)',
+  borderRadius: 10,
+  padding: '10px 14px',
+  boxShadow: 'var(--boxShadowButton)',
+  '&:hover': {
+    background: 'var(--gradient-selected-hover)',
+  },
+});
+
+// avatar wrapper with soft glow
+export const StyledAvatarWrap = styled('div')({
+  width: 96,
+  height: 96,
+  borderRadius: '50%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 });
