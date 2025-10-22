@@ -1,8 +1,10 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { UserProfileSlice } from '../features/UserProfileSlice';
+import { UserProfileSlice } from './slices/UserProfileSlice';
+import { SelectUserSlice } from './slices/SelectUserSlice';
 
 const rootReducer = combineReducers({
   user: UserProfileSlice.reducer,
+  selectUser: SelectUserSlice.reducer,
 });
 
 export const setupStore = () => {

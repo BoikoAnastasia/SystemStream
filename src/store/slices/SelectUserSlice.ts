@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IProfile, IUserProfile } from '../types/share';
+import { IProfile, IUserProfile } from '../../types/share';
 
 const initialState: IUserProfile = {
   data: null,
@@ -7,29 +7,24 @@ const initialState: IUserProfile = {
   isLoading: false,
 };
 
-export const UserProfileSlice = createSlice({
-  name: 'user',
+export const SelectUserSlice = createSlice({
+  name: 'selectedUser',
   initialState,
   reducers: {
-    UserFetch: (state) => {
+    SelectUserFetch: (state) => {
       state.isError = null;
       state.isLoading = true;
     },
-    UserLogout: (state) => {
-      state.data = null;
-      state.isError = false;
-      state.isLoading = false;
-    },
-    UserFetchSuccess: (state, action: PayloadAction<IProfile>) => {
+    SelectUserFetchSuccess: (state, action: PayloadAction<IProfile>) => {
       state.data = action.payload;
       state.isError = null;
       state.isLoading = false;
     },
-    UserFetchError: (state, action) => {
+    SelectUserFetchError: (state, action) => {
       state.isError = action.payload;
       state.isLoading = false;
     },
   },
 });
 
-export default UserProfileSlice.reducer;
+export default SelectUserSlice.reducer;

@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 // redux
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../../store/store';
-import { userProfile } from '../../../../store/reducers/ActionCreate';
+import { fetchUserByNickname, userProfile } from '../../../../store/reducers/ActionCreate';
 // components
 import { VideoCard } from '../../../../components/videoCard/VideoCard';
 import { BannerEffect } from '../../../../components/ui/bannerEffect/BannerEffect';
@@ -18,6 +19,7 @@ import {
   StyledBannerUserName,
   StyledFollowButton,
   StyledInfo,
+  StyledloadingCircle,
   StyledNameComponents,
   StyledProfileSection,
   StyledTitleModal,
@@ -26,37 +28,54 @@ import {
 } from '../../../../components/StylesComponents';
 
 export const UserAbout = () => {
-  const { data } = useAppSelector((state) => state.user);
+  const { nickname } = useParams<{ nickname: string }>();
   const dispatch = useDispatch<AppDispatch>();
 
+  const { data: profile } = useAppSelector((state) => state.user);
+  const { data: selectedUser } = useAppSelector((state) => state.selectUser);
+
   useEffect(() => {
-    if (!data) dispatch(userProfile());
-  }, [data, dispatch]);
+    if (!nickname) return;
+    if (profile?.nickname === nickname) {
+      if (!profile) dispatch(userProfile());
+    } else {
+      dispatch(fetchUserByNickname(nickname));
+    }
+  }, [nickname, dispatch, profile]);
+
+  // if (!profile)
+  //   return (
+  //     <>
+  //       <StyledloadingCircle></StyledloadingCircle>
+  //     </>
+  //   );
+
+  const userData = profile?.nickname === nickname ? profile : selectedUser;
 
   return (
     <ContainerProfileComponents>
       <StyledProfileSection
         sx={{
-          backgroundImage: `url(${data?.backgroundImage})`,
+          backgroundImage: `url(${userData?.backgroundImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
         <StyledInfo>
-          <StyledBannerUserName>{data?.nickname || 'Тестовое имя'}</StyledBannerUserName>
+          <StyledBannerUserName>{userData?.nickname || 'Тестовое имя'}</StyledBannerUserName>
           <StyledBannerUserInfo>Streamer</StyledBannerUserInfo>
           <StyledBannerUserInfo>1.2M подписчиков</StyledBannerUserInfo>
           <StyledFollowButton>Подписаться</StyledFollowButton>
         </StyledInfo>
-        {!data?.backgroundImage && <BannerEffect />}
-        <StyledBannerAvatar src={`url(${data?.profileImage}`} />
+        {!userData?.backgroundImage && <BannerEffect />}
+        <StyledBannerAvatar src={`url(${userData?.profileImage}`} />
         <Socials />
       </StyledProfileSection>
 
       <StyledAboutSection>
         <StyledTitleModal>ОБО МНЕ</StyledTitleModal>
         <StyledNameComponents sx={{ padding: '0 20px' }}>
-          {data?.profileDescription || 'Тестовое описание '}
+          {userData?.profileDescription || 'Тестовое описание '}
         </StyledNameComponents>
       </StyledAboutSection>
       <StyledVideoSection>

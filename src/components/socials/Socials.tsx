@@ -8,7 +8,7 @@ import { StyledIconButton, StyledSocials } from '../StylesComponents';
 const socials = [
   { id: 'in', icon: InstagramIcon, value: '@AvaBennett' },
   { id: 'tw', icon: TwitterIcon, value: '@AvaBennett' },
-  { id: 'tw', icon: TwitterIcon, value: '@AvaBennett' },
+  { id: 'tw2', icon: TwitterIcon, value: '@AvaBennett' },
 ];
 
 export const Socials = () => {

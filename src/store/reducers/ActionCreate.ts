@@ -1,8 +1,10 @@
-import { UserProfileSlice } from '../../features/UserProfileSlice';
+import { UserProfileSlice } from '../slices/UserProfileSlice';
 import { getCookie, removeCookie, setCookie } from '../../utils/cookieFunctions';
 import { AppDispatch } from '../store';
+import { SelectUserSlice } from '../slices/SelectUserSlice';
 
 const { UserFetch, UserFetchError, UserFetchSuccess, UserLogout } = UserProfileSlice.actions;
+const { SelectUserFetch, SelectUserFetchError, SelectUserFetchSuccess } = SelectUserSlice.actions;
 // user
 export const loginUser = async ({ emailOrUsername, password }: { emailOrUsername: string; password: string }) => {
   try {
@@ -82,8 +84,25 @@ export const userProfile = () => async (dispatch: AppDispatch) => {
       },
     });
     const data = await response.json();
-    return dispatch(UserFetchSuccess(data));
+    dispatch(UserFetchSuccess(data));
+    return { payload: data };
   } catch (error) {
     dispatch(UserFetchError(error));
+  }
+};
+
+// fecthUserByNickname
+export const fetchUserByNickname = (nickname: string) => async (dispatch: AppDispatch) => {
+  try {
+    dispatch(SelectUserFetch());
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/publicProfile?nickname=${nickname}`);
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Ошибка авторизации:', error.message || response.statusText);
+    }
+    const data = await response.json();
+    return dispatch(SelectUserFetchSuccess(data));
+  } catch (error) {
+    return dispatch(SelectUserFetchError(error));
   }
 };

@@ -19,6 +19,6 @@ const StreamPage = lazy(() =>
 
 export const routers = [
   { path: '/', Element: MainPage },
-  { path: '/user', Element: UserPage },
+  { path: '/:nickname', Element: UserPage },
   { path: '/stream', Element: StreamPage },
 ];

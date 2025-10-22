@@ -89,6 +89,7 @@ export type CardDrawerType = {
   title: string;
   author: string;
   category: string;
+  href?: string;
 };
 
 export interface ICardDrawerTypography {

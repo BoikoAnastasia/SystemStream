@@ -5,7 +5,7 @@ import { registrationUser } from '../../store/reducers/ActionCreate';
 import { Formik, Form } from 'formik';
 import { validationRegist } from '../../validation/validation';
 // mui
-import { FormControl, InputAdornment } from '@mui/material';
+import { Box, FormControl, InputAdornment } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import {
@@ -116,10 +116,10 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
               label="Password"
             />
             {touched.password && errors.password && (
-              <div style={{ color: 'var(--error)', fontSize: '12px', marginTop: '4px' }}>{errors.password}</div>
+              <Box sx={{ color: 'var(--error)', fontSize: '12px', marginTop: '4px' }}>{errors.password}</Box>
             )}
             {errorMessage && (
-              <div style={{ color: 'var(--error)', fontSize: '14px', marginTop: '-10px' }}>{errorMessage}</div>
+              <Box sx={{ color: 'var(--error)', fontSize: '14px', marginTop: '-10px' }}>{errorMessage}</Box>
             )}
           </FormControl>
           <StyledButtonsForm>

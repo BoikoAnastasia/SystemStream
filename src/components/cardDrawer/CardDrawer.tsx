@@ -12,10 +12,10 @@ interface ICardDrawerProps {
 }
 
 export const CardDrawer = ({ card, variant = 'full' }: ICardDrawerProps) => {
-  const { author, avatar, category, title, views } = card;
+  const { author, avatar, category, title, views, href } = card;
 
   return (
-    <Link to="/user">
+    <Link to={href!}>
       <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
         <Box sx={{ position: 'relative' }}>
           <Avatar alt="avatar" src={avatar} sx={{ width: '50px', height: '50px' }} />

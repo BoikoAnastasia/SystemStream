@@ -56,7 +56,6 @@ export const HeaderMenuAvatar = () => {
   };
 
   useEffect(() => {
-    console.log(isLogged);
     const interval = setInterval(() => {
       const cookieExists = checkCookie('tokenData');
       setIsLogged(cookieExists);

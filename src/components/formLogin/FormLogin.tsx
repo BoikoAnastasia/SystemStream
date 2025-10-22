@@ -10,7 +10,7 @@ import { validationLogin } from '../../validation/validation';
 // mui
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { FormControl, InputAdornment } from '@mui/material';
+import { Box, FormControl, InputAdornment } from '@mui/material';
 import {
   StyledButtonsForm,
   StyledButtonForm,
@@ -49,9 +49,12 @@ export const FormLogin = ({
     const isRight = await loginUser({ emailOrUsername: values.username, password: values.password });
     if (isRight) {
       setMessage('Вы успешно вошли!');
-      await dispatch(userProfile());
+      const action = await dispatch(userProfile());
+      const userData = action?.payload;
+
       handleClose();
-      navigate('/user');
+      if (userData?.nickname) navigate(`/${userData.nickname}`);
+      else navigate('/');
     } else {
       setMessage(null);
       setErrorMessage('Неверный логин или пароль.');
@@ -105,17 +108,17 @@ export const FormLogin = ({
               label="Password"
             />
             {touched.password && errors.password && (
-              <div style={{ color: 'var(--error)', fontSize: '12px', marginTop: '4px' }}>{errors.password}</div>
+              <Box sx={{ color: 'var(--error)', fontSize: '12px', marginTop: '4px' }}>{errors.password}</Box>
             )}
           </FormControl>
           {errorMessage && (
-            <div style={{ color: 'var(--error)', fontSize: '14px', marginTop: '-10px' }}>{errorMessage}</div>
+            <Box sx={{ color: 'var(--error)', fontSize: '14px', marginTop: '-10px' }}>{errorMessage}</Box>
           )}
           <StyledButtonsForm>
             <StyledButtonForm variant="contained" type="submit">
               Войти
             </StyledButtonForm>
-            <div style={{ color: 'var(--white)', fontSize: '14px' }}>или</div>
+            <Box sx={{ color: 'var(--white)', fontSize: '14px' }}>или</Box>
             <StyledButtonForm bgcolor={'var(--background-line)'} c={'var(--input-background)'}>
               Продолжить с помощью Google
             </StyledButtonForm>
