@@ -1,12 +1,14 @@
+import { useEffect } from 'react';
+// redux
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../../../store/store';
+import { userProfile } from '../../../../store/reducers/ActionCreate';
 // components
 import { VideoCard } from '../../../../components/videoCard/VideoCard';
 import { BannerEffect } from '../../../../components/ui/bannerEffect/BannerEffect';
+import { Socials } from '../../../../components/socials/Socials';
 // redux
 import { useAppSelector } from '../../../../hooks/redux';
-// mui
-import { Typography } from '@mui/material';
-import InstagramIcon from '@mui/icons-material/Instagram';
-import TwitterIcon from '@mui/icons-material/Twitter';
 // styles
 import {
   ContainerProfileComponents,
@@ -15,11 +17,9 @@ import {
   StyledBannerUserInfo,
   StyledBannerUserName,
   StyledFollowButton,
-  StyledIconButton,
   StyledInfo,
   StyledNameComponents,
   StyledProfileSection,
-  StyledSocials,
   StyledTitleModal,
   StyledVideoGrid,
   StyledVideoSection,
@@ -27,34 +27,37 @@ import {
 
 export const UserAbout = () => {
   const { data } = useAppSelector((state) => state.user);
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    if (!data) dispatch(userProfile());
+  }, [data, dispatch]);
 
   return (
     <ContainerProfileComponents>
-      <StyledProfileSection>
+      <StyledProfileSection
+        sx={{
+          backgroundImage: `url(${data?.backgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
         <StyledInfo>
           <StyledBannerUserName>{data?.nickname || 'Тестовое имя'}</StyledBannerUserName>
           <StyledBannerUserInfo>Streamer</StyledBannerUserInfo>
-          <StyledBannerUserInfo>1.2M followers</StyledBannerUserInfo>
+          <StyledBannerUserInfo>1.2M подписчиков</StyledBannerUserInfo>
           <StyledFollowButton>Подписаться</StyledFollowButton>
         </StyledInfo>
-        <BannerEffect />
-        <StyledBannerAvatar src="./img/banner-user/banner-02.png" />
+        {!data?.backgroundImage && <BannerEffect />}
+        <StyledBannerAvatar src={`url(${data?.profileImage}`} />
+        <Socials />
       </StyledProfileSection>
+
       <StyledAboutSection>
         <StyledTitleModal>ОБО МНЕ</StyledTitleModal>
         <StyledNameComponents sx={{ padding: '0 20px' }}>
-          {data?.profileDescription || 'Тестового описания нет'}
+          {data?.profileDescription || 'Тестовое описание '}
         </StyledNameComponents>
-        <StyledSocials>
-          <StyledIconButton>
-            <InstagramIcon />
-            <Typography>@AvaBennett</Typography>
-          </StyledIconButton>
-          <StyledIconButton>
-            <TwitterIcon />
-            <Typography>@AnaBennett</Typography>
-          </StyledIconButton>
-        </StyledSocials>
       </StyledAboutSection>
       <StyledVideoSection>
         <StyledTitleModal>ПОСЛЕДНИЕ СТРИМЫ</StyledTitleModal>

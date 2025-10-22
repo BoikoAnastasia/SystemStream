@@ -20,13 +20,7 @@ import {
   Typography,
 } from '@mui/material';
 import { keyframes } from '@emotion/react';
-import {
-  ICardDrawerTypography,
-  IStyledButtonDark,
-  IStyledButtonForm,
-  IStyledListVideo,
-  StyledButtonSearchProps,
-} from '../types/share';
+import { ICardDrawerTypography, IStyledButtonDark, IStyledButtonForm, StyledButtonSearchProps } from '../types/share';
 
 const Rotate = keyframes`
   from {
@@ -336,6 +330,8 @@ export const StyledInputLabel = styled(InputLabel)(() => ({
 
 export const StyledIconButton = styled(IconButton)(() => ({
   color: 'var(--input-border)',
+  borderRadius: 0,
+  // background: 'var(--background-tabs)',
   '&:hover': {
     color: 'var(--white)',
   },
@@ -352,44 +348,6 @@ export const StyledButtonForm = styled(Button, {
   '&:hover': {
     color: hovercolor || 'white',
     backgroundColor: hoverbgcolor || 'var(--button-light-hover)',
-  },
-}));
-
-// ListVideo
-export const StyledBoxListVideo = styled(Box)(() => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '28px',
-}));
-
-export const StyledListVideo = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'columns' && prop !== 'columnsMb',
-})<IStyledListVideo>(({ columns, columnsMb }) => ({
-  display: 'grid',
-  gridTemplateColumns: `repeat(${columns ? columns : 4}, 1fr)`,
-  gap: '12px',
-  '@media (max-width: 768px)': {
-    gridTemplateColumns: `repeat(${columnsMb ? columnsMb : 2}, 1fr)`,
-  },
-}));
-
-export const StyledVideoView = styled(Card)(() => ({
-  background: 'none',
-  '&.MuiPaper-root': {
-    border: 'none',
-    boxShadow: 'none',
-  },
-}));
-
-export const StyledUserHeaderBox = styled(Box)(() => ({
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  padding: '0 16px 0',
-  gap: '20px',
-  '@media (max-width: 768px)': {
-    flexDirection: 'column',
-    padding: '0',
   },
 }));
 
@@ -423,14 +381,6 @@ export const StyledButtonDark = styled(Button, {
   borderRadius: br || '20px',
   textTransform: 'none',
   backgroundColor: 'var(--button-dark)',
-}));
-
-// StreamPage
-export const StyledStreamBoxAbout = styled(Box)(() => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '12px',
-  padding: '20px',
 }));
 
 // Chat
@@ -476,13 +426,6 @@ export const StyledChatCardNickname = styled(Box, {
 
 export const StyledChatCardMessage = styled(Box)(() => ({
   fontSize: '14px',
-  wordBreak: 'break-word',
-}));
-
-export const StyledChatCardMessageCurrentUser = styled(Box)(() => ({
-  gridArea: 'message',
-  fontSize: '16px',
-  color: 'var(--input-background)',
   wordBreak: 'break-word',
 }));
 
@@ -672,13 +615,15 @@ export const StyledProfileSection = styled(Box)({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
+  gap: '20px',
   height: '550px',
   padding: '20px 60px 40px',
   borderRadius: '20px',
   overflow: 'hidden',
-  '@media (max-width: 1024px)': {
+  '@media (max-width: 768px)': {
     flexDirection: 'column',
-    padding: '10px',
+    height: 'auto',
+    padding: '20px',
   },
 });
 
@@ -692,24 +637,16 @@ export const StyledInfo = styled(Box)({
   zIndex: 2,
   '@media (max-width: 768px)': {
     maxWidth: '100%',
+    alignItems: 'center',
   },
 });
 
 export const StyledBannerAvatar = styled(Avatar)(() => ({
-  position: 'absolute',
-  height: '100%',
-  width: '56%',
-  right: 0,
-  bottom: 0,
-  borderRadius: 0,
-  objectFit: 'cover',
-  '@media (max-width: 1024px)': {
-    height: '70%',
-    width: '73%',
-  },
+  height: '300px',
+  width: '300px',
   '@media (max-width: 768px)': {
-    height: '65%',
-    width: '100%',
+    height: '150px',
+    width: '150px',
   },
 }));
 
@@ -733,10 +670,22 @@ export const StyledAboutSection = styled(Box)({
 });
 
 export const StyledSocials = styled(Box)({
-  display: 'flex',
+  position: 'absolute',
+  left: 0,
+  bottom: 0,
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+  gridAutoFlow: 'column',
   alignItems: 'center',
+  justifyContent: 'center',
   gap: '20px',
+  width: '100%',
   padding: '0 20px',
+  '@media (max-width: 768px)': {
+    position: 'relative',
+    gridTemplateColumns: 'repeat(2, minmax(150px, 1fr))',
+    gridAutoFlow: 'row',
+  },
 });
 
 export const StyledVideoSection = styled(Box)({

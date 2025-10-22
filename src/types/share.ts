@@ -31,11 +31,6 @@ export interface IStyledButtonDark {
   br?: string;
 }
 
-export interface IStyledListVideo {
-  columns?: string;
-  columnsMb?: string;
-}
-
 export interface ITabPanelProps {
   children?: React.ReactNode;
   index: number;
