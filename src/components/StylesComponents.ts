@@ -22,22 +22,53 @@ import {
 import { keyframes } from '@emotion/react';
 import { ICardDrawerTypography, IStyledButtonDark, IStyledButtonForm, StyledButtonSearchProps } from '../types/share';
 
-const Rotate = keyframes`
-  from {
-    transform: rotate(0deg)
+const animloader = keyframes`
+  0% {
+    transform: translateY(8px) scaleY(1) scaleX(1.25);
   }
-  to {
-    transform: rotate(360deg)
-  }`;
-
-export const StyledloadingCircle = styled(Typography)(() => ({
-  width: '60px',
-  height: '60px',
-  display: 'block',
-  borderRadius: '50%',
-  border: '3px dashed white',
+  25%, 75% {
+    transform: translateY(-5px) scaleY(1.2) scaleX(1);
+  }
+  50% {
+    transform: translateY(-10px) scaleY(1) scaleX(1);
+  }
+  100% {
+    transform: translateY(8px) scaleY(0.8) scaleX(0.8);
+  }
+`;
+export const Styledloading = styled('span')(() => ({
+  position: 'relative',
+  display: 'inline-block',
+  fontSize: '2.5rem',
+  fontFamily: 'Arial, Helvetica, sans-serif',
+  color: '#FFF',
   margin: '0 auto',
-  animation: `${Rotate} 2.0s infinite linear`,
+  letterSpacing: '2px',
+  boxSizing: 'border-box',
+
+  '&::before': {
+    content: '""',
+    boxSizing: 'border-box',
+    position: 'absolute',
+    right: '54px',
+    bottom: '9.5px',
+    height: '24px',
+    width: '5.15px',
+    background: 'currentColor',
+  },
+
+  '&::after': {
+    content: '""',
+    width: '8px',
+    height: '8px',
+    position: 'absolute',
+    left: '99px',
+    top: '-5px',
+    borderRadius: '50%',
+    background: 'red',
+    boxSizing: 'border-box',
+    animation: `${animloader} 1s ease-in infinite`,
+  },
 }));
 
 export const ContainerBox = styled(Box)(() => ({

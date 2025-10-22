@@ -19,7 +19,6 @@ import {
   StyledBannerUserName,
   StyledFollowButton,
   StyledInfo,
-  StyledloadingCircle,
   StyledNameComponents,
   StyledProfileSection,
   StyledTitleModal,
@@ -43,12 +42,7 @@ export const UserAbout = () => {
     }
   }, [nickname, dispatch, profile]);
 
-  // if (!profile)
-  //   return (
-  //     <>
-  //       <StyledloadingCircle></StyledloadingCircle>
-  //     </>
-  //   );
+  // if (!profile) return <Loader />;
 
   const userData = profile?.nickname === nickname ? profile : selectedUser;
 

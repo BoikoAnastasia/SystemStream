@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { routers } from './routers/routers';
-import { StyledloadingCircle } from './components/StylesComponents';
 import { NotFound } from './pages/NotFound/NotFound';
 import './index.css';
 import { Providers } from './Providers';
+import { Loader } from './components/ui/loader/Loader';
 
 function App() {
   return (
@@ -27,7 +27,7 @@ function App() {
 }
 
 const Loading = () => {
-  return <StyledloadingCircle></StyledloadingCircle>;
+  return <Loader />;
 };
 
 export default App;
