@@ -12,9 +12,11 @@ import { checkCookie } from '../../../utils/cookieFunctions';
 // mui
 import { IconButton, MenuItem } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
+import { useAppSelector } from '../../../hooks/redux';
 
 export const HeaderMenuAvatar = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const { data: profile } = useAppSelector((state) => state.user);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openModal, setOpenModal] = useState(false);
@@ -25,11 +27,11 @@ export const HeaderMenuAvatar = () => {
       value: 'Личный кабинет',
     },
     {
-      href: '/user',
+      href: `/${profile?.nickname}`,
       value: 'Профиль',
     },
     {
-      href: '/',
+      href: '/settings',
       value: 'Настройки',
     },
   ];

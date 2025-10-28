@@ -29,7 +29,6 @@ import {
 export const UserAbout = () => {
   const { nickname } = useParams<{ nickname: string }>();
   const dispatch = useDispatch<AppDispatch>();
-
   const { data: profile } = useAppSelector((state) => state.user);
   const { data: selectedUser } = useAppSelector((state) => state.selectUser);
 
@@ -37,12 +36,10 @@ export const UserAbout = () => {
     if (!nickname) return;
     if (profile?.nickname === nickname) {
       if (!profile) dispatch(userProfile());
-    } else {
-      dispatch(fetchUserByNickname(nickname));
+      return;
     }
+    dispatch(fetchUserByNickname(nickname));
   }, [nickname, dispatch, profile]);
-
-  // if (!profile) return <Loader />;
 
   const userData = profile?.nickname === nickname ? profile : selectedUser;
 

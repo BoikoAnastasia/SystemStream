@@ -60,11 +60,15 @@ export const registrationUser = async ({
       },
       body: JSON.stringify({ Nickname: username, Email: email, Password: password }),
     });
+    console.log('response: ', response);
     if (!response.ok) {
+      console.log('response.json: ', response);
       const errorData = await response.json();
+      console.log('errorData: ', errorData);
       return { success: false, message: errorData.message || `Ошибка: ${response.status}` };
     }
     const result = await response.json();
+    console.log('result: ', result);
     return { success: true, data: result };
   } catch (e: any) {
     return { success: false, message: e.message || 'Ошибка регистрации' };
@@ -95,7 +99,22 @@ export const userProfile = () => async (dispatch: AppDispatch) => {
 export const fetchUserByNickname = (nickname: string) => async (dispatch: AppDispatch) => {
   try {
     dispatch(SelectUserFetch());
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/publicProfile?nickname=${nickname}`);
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/public-profile-nickname?nickname=${nickname}`);
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Ошибка авторизации:', error.message || response.statusText);
+    }
+    const data = await response.json();
+    return dispatch(SelectUserFetchSuccess(data));
+  } catch (error) {
+    return dispatch(SelectUserFetchError(error));
+  }
+};
+
+export const fetchUserById = (id: number) => async (dispatch: AppDispatch) => {
+  try {
+    dispatch(SelectUserFetch());
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/public-profile-id?userId=${id}`);
     if (!response.ok) {
       const error = await response.json();
       console.error('Ошибка авторизации:', error.message || response.statusText);
