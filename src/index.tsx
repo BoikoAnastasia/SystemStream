@@ -1,12 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import { ThemeProvider } from '@mui/material/styles';
-import { theme } from './theme';
+// redux, store
 import { setupStore } from './store/store';
 import { Provider } from 'react-redux';
+// components
+import reportWebVitals from './reportWebVitals';
+import App from './App';
+// styles, theme
+import { ThemeProvider } from '@mui/material/styles';
+import theme from './theme';
+import './index.css';
 
 import { BrowserRouter } from 'react-router-dom';
 const store = setupStore();
@@ -16,9 +19,9 @@ root.render(
   <Provider store={store}>
     <BrowserRouter>
       <React.StrictMode>
-        {/* <ThemeProvider theme={theme}> */}
-        <App />
-        {/* </ThemeProvider> */}
+        <ThemeProvider theme={theme}>
+          <App />
+        </ThemeProvider>
       </React.StrictMode>
     </BrowserRouter>
   </Provider>

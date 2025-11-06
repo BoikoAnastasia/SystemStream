@@ -20,6 +20,9 @@ export const StyleHeaderBlock = styled(Box)(() => ({
   gap: '15px',
   justifyContent: 'flex-end',
   width: '100%',
+  '@media (max-width: 768px)': {
+    gap: '5px',
+  },
 }));
 
 export const StyledMenu = styled(Menu)(() => ({

@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { Link, useParams } from 'react-router-dom';
 // redux
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../../store/store';
-import { fetchUserByNickname, userProfile } from '../../../../store/reducers/ActionCreate';
+import { fetchUserByNickname, userProfile } from '../../../../store/actions/UserActions';
 // components
 import { VideoCard } from '../../../../components/videoCard/VideoCard';
 import { BannerEffect } from '../../../../components/ui/bannerEffect/BannerEffect';
@@ -25,12 +25,36 @@ import {
   StyledVideoGrid,
   StyledVideoSection,
 } from '../../../../components/StylesComponents';
+import { fetchStreamKey, fetchStreamView } from '../../../../store/actions/StreamActions';
+import { VideoHls } from '../../../../components/videoHls/VideoHls';
+import Hls from 'hls.js';
 
 export const UserAbout = () => {
   const { nickname } = useParams<{ nickname: string }>();
   const dispatch = useDispatch<AppDispatch>();
   const { data: profile } = useAppSelector((state) => state.user);
   const { data: selectedUser } = useAppSelector((state) => state.selectUser);
+  const { data: stream } = useAppSelector((state) => state.stream);
+  const { data: setting } = useAppSelector((state) => state.settings);
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  const startStream = (hlsUrl: string) => {
+    if (videoRef.current) {
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(hlsUrl);
+        hls.attachMedia(videoRef.current);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          videoRef.current?.play();
+        });
+      } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
+        videoRef.current.src = hlsUrl;
+        videoRef.current.play();
+      }
+    }
+  };
+  const showWaitingScreen = () => {};
 
   useEffect(() => {
     if (!nickname) return;
@@ -40,6 +64,28 @@ export const UserAbout = () => {
     }
     dispatch(fetchUserByNickname(nickname));
   }, [nickname, dispatch, profile]);
+
+  useEffect(() => {
+    if (stream?.isLive && setting?.streamServerUrl) {
+      startStream(stream.hlsUrl);
+    } else {
+      showWaitingScreen();
+    }
+  }, [stream, setting]);
+
+  useEffect(() => {
+    if (!nickname) return;
+    if (!setting) dispatch(fetchStreamKey());
+  }, [dispatch, nickname, setting]);
+
+  useEffect(() => {
+    if (!nickname) return;
+    const interval = setInterval(() => {
+      dispatch(fetchStreamView(nickname));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [nickname, dispatch]);
 
   const userData = profile?.nickname === nickname ? profile : selectedUser;
 
@@ -53,11 +99,23 @@ export const UserAbout = () => {
         }}
       >
         <StyledInfo>
+          {setting && stream && (
+            <Link
+              to={setting.streamServerUrl!}
+              style={{
+                width: '70%',
+                height: '100%',
+              }}
+            >
+              <VideoHls videoRef={videoRef} />
+            </Link>
+          )}
           <StyledBannerUserName>{userData?.nickname || 'Тестовое имя'}</StyledBannerUserName>
           <StyledBannerUserInfo>Streamer</StyledBannerUserInfo>
           <StyledBannerUserInfo>1.2M подписчиков</StyledBannerUserInfo>
           <StyledFollowButton>Подписаться</StyledFollowButton>
         </StyledInfo>
+
         {!userData?.backgroundImage && <BannerEffect />}
         <StyledBannerAvatar src={`url(${userData?.profileImage}`} />
         <Socials />

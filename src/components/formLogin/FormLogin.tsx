@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 // store
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../store/store';
-import { loginUser, userProfile } from '../../store/reducers/ActionCreate';
+import { loginUser, userProfile } from '../../store/actions/UserActions';
 // formik
 import { Formik, Form } from 'formik';
 import { validationLogin } from '../../validation/validation';

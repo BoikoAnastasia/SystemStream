@@ -4,11 +4,11 @@ import { AppDispatch } from '../store';
 import { SelectUserSlice } from '../slices/SelectUserSlice';
 
 const { UserFetch, UserFetchError, UserFetchSuccess, UserLogout } = UserProfileSlice.actions;
-const { SelectUserFetch, SelectUserFetchError, SelectUserFetchSuccess } = SelectUserSlice.actions;
+const { SelectUserFetch, SelectUserError, SelectUserFetchSuccess } = SelectUserSlice.actions;
 // user
 export const loginUser = async ({ emailOrUsername, password }: { emailOrUsername: string; password: string }) => {
   try {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/login`, {
+    const response = await fetch(`${process.env.REACT_APP_API_USER}/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ export const registrationUser = async ({
   password: string;
 }) => {
   try {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/register`, {
+    const response = await fetch(`${process.env.REACT_APP_API_USER}/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ export const userProfile = () => async (dispatch: AppDispatch) => {
   try {
     dispatch(UserFetch());
     const token = getCookie('tokenData');
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/profile`, {
+    const response = await fetch(`${process.env.REACT_APP_API_USER}/profile`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ export const userProfile = () => async (dispatch: AppDispatch) => {
 export const fetchUserByNickname = (nickname: string) => async (dispatch: AppDispatch) => {
   try {
     dispatch(SelectUserFetch());
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/public-profile-nickname?nickname=${nickname}`);
+    const response = await fetch(`${process.env.REACT_APP_API_USER}/public-profile-nickname?nickname=${nickname}`);
     if (!response.ok) {
       const error = await response.json();
       console.error('Ошибка авторизации:', error.message || response.statusText);
@@ -107,14 +107,14 @@ export const fetchUserByNickname = (nickname: string) => async (dispatch: AppDis
     const data = await response.json();
     return dispatch(SelectUserFetchSuccess(data));
   } catch (error) {
-    return dispatch(SelectUserFetchError(error));
+    return dispatch(SelectUserError(error));
   }
 };
 
 export const fetchUserById = (id: number) => async (dispatch: AppDispatch) => {
   try {
     dispatch(SelectUserFetch());
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/public-profile-id?userId=${id}`);
+    const response = await fetch(`${process.env.REACT_APP_API_USER}/public-profile-id?userId=${id}`);
     if (!response.ok) {
       const error = await response.json();
       console.error('Ошибка авторизации:', error.message || response.statusText);
@@ -122,6 +122,6 @@ export const fetchUserById = (id: number) => async (dispatch: AppDispatch) => {
     const data = await response.json();
     return dispatch(SelectUserFetchSuccess(data));
   } catch (error) {
-    return dispatch(SelectUserFetchError(error));
+    return dispatch(SelectUserError(error));
   }
 };

@@ -1,30 +1,30 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IProfile, IUserProfileSlice } from '../../types/share';
+import { IStream } from '../../types/share';
 
-const initialState: IUserProfileSlice = {
+const initialState: any = {
   data: null,
   isError: false,
   isLoading: false,
 };
 
-export const SelectUserSlice = createSlice({
-  name: 'selectedUser',
+export const StreamSlice = createSlice({
+  name: 'stream',
   initialState,
   reducers: {
-    SelectUserFetch: (state) => {
+    StreamSliceFetch: (state) => {
       state.isError = null;
       state.isLoading = true;
     },
-    SelectUserFetchSuccess: (state, action: PayloadAction<IProfile>) => {
+    StreamSliceSuccess: (state, action: PayloadAction<IStream>) => {
       state.data = action.payload;
       state.isError = null;
       state.isLoading = false;
     },
-    SelectUserError: (state, action) => {
+    StreamSliceError: (state, action) => {
       state.isError = action.payload;
       state.isLoading = false;
     },
   },
 });
 
-export default SelectUserSlice.reducer;
+export default StreamSlice.reducer;

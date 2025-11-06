@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 // redux
 import { AppDispatch } from '../../../store/store';
 import { useDispatch } from 'react-redux';
-import { logoutUser } from '../../../store/reducers/ActionCreate';
+import { logoutUser } from '../../../store/actions/UserActions';
+import { useAppSelector } from '../../../hooks/redux';
 // components
 import { StyledMenu, StyledMenuButton } from '../../../layout/StyledLayout';
 import { ModalComponent } from '../../modal/ModalComponent';
@@ -12,7 +13,6 @@ import { checkCookie } from '../../../utils/cookieFunctions';
 // mui
 import { IconButton, MenuItem } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
-import { useAppSelector } from '../../../hooks/redux';
 
 export const HeaderMenuAvatar = () => {
   const dispatch = useDispatch<AppDispatch>();

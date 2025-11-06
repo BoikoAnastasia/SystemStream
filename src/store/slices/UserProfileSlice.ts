@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IProfile, IUserProfile } from '../../types/share';
+import { IProfile, IUserProfileSlice } from '../../types/share';
 
-const initialState: IUserProfile = {
+const initialState: IUserProfileSlice = {
   data: null,
   isError: false,
   isLoading: false,

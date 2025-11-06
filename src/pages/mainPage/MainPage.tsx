@@ -1,10 +1,14 @@
 import { FC, JSX } from 'react';
+// layout
 import { appLayout } from '../../layout/index';
+// components
 import { TabsComponent } from '../../components/ui/tabs/TabsComponent';
 import { SectionListVideo } from '../../components/sectionListVideo/SectionListVideo';
-import { Box } from '@mui/material';
 import { ContainerBox } from '../../components/StylesComponents';
 import { CatalogUsers } from '../../components/catalogUsers/CatalogUsers';
+// mui
+import { Box } from '@mui/material';
+// types
 import { IUser, IVideoItem } from '../../types/share';
 
 export const MainPage: FC = appLayout((): JSX.Element => {

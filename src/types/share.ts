@@ -1,10 +1,25 @@
 import { ReactNode } from 'react';
 
-export interface IUserProfile {
+// slice
+export interface IUserProfileSlice {
   data: IProfile | null;
   isLoading: boolean;
   isError: string | null | boolean;
 }
+
+export interface ISettingsSlice {
+  data: ISetting | null;
+  isError: string | null | boolean;
+  isLoading: boolean;
+}
+
+export interface IStreamSlice {
+  data: IStream | null;
+  isError: string | null | boolean;
+  isLoading: boolean;
+}
+
+// data
 
 export interface IProfile {
   id: number;
@@ -16,6 +31,24 @@ export interface IProfile {
   registrationDate: Date;
   isOnline: boolean;
   cashBalance: number;
+}
+
+export interface ISetting {
+  streamKey: string;
+  streamServerUrl: string;
+}
+
+export interface IStream {
+  streamId: number;
+  streamName: string;
+  streamerName: string;
+  streamerId: number;
+  tags: [];
+  previewlUrl: null | string;
+  hlsUrl: string;
+  totalViews: number;
+  startedAt: string;
+  isLive: boolean;
 }
 
 // components

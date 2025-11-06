@@ -1,6 +1,6 @@
 import { Dispatch, MouseEvent, SetStateAction, useState } from 'react';
 // reducer
-import { registrationUser } from '../../store/reducers/ActionCreate';
+import { registrationUser } from '../../store/actions/UserActions';
 // formik
 import { Formik, Form } from 'formik';
 import { validationRegist } from '../../validation/validation';

@@ -1,30 +1,30 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IProfile, IUserProfileSlice } from '../../types/share';
+import { ISetting, ISettingsSlice } from '../../types/share';
 
-const initialState: IUserProfileSlice = {
+const initialState: ISettingsSlice = {
   data: null,
   isError: false,
   isLoading: false,
 };
 
-export const SelectUserSlice = createSlice({
-  name: 'selectedUser',
+export const SettingsSlice = createSlice({
+  name: 'settings',
   initialState,
   reducers: {
-    SelectUserFetch: (state) => {
+    SettingsSliceFetch: (state) => {
       state.isError = null;
       state.isLoading = true;
     },
-    SelectUserFetchSuccess: (state, action: PayloadAction<IProfile>) => {
+    SettingsSliceSuccess: (state, action: PayloadAction<ISetting>) => {
       state.data = action.payload;
       state.isError = null;
       state.isLoading = false;
     },
-    SelectUserError: (state, action) => {
+    SettingsSliceError: (state, action) => {
       state.isError = action.payload;
       state.isLoading = false;
     },
   },
 });
 
-export default SelectUserSlice.reducer;
+export default SettingsSlice.reducer;
