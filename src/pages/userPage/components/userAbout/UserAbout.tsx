@@ -38,6 +38,7 @@ export const UserAbout = () => {
   const { data: setting } = useAppSelector((state) => state.settings);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamStartedRef = useRef(false);
 
   const startStream = (hlsUrl: string) => {
     if (videoRef.current) {
@@ -54,7 +55,6 @@ export const UserAbout = () => {
       }
     }
   };
-  const showWaitingScreen = () => {};
 
   useEffect(() => {
     if (!nickname) return;
@@ -67,9 +67,14 @@ export const UserAbout = () => {
 
   useEffect(() => {
     if (stream?.isLive && setting?.streamServerUrl) {
-      startStream(stream.hlsUrl);
-    } else {
-      showWaitingScreen();
+      if (stream.isLive && !streamStartedRef.current) {
+        startStream(stream.hlsUrl);
+        streamStartedRef.current = true;
+      }
+    } else if (!stream.isLive) {
+      // Поток закончился
+      streamStartedRef.current = false;
+      if (videoRef.current) videoRef.current.src = '';
     }
   }, [stream, setting]);
 
@@ -80,6 +85,11 @@ export const UserAbout = () => {
 
   useEffect(() => {
     if (!nickname) return;
+
+    // Сначала вызываем один раз сразу
+    dispatch(fetchStreamView(nickname));
+
+    // Затем запускаем интервал
     const interval = setInterval(() => {
       dispatch(fetchStreamView(nickname));
     }, 5000);
