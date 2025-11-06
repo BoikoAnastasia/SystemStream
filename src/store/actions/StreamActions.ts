@@ -62,16 +62,10 @@ export const postStreamKey = () => async (dispatch: AppDispatch) => {
 export const fetchStreamView = (nickname: string) => async (dispatch: AppDispatch) => {
   try {
     dispatch(StreamSliceFetch());
-    const token = getCookie('tokenData');
-    if (!token) return;
-    console.log('token:', token);
-    const response = await fetch(`${process.env.REACT_APP_API_STREAM_VIEW}/${nickname}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    // const token = getCookie('tokenData');
+    // if (!token) return;
+    // console.log('token:', token);
+    const response = await fetch(`${process.env.REACT_APP_API_STREAM_VIEW}/${nickname}`);
     console.log(response);
     if (!response.ok) {
       const error = await response.json();
