@@ -71,7 +71,7 @@ export const UserAbout = () => {
         startStream(stream.hlsUrl);
         streamStartedRef.current = true;
       }
-    } else if (!stream.isLive) {
+    } else if (!stream?.isLive) {
       // Поток закончился
       streamStartedRef.current = false;
       if (videoRef.current) videoRef.current.src = '';
