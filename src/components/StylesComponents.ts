@@ -82,7 +82,7 @@ export const ContainerBox = styled(Box)(() => ({
 }));
 
 export const StyledBannerUserName = styled('h1')(() => ({
-  fontSize: '60px',
+  fontSize: '40px',
   fontWeight: 'bold',
   color: 'var(--white)',
   '@media (max-width: 1024px)': {
@@ -91,7 +91,7 @@ export const StyledBannerUserName = styled('h1')(() => ({
 }));
 
 export const StyledBannerUserInfo = styled('h1')(() => ({
-  fontSize: '34px',
+  fontSize: '28px',
   fontWeight: 400,
   color: '#bbb',
   '@media (max-width: 1024px)': {
@@ -638,7 +638,7 @@ export const ContainerProfileComponents = styled(Box)(() => ({
   display: 'flex',
   flexDirection: 'column',
   gap: '30px',
-  padding: '40px 0',
+  paddingBottom: '40px',
 }));
 
 export const StyledProfileSection = styled(Box)({
@@ -647,7 +647,7 @@ export const StyledProfileSection = styled(Box)({
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: '20px',
-  height: '550px',
+  height: '330px',
   padding: '20px 60px 40px',
   borderRadius: '20px',
   overflow: 'hidden',
@@ -673,12 +673,8 @@ export const StyledInfo = styled(Box)({
 });
 
 export const StyledBannerAvatar = styled(Avatar)(() => ({
-  height: '300px',
-  width: '300px',
-  '@media (max-width: 768px)': {
-    height: '150px',
-    width: '150px',
-  },
+  height: '150px',
+  width: '150px',
 }));
 
 export const StyledFollowButton = styled(Button)({

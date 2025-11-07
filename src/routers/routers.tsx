@@ -12,11 +12,11 @@ const UserPage = lazy(() =>
   }))
 );
 
-const StreamPage = lazy(() =>
-  import('../pages/streamPage/StreamPage').then(({ StreamPage }) => ({
-    default: StreamPage,
-  }))
-);
+// const StreamPage = lazy(() =>
+//   import('../pages/streamPage/StreamPage').then(({ StreamPage }) => ({
+//     default: StreamPage,
+//   }))
+// );
 
 const SettingsPage = lazy(() =>
   import('../pages/settingsPage/SettingsPage').then(({ SettingsPage }) => ({
@@ -27,6 +27,6 @@ const SettingsPage = lazy(() =>
 export const routers = [
   { path: '/', Element: MainPage },
   { path: '/:nickname', Element: UserPage },
-  { path: '/stream', Element: StreamPage },
+  // { path: '/stream', Element: StreamPage },
   { path: '/settings', Element: SettingsPage },
 ];

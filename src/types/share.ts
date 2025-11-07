@@ -43,7 +43,7 @@ export interface IStream {
   streamName: string;
   streamerName: string;
   streamerId: number;
-  tags: [];
+  tags: Array<string>;
   previewlUrl: null | string;
   hlsUrl: string;
   totalViews: number;

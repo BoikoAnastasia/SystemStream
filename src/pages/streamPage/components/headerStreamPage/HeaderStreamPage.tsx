@@ -1,16 +1,15 @@
 import { Avatar, Box } from '@mui/material';
 import {
   StyledHeaderStreamPage,
-  StyledButtonDark,
   StyledButtonLive,
   StyledButtonWathers,
   StyledTitle,
   StyledSpanDark,
 } from '../../../../components/StylesComponents';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { ButtonLike } from '../../../../components/ui/button/ButtonLike';
+import { IStream } from '../../../../types/share';
 
-export const HeaderStreamPage = () => {
+export const HeaderStreamPage = ({ streamInfo }: { streamInfo: IStream }) => {
   return (
     <StyledHeaderStreamPage>
       <Box
@@ -24,19 +23,13 @@ export const HeaderStreamPage = () => {
       >
         <Avatar sx={{ gridArea: 'avatar' }} src="./img/users/user-01.jpg"></Avatar>
         <Box sx={{ gridArea: 'streamInfo', display: 'flex', alignItems: 'center' }}>
-          <StyledTitle style={{ marginRight: '10px' }}>Ava Bennett</StyledTitle>
-          <StyledButtonLive>В эфире</StyledButtonLive>
+          <StyledTitle style={{ marginRight: '10px' }}>{streamInfo.streamerName}</StyledTitle>
+          {streamInfo.isLive ? <StyledButtonLive>В эфире</StyledButtonLive> : <></>}
           <StyledButtonWathers>
-            <VisibilityIcon sx={{ width: '10px', height: '10px' }} /> 10.4т
+            <VisibilityIcon sx={{ width: '10px', height: '10px' }} /> {streamInfo.totalViews}
           </StyledButtonWathers>
         </Box>
-        <StyledSpanDark style={{ gridArea: 'nameStream' }}>
-          Сейчас в эфире: Новые айфоны - Смотрим презентацию
-        </StyledSpanDark>
-      </Box>
-      <Box sx={{ display: 'flex', gap: '10px' }}>
-        <ButtonLike />
-        <StyledButtonDark>Подписаться</StyledButtonDark>
+        <StyledSpanDark style={{ gridArea: 'nameStream' }}>Сейчас в эфире: {streamInfo.streamName}</StyledSpanDark>
       </Box>
     </StyledHeaderStreamPage>
   );

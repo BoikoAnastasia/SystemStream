@@ -1,15 +1,21 @@
-import { FC, JSX, useState } from 'react';
+import { useState } from 'react';
 // components
-import { appLayout } from '../../layout';
 import { Chat } from '../../components/chat/Chat';
 import { HeaderStreamPage } from './components/headerStreamPage/HeaderStreamPage';
 // mui
-import { Box, Button, CardMedia } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 // hooks
 import { useDeviceDetect } from '../../hooks/useDeviceDetect';
+import { IStream } from '../../types/share';
 
-export const StreamPage: FC = appLayout((): JSX.Element => {
+export const StreamPage = ({
+  videoRef,
+  streamInfo,
+}: {
+  videoRef: React.RefObject<HTMLVideoElement | null>;
+  streamInfo: IStream;
+}) => {
   const { isMobile } = useDeviceDetect();
   const [isOpen, setIsOpen] = useState(true);
 
@@ -44,14 +50,15 @@ export const StreamPage: FC = appLayout((): JSX.Element => {
             transition: 'all .3s ease',
           }}
         >
-          <HeaderStreamPage />
-          <CardMedia
-            component="video"
-            src="./video/video-04.mp4"
+          <HeaderStreamPage streamInfo={streamInfo} />
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
             controls
-            sx={{
+            style={{
               borderRadius: '20px',
-              height: 'auto',
+              height: isMobile ? '250px' : '500px',
               maxHeight: isOpen ? '800px' : '100%',
             }}
           />
@@ -80,4 +87,4 @@ export const StreamPage: FC = appLayout((): JSX.Element => {
       </Box>
     </>
   );
-});
+};

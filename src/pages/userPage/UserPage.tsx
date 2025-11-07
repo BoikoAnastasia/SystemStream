@@ -1,13 +1,25 @@
-import { FC, JSX } from 'react';
+import { FC, JSX, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
+import Hls from 'hls.js';
 import { appLayout } from '../../layout/index';
+// redux
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../hooks/redux';
 // components
 import { TabsComponent } from '../../components/ui/tabs/TabsComponent';
 import { UserAbout } from './components/userAbout/UserAbout';
 import { UserSchedule } from './components/userSchedule/UserSchedule';
 import { SectionListVideo } from '../../components/sectionListVideo/SectionListVideo';
 import { ContainerBox } from '../../components/StylesComponents';
+import { StreamPage } from '../streamPage/StreamPage';
+import { UserBanner } from './components/userBanner/UserBanner';
+// store
+import { AppDispatch } from '../../store/store';
+import { fetchUserByNickname, userProfile } from '../../store/actions/UserActions';
+import { fetchStreamKey, fetchStreamView } from '../../store/actions/StreamActions';
 // share
 import { IVideoItem } from '../../types/share';
+import { Loader } from '../../components/ui/loader/Loader';
 
 const testVideos: IVideoItem[] = [
   {
@@ -67,10 +79,77 @@ const testVideos: IVideoItem[] = [
 ];
 
 export const UserPage: FC = appLayout((): JSX.Element => {
+  const { nickname } = useParams<{ nickname: string }>();
+  const dispatch = useDispatch<AppDispatch>();
+  const { data: profile } = useAppSelector((state) => state.user);
+  const { data: selectedUser } = useAppSelector((state) => state.selectUser);
+  const { data: stream, isLoading } = useAppSelector((state) => state.stream);
+  const { data: setting } = useAppSelector((state) => state.settings);
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamStartedRef = useRef(false);
+
+  const startStream = (hlsUrl: string) => {
+    if (videoRef.current) {
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(hlsUrl);
+        hls.attachMedia(videoRef.current);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          videoRef.current?.play();
+        });
+      } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
+        videoRef.current.src = hlsUrl;
+        videoRef.current.play();
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!nickname) return;
+    if (profile?.nickname === nickname) {
+      if (!profile) dispatch(userProfile());
+      return;
+    }
+    dispatch(fetchUserByNickname(nickname));
+  }, [nickname, dispatch, profile]);
+
+  useEffect(() => {
+    if (stream?.isLive) {
+      if (stream.isLive && !streamStartedRef.current) {
+        startStream(stream.hlsUrl);
+        streamStartedRef.current = true;
+      }
+    } else if (!stream?.isLive) {
+      // Поток закончился
+      streamStartedRef.current = false;
+      if (videoRef.current) videoRef.current.src = '';
+    }
+  }, [stream, setting]);
+
+  useEffect(() => {
+    if (!nickname) return;
+    if (!setting) dispatch(fetchStreamKey());
+  }, [dispatch, nickname, setting]);
+
+  useEffect(() => {
+    if (!nickname) return;
+    dispatch(fetchStreamView(nickname));
+
+    const interval = setInterval(() => {
+      dispatch(fetchStreamView(nickname));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [nickname, dispatch]);
+
+  const userData = profile?.nickname === nickname ? profile : selectedUser;
   return (
     <ContainerBox>
+      {isLoading ? <Loader /> : stream?.isLive && <StreamPage videoRef={videoRef} streamInfo={stream} />}
+      <UserBanner userData={userData} />
       <TabsComponent
-        propsChild={[<UserAbout />, <UserSchedule />, <SectionListVideo list={testVideos} />]}
+        propsChild={[<UserAbout userData={userData} />, <UserSchedule />, <SectionListVideo list={testVideos} />]}
         propTabsTitle={['Основная информация', 'Расписание стримов', 'Все стримы']}
       />
     </ContainerBox>
