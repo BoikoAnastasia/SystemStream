@@ -66,7 +66,8 @@ export const UserAbout = () => {
   }, [nickname, dispatch, profile]);
 
   useEffect(() => {
-    if (stream?.isLive && setting?.streamServerUrl) {
+    if (stream?.isLive) {
+      // if (stream?.isLive && setting?.streamServerUrl) {
       if (stream.isLive && !streamStartedRef.current) {
         startStream(stream.hlsUrl);
         streamStartedRef.current = true;
