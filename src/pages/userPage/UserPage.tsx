@@ -115,17 +115,22 @@ export const UserPage: FC = appLayout((): JSX.Element => {
   }, [nickname, dispatch, profile]);
 
   useEffect(() => {
-    if (stream?.isLive) {
-      if (stream.isLive && !streamStartedRef.current) {
-        startStream(stream.hlsUrl);
-        streamStartedRef.current = true;
-      }
-    } else if (!stream?.isLive) {
-      // Поток закончился
-      streamStartedRef.current = false;
-      if (videoRef.current) videoRef.current.src = '';
+    if (!stream) return;
+
+    if (stream.isLive && !streamStartedRef.current) {
+      startStream(stream.hlsUrl);
+      streamStartedRef.current = true;
+    } else if (!stream.isLive && streamStartedRef.current) {
+      const timeout = setTimeout(() => {
+        if (!stream.isLive) {
+          streamStartedRef.current = false;
+          if (videoRef.current) videoRef.current.src = '';
+        }
+      }, 8000);
+
+      return () => clearTimeout(timeout);
     }
-  }, [stream, setting]);
+  }, [stream]);
 
   useEffect(() => {
     if (!nickname) return;
@@ -146,7 +151,7 @@ export const UserPage: FC = appLayout((): JSX.Element => {
   const userData = profile?.nickname === nickname ? profile : selectedUser;
   return (
     <ContainerBox>
-      {isLoading ? <Loader /> : stream?.isLive && <StreamPage videoRef={videoRef} streamInfo={stream} />}
+      {stream?.isLive && <StreamPage videoRef={videoRef} streamInfo={stream} />}
       <UserBanner userData={userData} />
       <TabsComponent
         propsChild={[<UserAbout userData={userData} />, <UserSchedule />, <SectionListVideo list={testVideos} />]}
