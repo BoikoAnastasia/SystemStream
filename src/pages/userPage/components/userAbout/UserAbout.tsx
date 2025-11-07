@@ -109,9 +109,9 @@ export const UserAbout = () => {
         }}
       >
         <StyledInfo>
-          {setting && stream && (
+          {stream && (
             <Link
-              to={setting.streamServerUrl!}
+              to={setting?.streamServerUrl ?? '#'}
               style={{
                 width: '70%',
                 height: '100%',
