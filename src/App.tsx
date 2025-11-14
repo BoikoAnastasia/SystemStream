@@ -1,12 +1,23 @@
 import { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
+// routers
 import { routers } from './routers/routers';
-import { NotFound } from './pages/NotFound/NotFound';
-import './index.css';
 import { Providers } from './Providers';
+// components
+import { NotFound } from './pages/NotFound/NotFound';
 import { Loader } from './components/ui/loader/Loader';
+// hooks
+import { useAuthRestore } from './hooks/useAuthRestore';
+// styles
+import './index.css';
 
 function App() {
+  const { isLoading } = useAuthRestore();
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
   return (
     <Providers>
       <Suspense fallback={<Loading />}>

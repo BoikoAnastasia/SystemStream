@@ -35,7 +35,6 @@ export interface IProfile {
 
 export interface ISetting {
   streamKey: string;
-  streamServerUrl: string;
 }
 
 export interface IStream {
@@ -49,6 +48,13 @@ export interface IStream {
   totalViews: number;
   startedAt: string;
   isLive: boolean;
+}
+
+export interface INotification {
+  id: number;
+  type: string;
+  title: string;
+  message: string;
 }
 
 // components

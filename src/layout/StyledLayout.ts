@@ -1,4 +1,4 @@
-import { Box, Button, Menu } from '@mui/material';
+import { Box, Menu, MenuItem } from '@mui/material';
 import { styled } from '@mui/system';
 
 export const StyleHeader = styled(Box)(() => ({
@@ -44,7 +44,7 @@ export const StyledMenu = styled(Menu)(() => ({
   },
 }));
 
-export const StyledMenuButton = styled(Button)(() => ({
+export const StyledMenuButton = styled(MenuItem)(() => ({
   color: 'var(--white)',
   textTransform: 'none',
   fontSize: '1rem',

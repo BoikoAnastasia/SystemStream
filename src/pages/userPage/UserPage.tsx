@@ -11,15 +11,17 @@ import { UserAbout } from './components/userAbout/UserAbout';
 import { UserSchedule } from './components/userSchedule/UserSchedule';
 import { SectionListVideo } from '../../components/sectionListVideo/SectionListVideo';
 import { ContainerBox } from '../../components/StylesComponents';
-import { StreamPage } from '../streamPage/StreamPage';
 import { UserBanner } from './components/userBanner/UserBanner';
+import { StreamPage } from '../streamPage/StreamPage';
 // store
 import { AppDispatch } from '../../store/store';
-import { fetchUserByNickname, userProfile } from '../../store/actions/UserActions';
-import { fetchStreamKey, fetchStreamView } from '../../store/actions/StreamActions';
+import { fetchUserByNickname } from '../../store/actions/UserActions';
+import { SelectUserSlice } from '../../store/slices/SelectUserSlice';
+// hooks, context
+import { useStreamHub } from '../../hooks/useStreamHub';
+import { useNickname } from '../../context/NicknameContext';
 // share
 import { IVideoItem } from '../../types/share';
-import { Loader } from '../../components/ui/loader/Loader';
 
 const testVideos: IVideoItem[] = [
   {
@@ -79,80 +81,61 @@ const testVideos: IVideoItem[] = [
 ];
 
 export const UserPage: FC = appLayout((): JSX.Element => {
-  const { nickname } = useParams<{ nickname: string }>();
+  const { nickname: paramNickname } = useParams<{ nickname: string }>();
+  const { nickname, setNickname } = useNickname();
+  const { currentStream, joinStream, leaveStream, isConnected } = useStreamHub(nickname || undefined);
+  const { Clear } = SelectUserSlice.actions;
+
   const dispatch = useDispatch<AppDispatch>();
   const { data: profile } = useAppSelector((state) => state.user);
   const { data: selectedUser } = useAppSelector((state) => state.selectUser);
-  const { data: stream, isLoading } = useAppSelector((state) => state.stream);
-  const { data: setting } = useAppSelector((state) => state.settings);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const streamStartedRef = useRef(false);
-
-  const startStream = (hlsUrl: string) => {
-    if (videoRef.current) {
-      if (Hls.isSupported()) {
-        const hls = new Hls();
-        hls.loadSource(hlsUrl);
-        hls.attachMedia(videoRef.current);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          videoRef.current?.play();
-        });
-      } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
-        videoRef.current.src = hlsUrl;
-        videoRef.current.play();
-      }
-    }
-  };
 
   useEffect(() => {
-    if (!nickname) return;
-    if (profile?.nickname === nickname) {
-      if (!profile) dispatch(userProfile());
+    if (paramNickname) setNickname(paramNickname);
+  }, [paramNickname, setNickname]);
+
+  useEffect(() => {
+    if (!paramNickname) return;
+    if (profile && profile.nickname === paramNickname) {
+      dispatch(Clear());
       return;
     }
-    dispatch(fetchUserByNickname(nickname));
-  }, [nickname, dispatch, profile]);
+    dispatch(fetchUserByNickname(paramNickname));
+  }, [paramNickname, profile, dispatch, Clear]);
 
   useEffect(() => {
-    if (!stream) return;
+    if (isConnected && paramNickname) joinStream(paramNickname);
+    return () => {
+      if (paramNickname) leaveStream(paramNickname);
+    };
+  }, [isConnected, joinStream, leaveStream, paramNickname]);
 
-    if (stream.isLive && !streamStartedRef.current) {
-      startStream(stream.hlsUrl);
-      streamStartedRef.current = true;
-    } else if (!stream.isLive && streamStartedRef.current) {
-      const timeout = setTimeout(() => {
-        if (!stream.isLive) {
-          streamStartedRef.current = false;
-          if (videoRef.current) videoRef.current.src = '';
-        }
-      }, 8000);
-
-      return () => clearTimeout(timeout);
+  useEffect(() => {
+    if (!currentStream) {
+      if (videoRef.current) videoRef.current.src = '';
+      return;
     }
-  }, [stream]);
 
-  useEffect(() => {
-    if (!nickname) return;
-    if (!setting) dispatch(fetchStreamKey());
-  }, [dispatch, nickname, setting]);
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(currentStream.hlsUrl);
+      hls.attachMedia(videoRef.current!);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => videoRef.current?.play());
+    } else {
+      videoRef.current!.src = currentStream.hlsUrl;
+      videoRef.current!.play();
+    }
+  }, [currentStream]);
 
-  useEffect(() => {
-    if (!nickname) return;
-    dispatch(fetchStreamView(nickname));
+  const userData = profile?.nickname === paramNickname ? profile : selectedUser;
+  const showBtnSubsribe = profile?.nickname !== paramNickname;
 
-    const interval = setInterval(() => {
-      dispatch(fetchStreamView(nickname));
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [nickname, dispatch]);
-
-  const userData = profile?.nickname === nickname ? profile : selectedUser;
   return (
     <ContainerBox>
-      {stream?.isLive && <StreamPage videoRef={videoRef} streamInfo={stream} />}
-      <UserBanner userData={userData} />
+      {currentStream?.isLive && <StreamPage videoRef={videoRef} streamInfo={currentStream} />}
+      <UserBanner userData={userData} showBtnSubsribe={showBtnSubsribe} />
       <TabsComponent
         propsChild={[<UserAbout userData={userData} />, <UserSchedule />, <SectionListVideo list={testVideos} />]}
         propTabsTitle={['Основная информация', 'Расписание стримов', 'Все стримы']}

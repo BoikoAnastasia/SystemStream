@@ -8,9 +8,10 @@ export const getCookie = (nameCookie: string) => {
   return Cookies.get(nameCookie);
 };
 
-export const setCookie = (nameCookie: string, cookieData: string, expires: number = 1, secure: boolean = true) => {
-  Cookies.set(nameCookie, cookieData, { expires: expires, secure: secure });
-  console.log(`${nameCookie} - cookie внесены`);
+export const setCookie = (name: string, value: string, days: number, path = '/') => {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=${path}`;
 };
 
 export const removeCookie = (nameCookie: string) => {

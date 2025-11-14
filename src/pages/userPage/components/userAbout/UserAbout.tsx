@@ -10,7 +10,7 @@ import {
   StyledVideoSection,
 } from '../../../../components/StylesComponents';
 // types
-import { IProfile, IUser } from '../../../../types/share';
+import { IProfile } from '../../../../types/share';
 
 export const UserAbout = ({ userData }: { userData: IProfile | null }) => {
   return (

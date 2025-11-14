@@ -1,12 +1,16 @@
 import { useState } from 'react';
+// context
+import { useNotification } from '../../../context/NotificationContext';
 // mui
 import { IconButton, MenuItem } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-// styles
+// styles, types
 import { StyledMenu } from '../../../layout/StyledLayout';
+import { INotification } from '../../../types/share';
 
 export const HeaderNotificationMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { notifications } = useNotification();
 
   const open = Boolean(anchorEl);
 
@@ -40,7 +44,11 @@ export const HeaderNotificationMenu = () => {
           },
         }}
       >
-        <MenuItem>Уведомлений нет</MenuItem>
+        {notifications.length !== 0 ? (
+          notifications.map((notification: INotification) => <MenuItem>{notification.message}</MenuItem>)
+        ) : (
+          <MenuItem>Уведомлений нет</MenuItem>
+        )}
       </StyledMenu>
     </>
   );

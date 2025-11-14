@@ -1,4 +1,7 @@
+// mui
 import { Avatar, Box } from '@mui/material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+// styles
 import {
   StyledHeaderStreamPage,
   StyledButtonLive,
@@ -6,7 +9,7 @@ import {
   StyledTitle,
   StyledSpanDark,
 } from '../../../../components/StylesComponents';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+// types
 import { IStream } from '../../../../types/share';
 
 export const HeaderStreamPage = ({ streamInfo }: { streamInfo: IStream }) => {

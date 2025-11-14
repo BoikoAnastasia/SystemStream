@@ -7,6 +7,7 @@ import { Box, Button } from '@mui/material';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 // hooks
 import { useDeviceDetect } from '../../hooks/useDeviceDetect';
+// types
 import { IStream } from '../../types/share';
 
 export const StreamPage = ({

@@ -1,7 +1,9 @@
-import { getCookie } from '../../utils/cookieFunctions';
+// store, slices
+import { AppDispatch } from '../store';
 import { SettingsSlice } from '../slices/SettingsSlice';
 import { StreamSlice } from '../slices/StreamSlice';
-import { AppDispatch } from '../store';
+// utils
+import { getCookie } from '../../utils/cookieFunctions';
 
 const { SettingsSliceFetch, SettingsSliceError, SettingsSliceSuccess } = SettingsSlice.actions;
 const { StreamSliceError, StreamSliceFetch, StreamSliceSuccess } = StreamSlice.actions;
@@ -58,13 +60,9 @@ export const postStreamKey = () => async (dispatch: AppDispatch) => {
 };
 
 // Получение StreamView
-// отправка каждые несколько секунд
 export const fetchStreamView = (nickname: string) => async (dispatch: AppDispatch) => {
   try {
     dispatch(StreamSliceFetch());
-    // const token = getCookie('tokenData');
-    // if (!token) return;
-    // console.log('token:', token);
     const response = await fetch(`${process.env.REACT_APP_API_STREAM_VIEW}/${nickname}`);
     console.log(response);
     if (!response.ok) {
@@ -77,14 +75,3 @@ export const fetchStreamView = (nickname: string) => async (dispatch: AppDispatc
     dispatch(StreamSliceError(error));
   }
 };
-
-// "streamId": 9,
-// "streamName": "sanyas's Stream",
-// "streamerName": "sanyas",
-// "streamerId": 7,
-// "tags": [],
-// "previewlUrl": null,
-// "hlsUrl": "/hls/live_7_ae3dae00389b443a80865d721fabfd9e.m3u8",
-// "totalViews": 0,
-// "startedAt": "2025-11-05T14:02:13.271529Z",
-// "isLive": false

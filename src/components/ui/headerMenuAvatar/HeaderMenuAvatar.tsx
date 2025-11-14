@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { logoutUser } from '../../../store/actions/UserActions';
 import { useAppSelector } from '../../../hooks/redux';
 // components
-import { StyledMenu, StyledMenuButton } from '../../../layout/StyledLayout';
+import { StyledMenu } from '../../../layout/StyledLayout';
 import { ModalComponent } from '../../modal/ModalComponent';
 // utils
 import { checkCookie } from '../../../utils/cookieFunctions';
@@ -88,17 +88,22 @@ export const HeaderMenuAvatar = () => {
         }}
       >
         {menuData.map((item, index) => (
-          <MenuItem key={index}>
-            <Link to={item.href}>{item.value}</Link>
+          <MenuItem
+            sx={{ '&.MuiMenuItem-root': { color: 'var(--white)' } }}
+            key={index}
+            component={Link}
+            to={item.href}
+          >
+            {item.value}
           </MenuItem>
         ))}
         {isLogged ? (
-          <MenuItem>
-            <StyledMenuButton onClick={logout}>Выйти</StyledMenuButton>
+          <MenuItem sx={{ '&.MuiMenuItem-root': { color: 'var(--white)' } }} onClick={logout}>
+            Выйти
           </MenuItem>
         ) : (
-          <MenuItem>
-            <StyledMenuButton onClick={handleOpenModal}>Войти</StyledMenuButton>
+          <MenuItem sx={{ '&.MuiMenuItem-root': { color: 'var(--white)' } }} onClick={handleOpenModal}>
+            Войти
           </MenuItem>
         )}
       </StyledMenu>

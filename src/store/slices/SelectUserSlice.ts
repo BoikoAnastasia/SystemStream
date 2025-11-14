@@ -24,6 +24,11 @@ export const SelectUserSlice = createSlice({
       state.isError = action.payload;
       state.isLoading = false;
     },
+    Clear(state) {
+      state.data = null;
+      state.isLoading = false;
+      state.isError = null;
+    },
   },
 });
 
