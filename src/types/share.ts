@@ -33,6 +33,15 @@ export interface IProfile {
   cashBalance: number;
 }
 
+export interface ISubscriber {
+  nickname: string;
+  profileImage: string;
+  isOnline: boolean;
+  streamersLeague: string;
+  previewlUrl: string;
+  streamName: string;
+}
+
 export interface ISetting {
   streamKey: string;
 }
