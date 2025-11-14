@@ -5,7 +5,7 @@ import { registrationUser } from '../../store/actions/UserActions';
 import { Formik, Form } from 'formik';
 import { validationRegist } from '../../validation/validation';
 // mui
-import { Box, FormControl, InputAdornment } from '@mui/material';
+import { Box, Checkbox, FormControl, FormControlLabel, InputAdornment } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import {
@@ -122,6 +122,24 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
               <Box sx={{ color: 'var(--error)', fontSize: '14px', marginTop: '-10px' }}>{errorMessage}</Box>
             )}
           </FormControl>
+          <FormControlLabel
+            sx={{
+              fontSize: '12px',
+              '.MuiCheckbox-root': {
+                color: 'white',
+              },
+            }}
+            required
+            control={<Checkbox />}
+            label={
+              <span style={{ fontSize: '12px' }}>
+                Регистрируясь, вы соглашаетесь с{' '}
+                <a style={{ color: '#7163f8' }} href="/privacy-policy" target="_blank" rel="noopener noreferrer">
+                  политикой конфиденциальности
+                </a>
+              </span>
+            }
+          />
           <StyledButtonsForm>
             <StyledButtonForm type="submit">Зарегистрироваться</StyledButtonForm>
           </StyledButtonsForm>

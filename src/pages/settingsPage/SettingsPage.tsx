@@ -22,7 +22,7 @@ import {
 
 export const SettingsPage: FC = settingLayout((): JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
-  const { data, isError, isLoading } = useAppSelector((state) => state.settings);
+  const { data, isError } = useAppSelector((state) => state.settings);
 
   const [showKey, setShowKey] = useState(false);
   const [streamKey, setStreamKey] = useState('');

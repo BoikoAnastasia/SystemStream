@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 // components
 import { Logo } from '../logo/Logo';
 import { useDrawer } from '../../context/DrawerContext';

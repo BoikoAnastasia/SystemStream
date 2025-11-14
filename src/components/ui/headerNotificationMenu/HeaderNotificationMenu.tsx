@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 // context
 import { useNotification } from '../../../context/NotificationContext';
 // mui
@@ -12,6 +12,7 @@ import { INotification } from '../../../types/share';
 export const HeaderNotificationMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { notifications, removeNotification } = useNotification();
+  const navigate = useNavigate();
 
   const open = Boolean(anchorEl);
 
@@ -21,6 +22,12 @@ export const HeaderNotificationMenu = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleNotificationClick = (link: string, id: number) => {
+    removeNotification(id);
+    navigate(link.startsWith('/') ? link : `/${link}`);
+    handleClose();
   };
 
   return (
@@ -50,7 +57,7 @@ export const HeaderNotificationMenu = () => {
       >
         {notifications.length !== 0 ? (
           notifications.map((notification: INotification) => (
-            <MenuItem component={Link} to={notification.link} onClick={() => removeNotification(notification.id)}>
+            <MenuItem onClick={() => handleNotificationClick(notification.link, notification.id)}>
               {notification.message}
             </MenuItem>
           ))
