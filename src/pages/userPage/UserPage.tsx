@@ -83,7 +83,7 @@ const testVideos: IVideoItem[] = [
 export const UserPage: FC = appLayout((): JSX.Element => {
   const { nickname: paramNickname } = useParams<{ nickname: string }>();
   const { nickname, setNickname } = useNickname();
-  const { currentStream, joinStream, leaveStream, isConnected } = useStreamHub(nickname || undefined);
+  const { currentStream, joinStream, leaveStream } = useStreamHub(nickname || undefined);
   const { Clear } = SelectUserSlice.actions;
 
   const dispatch = useDispatch<AppDispatch>();
@@ -106,11 +106,15 @@ export const UserPage: FC = appLayout((): JSX.Element => {
   }, [paramNickname, profile, dispatch, Clear]);
 
   useEffect(() => {
-    if (isConnected && paramNickname) joinStream(paramNickname);
+    if (!paramNickname || !currentStream) return;
+    if (currentStream?.isLive) {
+      joinStream();
+    }
+
     return () => {
-      if (paramNickname) leaveStream(paramNickname);
+      if (currentStream?.isLive) leaveStream();
     };
-  }, [isConnected, joinStream, leaveStream, paramNickname]);
+  }, [paramNickname, joinStream, leaveStream, currentStream]);
 
   useEffect(() => {
     if (!currentStream) {

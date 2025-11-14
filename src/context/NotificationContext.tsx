@@ -1,12 +1,7 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-// microsoft
-import { HubConnectionState } from '@microsoft/signalr';
-// context
 import { useNickname } from './NicknameContext';
-// hooks
 import { useStreamHub } from '../hooks/useStreamHub';
-// types
-import { INotification, IStream } from '../types/share';
+import { INotification } from '../types/share';
 
 interface NotificationContextValue {
   notifications: INotification[];
@@ -19,26 +14,24 @@ const NotificationContext = createContext<NotificationContextValue | undefined>(
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const { nickname } = useNickname();
-  const { connection, isConnected } = useStreamHub(nickname || undefined);
+  const { currentStream } = useStreamHub(nickname || undefined);
+
+  // Отслеживаем появление нового стрима
+  const [lastStreamId, setLastStreamId] = useState<Number | null>(null);
 
   useEffect(() => {
-    if (!connection || connection.state !== HubConnectionState.Connected) return;
+    if (!currentStream) return;
 
-    const handler = (streamData: IStream) => {
+    if (currentStream.streamId !== lastStreamId) {
       addNotification({
         id: Date.now(),
         type: 'stream_start',
         title: 'Новый стрим!',
-        message: `${streamData.streamerName} начал трансляцию: ${streamData.streamName}`,
+        message: `${currentStream.streamerName} начал трансляцию: ${currentStream.streamName}`,
       });
-    };
-
-    connection.on('StreamerStartedStream', handler);
-
-    return () => {
-      connection.off('StreamerStartedStream', handler);
-    };
-  }, [connection, isConnected, nickname]);
+      setLastStreamId(currentStream.streamId);
+    }
+  }, [currentStream, lastStreamId]);
 
   const addNotification = (notification: INotification) => {
     setNotifications((prev) => [notification, ...prev]);
