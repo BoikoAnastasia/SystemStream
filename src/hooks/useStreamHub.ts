@@ -1,138 +1,78 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
-import Hls from 'hls.js';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { IStream } from '../types/share';
 
+const STREAM_POLL_INTERVAL = 5000; // интервал обновления в мс
+
 export const useStreamHub = (nickname?: string) => {
-  const [connection, setConnection] = useState<HubConnection | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
   const [currentStream, setCurrentStream] = useState<IStream | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const streamRef = useRef<IStream | null>(null); // для сравнения URL
 
-  const hlsRef = useRef<Hls | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  // Функция получения стрима по никнейму
+  const fetchStream = useCallback(async () => {
+    if (!nickname) return;
 
-  // Создаём подключение
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_STREAM_VIEW}/${nickname}`);
+      if (!response.ok) {
+        console.warn('[StreamHub] Failed to fetch stream:', response.statusText);
+        setCurrentStream(null);
+        setIsConnected(false);
+        streamRef.current = null;
+        return;
+      }
+      const data: IStream | null = await response.json();
+
+      // Если URL стрима не поменялся, не обновляем state
+      if (data?.hlsUrl && data?.hlsUrl === streamRef.current?.hlsUrl) {
+        return;
+      }
+
+      setCurrentStream(data);
+      setIsConnected(!!data?.isLive);
+      streamRef.current = data;
+    } catch (err) {
+      console.warn('[StreamHub] Error fetching stream:', err);
+      setCurrentStream(null);
+      setIsConnected(false);
+      streamRef.current = null;
+    }
+  }, [nickname]);
+
+  // Пуллинг каждые X секунд
   useEffect(() => {
     if (!nickname) return;
 
-    const newConnection = new HubConnectionBuilder()
-      .withUrl(`${process.env.REACT_APP_API_STREAM_VIEW}/${nickname}`)
-      .withAutomaticReconnect()
-      .configureLogging(LogLevel.Warning)
-      .build();
+    fetchStream(); // первый запрос сразу
+    const interval = setInterval(fetchStream, STREAM_POLL_INTERVAL);
 
-    setConnection(newConnection);
-    console.log(`[StreamHub] Connection object created for ${nickname}`);
-  }, [nickname]);
+    return () => clearInterval(interval);
+  }, [nickname, fetchStream]);
 
-  // Старт подключения
-  useEffect(() => {
-    if (!connection) return;
-    let isMounted = true;
-
-    const startConnection = async () => {
-      if (!connection) return;
-      try {
-        await connection.start();
-        if (!isMounted) return;
-        setIsConnected(true);
-        console.log(`[StreamHub] Connected to ${nickname}`);
-
-        // Подписка на уведомления, если есть токен
-        if (localStorage.getItem('token')) {
-          try {
-            await connection.invoke('SubscribeToStreamNotifications');
-            console.log('[StreamHub] Subscribed to stream notifications');
-          } catch (invokeErr) {
-            console.warn('[StreamHub] Failed to invoke SubscribeToStreamNotifications:', invokeErr);
-          }
-        }
-      } catch (startErr) {
-        setIsConnected(false);
-        console.warn('[StreamHub] Failed to start connection, retrying in 10s:', startErr);
-        setTimeout(startConnection, 10000);
-      }
-    };
-
-    startConnection();
-
-    return () => {
-      isMounted = false;
-      if (connection.state === HubConnectionState.Connected) {
-        connection.stop().then(() => console.log('[StreamHub] Connection stopped'));
-      }
-    };
-  }, [connection, nickname]);
-
-  // join / leave
+  // join / leave (REST-запросы к серверу)
   const joinStream = useCallback(async () => {
-    if (!connection || connection.state !== HubConnectionState.Connected) return;
+    if (!nickname || !currentStream?.isLive) return;
     try {
-      await connection.invoke('JoinStream', nickname);
+      await fetch(`${process.env.REACT_APP_API_STREAM_VIEW}/${nickname}/join`, { method: 'POST' });
       console.log(`[StreamHub] Joined stream of ${nickname}`);
     } catch (err) {
       console.warn(`[StreamHub] Failed to join stream of ${nickname}:`, err);
     }
-  }, [connection, nickname]);
+  }, [nickname, currentStream]);
 
   const leaveStream = useCallback(async () => {
-    if (!connection || connection.state !== HubConnectionState.Connected) return;
+    if (!nickname || !currentStream?.isLive) return;
     try {
-      await connection.invoke('LeaveStream', nickname);
+      await fetch(`${process.env.REACT_APP_API_STREAM_VIEW}/${nickname}/leave`, { method: 'POST' });
       console.log(`[StreamHub] Left stream of ${nickname}`);
     } catch (err) {
       console.warn(`[StreamHub] Failed to leave stream of ${nickname}:`, err);
     }
-  }, [connection, nickname]);
-
-  // Подписка на события
-  useEffect(() => {
-    if (!connection) return;
-
-    const handleStreamStarted = (stream: IStream) => {
-      setCurrentStream(stream);
-
-      // Создаём HLS только один раз
-      if (Hls.isSupported() && videoRef.current) {
-        if (!hlsRef.current) {
-          hlsRef.current = new Hls();
-          hlsRef.current.attachMedia(videoRef.current);
-        }
-        // Загружаем источник только если поменялся URL
-        if (videoRef.current.src !== stream.hlsUrl) {
-          hlsRef.current.loadSource(stream.hlsUrl);
-          hlsRef.current.on(Hls.Events.MANIFEST_PARSED, () => videoRef.current?.play());
-        }
-      } else if (videoRef.current && videoRef.current.src !== stream.hlsUrl) {
-        videoRef.current.src = stream.hlsUrl;
-        videoRef.current.play();
-      }
-    };
-
-    const handleStreamEnded = () => setCurrentStream(null);
-
-    const handleViewerCountUpdated = (count: number) => {
-      setCurrentStream((prev) => (prev ? { ...prev, viewers: count } : prev));
-    };
-
-    connection.on('StreamStarted', handleStreamStarted);
-    connection.on('StreamerStartedStream', handleStreamStarted);
-    connection.on('StreamEnded', handleStreamEnded);
-    connection.on('ViewerCountUpdated', handleViewerCountUpdated);
-
-    return () => {
-      connection.off('StreamStarted', handleStreamStarted);
-      connection.off('StreamerStartedStream', handleStreamStarted);
-      connection.off('StreamEnded', handleStreamEnded);
-      connection.off('ViewerCountUpdated', handleViewerCountUpdated);
-    };
-  }, [connection]);
+  }, [nickname, currentStream]);
 
   return {
-    connection,
-    isConnected,
     currentStream,
-    videoRef,
+    isConnected,
     joinStream,
     leaveStream,
   };

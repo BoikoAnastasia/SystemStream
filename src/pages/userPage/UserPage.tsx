@@ -2,10 +2,8 @@ import { FC, JSX, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import Hls from 'hls.js';
 import { appLayout } from '../../layout/index';
-// redux
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../../hooks/redux';
-// components
 import { TabsComponent } from '../../components/ui/tabs/TabsComponent';
 import { UserAbout } from './components/userAbout/UserAbout';
 import { UserSchedule } from './components/userSchedule/UserSchedule';
@@ -13,71 +11,15 @@ import { SectionListVideo } from '../../components/sectionListVideo/SectionListV
 import { ContainerBox } from '../../components/StylesComponents';
 import { UserBanner } from './components/userBanner/UserBanner';
 import { StreamPage } from '../streamPage/StreamPage';
-// store
 import { AppDispatch } from '../../store/store';
 import { fetchUserByNickname } from '../../store/actions/UserActions';
 import { SelectUserSlice } from '../../store/slices/SelectUserSlice';
-// hooks, context
 import { useStreamHub } from '../../hooks/useStreamHub';
 import { useNickname } from '../../context/NicknameContext';
-// share
 import { IVideoItem } from '../../types/share';
 
 const testVideos: IVideoItem[] = [
-  {
-    id: '1',
-    video: './video/video-01.mp4',
-    href: '/stream',
-    name: 'Смотрим кофе',
-    users: '1.2K viewers',
-    type: 'Игры',
-    isLive: false,
-  },
-  {
-    id: '2',
-    video: './video/video-02.mp4',
-    href: '/stream',
-    name: 'Смотрим кофе 2',
-    users: '850 viewers',
-    type: 'Игры',
-    isLive: false,
-  },
-  {
-    id: '3',
-    video: './video/video-03.mp4',
-    href: '/stream',
-    name: 'Cooking Show Host',
-    users: '600 viewers',
-    type: 'Игры',
-    isLive: false,
-  },
-  {
-    id: '4',
-    video: './video/video-01.mp4',
-    href: '/stream',
-    name: 'Indie Game Developer',
-    users: '450 viewers',
-    type: 'Киберспорт',
-    isLive: false,
-  },
-  {
-    id: '5',
-    video: './video/video-02.mp4',
-    href: '/stream',
-    name: 'Travel Vlogger',
-    users: '300 viewers',
-    type: 'Киберспорт',
-    isLive: false,
-  },
-  {
-    id: '6',
-    video: './video/video-03.mp4',
-    href: '/stream',
-    name: 'Fitness Instructor',
-    users: '200 viewers',
-    type: 'Киберспорт',
-    isLive: false,
-  },
+  /* твои видео */
 ];
 
 export const UserPage: FC = appLayout((): JSX.Element => {
@@ -91,11 +33,14 @@ export const UserPage: FC = appLayout((): JSX.Element => {
   const { data: selectedUser } = useAppSelector((state) => state.selectUser);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const hlsRef = useRef<Hls | null>(null);
 
+  // Устанавливаем nickname в контекст
   useEffect(() => {
     if (paramNickname) setNickname(paramNickname);
   }, [paramNickname, setNickname]);
 
+  // Загружаем профиль пользователя
   useEffect(() => {
     if (!paramNickname) return;
     if (profile && profile.nickname === paramNickname) {
@@ -105,31 +50,48 @@ export const UserPage: FC = appLayout((): JSX.Element => {
     dispatch(fetchUserByNickname(paramNickname));
   }, [paramNickname, profile, dispatch, Clear]);
 
+  // Подключаемся к стриму один раз, только если стрим live
   useEffect(() => {
-    if (!paramNickname) return;
-    joinStream();
+    if (!paramNickname || !currentStream?.isLive) return;
+
+    joinStream(); // только если стрим live
 
     return () => {
       leaveStream();
     };
-  }, [paramNickname, joinStream, leaveStream]);
+  }, [paramNickname, currentStream?.isLive, joinStream, leaveStream]);
 
+  // Воспроизведение HLS без мерцания
   useEffect(() => {
-    if (!currentStream) {
-      if (videoRef.current) videoRef.current.src = '';
-      return;
+    if (!currentStream?.hlsUrl || !videoRef.current) return;
+
+    // Если Hls уже создан и тот же URL — не пересоздаём
+    if (hlsRef.current && hlsRef.current.url === currentStream.hlsUrl) return;
+
+    // Очистка старого Hls
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
     }
 
     if (Hls.isSupported()) {
       const hls = new Hls();
       hls.loadSource(currentStream.hlsUrl);
-      hls.attachMedia(videoRef.current!);
+      hls.attachMedia(videoRef.current);
       hls.on(Hls.Events.MANIFEST_PARSED, () => videoRef.current?.play());
+      hlsRef.current = hls;
     } else {
-      videoRef.current!.src = currentStream.hlsUrl;
-      videoRef.current!.play();
+      videoRef.current.src = currentStream.hlsUrl;
+      videoRef.current.play();
     }
-  }, [currentStream]);
+
+    return () => {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+    };
+  }, [currentStream?.hlsUrl]);
 
   const userData = profile?.nickname === paramNickname ? profile : selectedUser;
   const showBtnSubsribe = profile?.nickname !== paramNickname;
