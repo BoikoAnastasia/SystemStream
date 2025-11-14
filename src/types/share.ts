@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 // slice
 export interface IUserProfileSlice {
   data: IProfile | null;
+  isAuth?: boolean;
   isLoading: boolean;
   isError: string | null | boolean;
 }

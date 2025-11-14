@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+// context
+import { useHeaderModal } from '../../../../context/HeaderModalContext';
 // components
 import { Socials } from '../../../../components/socials/Socials';
 import { BannerEffect } from '../../../../components/ui/bannerEffect/BannerEffect';
@@ -9,6 +11,8 @@ import {
   isSubscribed,
   subscribeToUser,
 } from '../../../../store/actions/UserActions';
+// hooks
+import { useAppSelector } from '../../../../hooks/redux';
 // styles
 import {
   StyledBannerAvatar,
@@ -20,26 +24,30 @@ import {
 } from '../../../../components/StylesComponents';
 
 export const UserBanner = ({ userData, showBtnSubsribe }: any) => {
+  const { isAuth } = useAppSelector((state) => state.user);
+  const { setOpen } = useHeaderModal();
+
   const [subscribers, setSubscribers] = useState(0);
   const [isSubscriber, setIsSubscriber] = useState(false);
 
   useEffect(() => {
     if (!userData) return;
-
     const fetchData = async () => {
       const subscriptions = await fetchtSubsribtionsById(userData.id);
-      console.log(subscriptions);
       setSubscribers(subscriptions.length);
-
       const subscribed = await isSubscribed(userData.id);
-      setIsSubscriber(subscribed);
+      if (subscribed) setIsSubscriber(subscribed);
     };
-
     fetchData();
   }, [userData]);
 
   const handlerSubscribe = async () => {
     if (!userData) return;
+    if (!isAuth) {
+      setOpen(true);
+      return;
+    }
+
     const result = await subscribeToUser(userData.id);
     if (result) {
       const subscriptions = await fetchtSubsribtionsById(userData.id);

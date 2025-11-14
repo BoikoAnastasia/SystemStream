@@ -1,36 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 // redux
 import { AppDispatch } from '../../../store/store';
 import { useDispatch } from 'react-redux';
 import { logoutUser } from '../../../store/actions/UserActions';
 import { useAppSelector } from '../../../hooks/redux';
+// context
+import { useHeaderModal } from '../../../context/HeaderModalContext';
 // components
 import { StyledMenu } from '../../../layout/StyledLayout';
 import { ModalComponent } from '../../modal/ModalComponent';
-// utils
-import { checkCookie } from '../../../utils/cookieFunctions';
 // mui
 import { IconButton, MenuItem } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 
 export const HeaderMenuAvatar = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { data: profile } = useAppSelector((state) => state.user);
+  const { data: profile, isAuth } = useAppSelector((state) => state.user);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [openModal, setOpenModal] = useState(false);
-  const [isLogged, setIsLogged] = useState(checkCookie('tokenData'));
+  const { setOpen: setOpenModal } = useHeaderModal();
   const menuData = [
+    // {
+    //   authOnly: true,
+    //   href: '/',
+    //   value: 'Личный кабинет',
+    // },
     {
-      href: '/',
-      value: 'Личный кабинет',
-    },
-    {
+      authOnly: true,
       href: `/${profile?.nickname}`,
       value: 'Профиль',
     },
     {
+      authOnly: true,
       href: '/settings',
       value: 'Настройки',
     },
@@ -53,17 +55,8 @@ export const HeaderMenuAvatar = () => {
 
   const logout = async () => {
     await dispatch(logoutUser());
-    setIsLogged(false);
     handleClose();
   };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const cookieExists = checkCookie('tokenData');
-      setIsLogged(cookieExists);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [isLogged]);
 
   return (
     <>
@@ -87,17 +80,19 @@ export const HeaderMenuAvatar = () => {
           },
         }}
       >
-        {menuData.map((item, index) => (
-          <MenuItem
-            sx={{ '&.MuiMenuItem-root': { color: 'var(--white)' } }}
-            key={index}
-            component={Link}
-            to={item.href}
-          >
-            {item.value}
-          </MenuItem>
-        ))}
-        {isLogged ? (
+        {menuData
+          .filter((item) => (item.authOnly ? isAuth : true))
+          .map((item, index) => (
+            <MenuItem
+              sx={{ '&.MuiMenuItem-root': { color: 'var(--white)' } }}
+              key={index}
+              component={Link}
+              to={item.href}
+            >
+              {item.value}
+            </MenuItem>
+          ))}
+        {isAuth ? (
           <MenuItem sx={{ '&.MuiMenuItem-root': { color: 'var(--white)' } }} onClick={logout}>
             Выйти
           </MenuItem>
@@ -107,7 +102,7 @@ export const HeaderMenuAvatar = () => {
           </MenuItem>
         )}
       </StyledMenu>
-      <ModalComponent title="Войти или зарегистрироваться" open={openModal} setOpen={setOpenModal} />
+      <ModalComponent title="Войти или зарегистрироваться" />
     </>
   );
 };

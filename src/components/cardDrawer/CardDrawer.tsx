@@ -24,10 +24,10 @@ export const CardDrawer = ({ card, variant = 'full' }: ICardDrawerProps) => {
         </Box>
         {variant === 'full' && (
           <Box sx={{ width: '150px' }}>
-            {/* <CardDrawerTypography isEllipsis={true}>{title}</CardDrawerTypography> */}
+            <CardDrawerTypography isEllipsis={true}>{streamName}</CardDrawerTypography>
             <Box sx={{ display: 'flex', gap: '5px' }}>
               <CardDrawerTypography c={'#7666fc'} fs={'14px'} isEllipsis={false}>
-                {streamName}
+                {nickname}
               </CardDrawerTypography>
               <CardDrawerTypography c={'var(--color-sidebar)'} fs={'14px'} isEllipsis={true}>
                 {streamersLeague}

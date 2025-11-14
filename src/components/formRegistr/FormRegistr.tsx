@@ -99,6 +99,7 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
               value={values.password}
               sx={{ borderRadius: '50px' }}
               id="outlined-adornment-password"
+              autoComplete="false"
               type={showPassword ? 'text' : 'password'}
               endAdornment={
                 <InputAdornment position="end">

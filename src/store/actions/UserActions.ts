@@ -104,13 +104,21 @@ export const fetchUserByNickname = (nickname: string) => async (dispatch: AppDis
     dispatch(SelectUserFetch());
     const response = await fetch(`${process.env.REACT_APP_API_USER}/public-profile-nickname?nickname=${nickname}`);
     if (!response.ok) {
+      if (response.status === 404) {
+        return dispatch(SelectUserError('NOT_FOUND'));
+      }
       const error = await response.json();
       console.error('Ошибка авторизации:', error.message || response.statusText);
+      return dispatch(SelectUserError(error.message || 'ERROR'));
     }
     const data = await response.json();
+    if (!data || Object.keys(data).length === 0) {
+      return dispatch(SelectUserError('NOT_FOUND'));
+    }
+
     return dispatch(SelectUserFetchSuccess(data));
-  } catch (error) {
-    return dispatch(SelectUserError(error));
+  } catch (error: any) {
+    return dispatch(SelectUserError(error.message || 'ERROR'));
   }
 };
 
@@ -193,6 +201,7 @@ export const deleteSubscribe = async (id: number) => {
 export const isSubscribed = async (id: number) => {
   try {
     const token = getCookie('tokenData');
+    if (!token) return;
     const response = await fetch(`${process.env.REACT_APP_API_USER}/is-subscribed/${id}`, {
       method: 'GET',
       headers: {

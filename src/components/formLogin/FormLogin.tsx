@@ -81,6 +81,7 @@ export const FormLogin = ({
             error={touched.username && Boolean(errors.username)}
             helperText={touched.username && errors.username}
             name="username"
+            autoComplete="username"
           />
           <FormControl variant="outlined" sx={{ width: '100%' }}>
             <StyledInputLabel htmlFor="outlined-adornment-password">Пароль</StyledInputLabel>
@@ -88,10 +89,11 @@ export const FormLogin = ({
               onChange={handleChange}
               onBlur={handleBlur}
               value={values.password}
-              name="password"
-              sx={{ borderRadius: '50px' }}
-              id="outlined-adornment-password"
               type={showPassword ? 'text' : 'password'}
+              id="outlined-adornment-password"
+              name="password"
+              autoComplete="current-password"
+              sx={{ borderRadius: '50px' }}
               endAdornment={
                 <InputAdornment position="end">
                   <StyledIconButton
