@@ -54,3 +54,15 @@ export const StyledMenuButton = styled(MenuItem)(() => ({
   border: 'none',
   background: 'transparent',
 }));
+
+export const IconNotidicationCount = styled(Box)(() => ({
+  position: 'absolute',
+  top: 10,
+  right: 10,
+  color: 'var(--white)',
+  fontSize: '1rem',
+  width: '10px',
+  height: '10px',
+  borderRadius: '50%',
+  background: '#ff0000',
+}));

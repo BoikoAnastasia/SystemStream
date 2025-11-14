@@ -55,6 +55,7 @@ export interface INotification {
   type: string;
   title: string;
   message: string;
+  link: string;
 }
 
 // components

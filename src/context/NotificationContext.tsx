@@ -28,6 +28,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         type: 'stream_start',
         title: 'Новый стрим!',
         message: `${currentStream.streamerName} начал трансляцию: ${currentStream.streamName}`,
+        link: currentStream.streamName,
       });
       setLastStreamId(currentStream.streamId);
     }

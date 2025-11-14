@@ -106,15 +106,13 @@ export const UserPage: FC = appLayout((): JSX.Element => {
   }, [paramNickname, profile, dispatch, Clear]);
 
   useEffect(() => {
-    if (!paramNickname || !currentStream) return;
-    if (currentStream?.isLive) {
-      joinStream();
-    }
+    if (!paramNickname) return;
+    joinStream();
 
     return () => {
-      if (currentStream?.isLive) leaveStream();
+      leaveStream();
     };
-  }, [paramNickname, joinStream, leaveStream, currentStream]);
+  }, [paramNickname, joinStream, leaveStream]);
 
   useEffect(() => {
     if (!currentStream) {
