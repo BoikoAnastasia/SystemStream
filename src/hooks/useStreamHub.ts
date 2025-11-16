@@ -1,79 +1,81 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
-import { IStream } from '../types/share';
+import { useEffect, useRef, useState } from 'react';
+import * as signalR from '@microsoft/signalr';
+import Hls from 'hls.js';
 
-const STREAM_POLL_INTERVAL = 5000; // интервал обновления в мс
+interface UseStreamHubProps {
+  nickname?: string;
+}
 
-export const useStreamHub = (nickname?: string) => {
-  const [currentStream, setCurrentStream] = useState<IStream | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
-  const streamRef = useRef<IStream | null>(null); // для сравнения URL
+export const useStreamHub = ({ nickname }: UseStreamHubProps) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const hlsRef = useRef<Hls | null>(null);
+  const hubUrl = `${process.env.REACT_APP_API_LOCAL}/hubs/streamHub`;
 
-  // Функция получения стрима по никнейму
-  const fetchStream = useCallback(async () => {
-    if (!nickname) return;
+  const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
+  const [currentStream, setCurrentStream] = useState<any>(null);
+  const [viewerCount, setViewerCount] = useState<number>(0);
 
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_STREAM_VIEW}/${nickname}`);
-      if (!response.ok) {
-        console.warn('[StreamHub] Failed to fetch stream:', response.statusText);
-        setCurrentStream(null);
-        setIsConnected(false);
-        streamRef.current = null;
-        return;
-      }
-      const data: IStream | null = await response.json();
-
-      // Если URL стрима не поменялся, не обновляем state
-      if (data?.hlsUrl && data?.hlsUrl === streamRef.current?.hlsUrl) {
-        return;
-      }
-
-      setCurrentStream(data);
-      setIsConnected(!!data?.isLive);
-      streamRef.current = data;
-    } catch (err) {
-      console.warn('[StreamHub] Error fetching stream:', err);
-      setCurrentStream(null);
-      setIsConnected(false);
-      streamRef.current = null;
-    }
-  }, [nickname]);
-
-  // Пуллинг каждые X секунд
+  // SignalR
   useEffect(() => {
     if (!nickname) return;
 
-    fetchStream(); // первый запрос сразу
-    const interval = setInterval(fetchStream, STREAM_POLL_INTERVAL);
+    const hubConnection = new signalR.HubConnectionBuilder().withUrl(hubUrl).withAutomaticReconnect().build();
 
-    return () => clearInterval(interval);
-  }, [nickname, fetchStream]);
+    setConnection(hubConnection);
 
-  // join / leave (REST-запросы к серверу)
-  const joinStream = useCallback(async () => {
-    if (!nickname || !currentStream?.isLive) return;
-    try {
-      await fetch(`${process.env.REACT_APP_API_STREAM_VIEW}/${nickname}/join`, { method: 'POST' });
-      console.log(`[StreamHub] Joined stream of ${nickname}`);
-    } catch (err) {
-      console.warn(`[StreamHub] Failed to join stream of ${nickname}:`, err);
+    hubConnection
+      .start()
+      .then(() => {
+        console.log('Connected to StreamHub');
+
+        hubConnection.on('StreamJoined', (streamInfo) => {
+          setCurrentStream(streamInfo);
+        });
+
+        hubConnection.on('UpdateViewerCount', (count) => {
+          setViewerCount(count);
+        });
+
+        hubConnection.invoke('JoinStream', nickname).catch(console.error);
+      })
+      .catch(console.error);
+
+    return () => {
+      if (hubConnection.state === signalR.HubConnectionState.Connected) {
+        hubConnection.invoke('LeaveStream', nickname).finally(() => hubConnection.stop());
+      }
+    };
+  }, [nickname, hubUrl]);
+
+  // HLS
+  useEffect(() => {
+    if (!currentStream?.hlsUrl || !videoRef.current) return;
+
+    if (hlsRef.current && hlsRef.current.url === currentStream.hlsUrl) return;
+
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
     }
-  }, [nickname, currentStream]);
 
-  const leaveStream = useCallback(async () => {
-    if (!nickname || !currentStream?.isLive) return;
-    try {
-      await fetch(`${process.env.REACT_APP_API_STREAM_VIEW}/${nickname}/leave`, { method: 'POST' });
-      console.log(`[StreamHub] Left stream of ${nickname}`);
-    } catch (err) {
-      console.warn(`[StreamHub] Failed to leave stream of ${nickname}:`, err);
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(currentStream.hlsUrl);
+      hls.attachMedia(videoRef.current);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => videoRef.current?.play());
+      hlsRef.current = hls;
+    } else {
+      videoRef.current.src = currentStream.hlsUrl;
+      videoRef.current.play();
     }
-  }, [nickname, currentStream]);
 
-  return {
-    currentStream,
-    isConnected,
-    joinStream,
-    leaveStream,
-  };
+    return () => {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+    };
+  }, [currentStream?.hlsUrl]);
+
+  return { videoRef, currentStream, viewerCount, connection };
 };

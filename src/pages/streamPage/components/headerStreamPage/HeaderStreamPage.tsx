@@ -12,7 +12,7 @@ import {
 // types
 import { IStream } from '../../../../types/share';
 
-export const HeaderStreamPage = ({ streamInfo }: { streamInfo: IStream }) => {
+export const HeaderStreamPage = ({ streamInfo, viewerCount }: { streamInfo: IStream; viewerCount: Number }) => {
   return (
     <StyledHeaderStreamPage>
       <Box
@@ -29,7 +29,7 @@ export const HeaderStreamPage = ({ streamInfo }: { streamInfo: IStream }) => {
           <StyledTitle style={{ marginRight: '10px' }}>{streamInfo.streamerName}</StyledTitle>
           {streamInfo.isLive ? <StyledButtonLive>В эфире</StyledButtonLive> : <></>}
           <StyledButtonWathers>
-            <VisibilityIcon sx={{ width: '10px', height: '10px' }} /> {streamInfo.totalViews}
+            <VisibilityIcon sx={{ width: '10px', height: '10px' }} /> {String(viewerCount)}
           </StyledButtonWathers>
         </Box>
         <StyledSpanDark style={{ gridArea: 'nameStream' }}>Сейчас в эфире: {streamInfo.streamName}</StyledSpanDark>

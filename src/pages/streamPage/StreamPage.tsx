@@ -13,9 +13,11 @@ import { IStream } from '../../types/share';
 export const StreamPage = ({
   videoRef,
   streamInfo,
+  viewerCount,
 }: {
   videoRef: React.RefObject<HTMLVideoElement | null>;
   streamInfo: IStream;
+  viewerCount: number;
 }) => {
   const { isMobile } = useDeviceDetect();
   const [isOpen, setIsOpen] = useState(true);
@@ -51,7 +53,7 @@ export const StreamPage = ({
             transition: 'all .3s ease',
           }}
         >
-          <HeaderStreamPage streamInfo={streamInfo} />
+          <HeaderStreamPage streamInfo={streamInfo} viewerCount={viewerCount} />
           <video
             ref={videoRef}
             autoPlay

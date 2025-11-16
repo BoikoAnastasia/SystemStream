@@ -1,29 +1,24 @@
-import { FC, JSX } from 'react';
+import { FC } from 'react';
 import { useParams } from 'react-router-dom';
-// components
-import { appLayout } from '../../layout/index';
+import { appLayout } from '../../layout';
 import { TabsComponent } from '../../components/ui/tabs/TabsComponent';
 import { UserAbout } from './components/userAbout/UserAbout';
 import { UserSchedule } from './components/userSchedule/UserSchedule';
 import { SectionListVideo } from '../../components/sectionListVideo/SectionListVideo';
 import { ContainerBox, StyledBannerUserInfo } from '../../components/StylesComponents';
 import { UserBanner } from './components/userBanner/UserBanner';
-import { StreamPage } from '../streamPage/StreamPage';
 import { Loader } from '../../components/ui/loader/Loader';
-// hooks
-import { IVideoItem } from '../../types/share';
-// types
 import { useUserPage } from '../../hooks/useUserPage';
+import { StreamPage } from '../streamPage/StreamPage';
 
-const testVideos: IVideoItem[] = [];
+const testVideos: any = [];
 
-export const UserPage: FC = appLayout((): JSX.Element => {
+export const UserPage: FC = appLayout(() => {
   const { nickname: paramNickname } = useParams<{ nickname: string }>();
-  const { userData, currentStream, videoRef, isLoading, isError, isNotProfileData } = useUserPage(paramNickname);
+  const { userData, isNotProfileData, videoRef, currentStream, viewerCount, isLoading, isError } =
+    useUserPage(paramNickname);
 
-  if (isLoading) {
-    return <Loader />;
-  }
+  if (isLoading) return <Loader />;
 
   if (isError === 'NOT_FOUND') {
     return (
@@ -35,7 +30,7 @@ export const UserPage: FC = appLayout((): JSX.Element => {
 
   return (
     <ContainerBox>
-      {currentStream?.isLive && <StreamPage videoRef={videoRef} streamInfo={currentStream} />}
+      {currentStream?.isLive && <StreamPage videoRef={videoRef} streamInfo={currentStream} viewerCount={viewerCount} />}
       <UserBanner userData={userData} isNotProfileData={isNotProfileData} />
       <TabsComponent
         propsChild={[<UserAbout userData={userData} />, <UserSchedule />, <SectionListVideo list={testVideos} />]}

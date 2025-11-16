@@ -14,7 +14,8 @@ const NotificationContext = createContext<NotificationContextValue | undefined>(
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const { nickname } = useNickname();
-  const { currentStream } = useStreamHub(nickname || undefined);
+
+  const { currentStream } = useStreamHub({ nickname: nickname || undefined });
 
   // Отслеживаем появление нового стрима
   const [lastStreamId, setLastStreamId] = useState<Number | null>(null);
