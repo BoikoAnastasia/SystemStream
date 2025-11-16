@@ -50,12 +50,26 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
     }
   };
 
-  const regUser = async (values: IModalForm) => {
-    setErrorMessage('');
-    setMessage('');
-    const resCheck = await checkIfUserExist(values);
-    if (!resCheck) return;
+  const regUser = async (values: IModalForm, { setFieldError, setSubmitting, resetForm }: any) => {
+    setSubmitting(true);
+    if (!values.email || !values.username) return;
+    // проверка никнейма
+    const resultNickname = await checkExistNickname(values.username);
+    if (resultNickname === true) {
+      setFieldError('username', 'Данный ник уже используется');
+      setSubmitting(false);
+      return;
+    }
 
+    // проверка email
+    const resultEmail = await checkExistEmail(values.email);
+    if (resultEmail === true) {
+      setFieldError('email', 'Данная почта уже существует');
+      setSubmitting(false);
+      return;
+    }
+
+    // регистрация
     const result = await registrationUser({
       username: values.username,
       password: values.password,
@@ -64,10 +78,12 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
 
     if (result.success) {
       setMessage('Вы успешно прошли регистрацию! Теперь авторизуйтесь.');
+      resetForm();
     } else {
       setMessage(result.message);
-      setErrorMessage(result.message);
     }
+
+    setSubmitting(false);
   };
 
   return (
