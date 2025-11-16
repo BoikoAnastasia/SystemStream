@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 // store
-import { fetchtSubsribtionsById } from '../../store/actions/UserActions';
+import { fetchtSubsribtionsById } from '../../store/actions/SubscribersActions';
 // components
 import { Logo } from '../logo/Logo';
 import { useDrawer } from '../../context/DrawerContext';

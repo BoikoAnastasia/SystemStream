@@ -8,9 +8,9 @@ import { BannerEffect } from '../../../../components/ui/bannerEffect/BannerEffec
 import {
   deleteSubscribe,
   fetchtSubsribtionsById,
-  isSubscribed,
+  streamerFolows,
   subscribeToUser,
-} from '../../../../store/actions/UserActions';
+} from '../../../../store/actions/SubscribersActions';
 // hooks
 import { useAppSelector } from '../../../../hooks/redux';
 // styles
@@ -23,22 +23,35 @@ import {
   StyledProfileSection,
 } from '../../../../components/StylesComponents';
 
-export const UserBanner = ({ userData, showBtnSubsribe }: any) => {
+export const UserBanner = ({ userData, isNotProfileData }: any) => {
   const { isAuth } = useAppSelector((state) => state.user);
   const { setOpen } = useHeaderModal();
+  const { data } = useAppSelector((state) => state.user);
 
-  const [subscribers, setSubscribers] = useState(0);
+  const [subscribers, setSubscribers] = useState([]);
   const [isSubscriber, setIsSubscriber] = useState(false);
+
+  const getSubsribers = async () => {
+    return isNotProfileData ? await streamerFolows(userData.id) : await fetchtSubsribtionsById(userData.id);
+  };
+
+  const fecthDataSubsribers = async () => {
+    const dataSubsribers = await getSubsribers();
+    setSubscribers(dataSubsribers);
+  };
+  const isUserAlreadySubsribers = () => {
+    if (!data || !subscribers) return;
+    const subsribed = subscribers.some((user: any) => user.id === data?.id);
+    setIsSubscriber(subsribed);
+  };
+
+  useEffect(() => {
+    isUserAlreadySubsribers();
+  }, [subscribers]);
 
   useEffect(() => {
     if (!userData) return;
-    const fetchData = async () => {
-      const subscriptions = await fetchtSubsribtionsById(userData.id);
-      setSubscribers(subscriptions.length);
-      const subscribed = await isSubscribed(userData.id);
-      if (subscribed) setIsSubscriber(subscribed);
-    };
-    fetchData();
+    fecthDataSubsribers();
   }, [userData]);
 
   const handlerSubscribe = async () => {
@@ -50,9 +63,7 @@ export const UserBanner = ({ userData, showBtnSubsribe }: any) => {
 
     const result = await subscribeToUser(userData.id);
     if (result) {
-      const subscriptions = await fetchtSubsribtionsById(userData.id);
-      setSubscribers(subscriptions.length);
-      setIsSubscriber(true);
+      fecthDataSubsribers();
     }
   };
 
@@ -60,9 +71,7 @@ export const UserBanner = ({ userData, showBtnSubsribe }: any) => {
     if (!userData) return;
     const result = await deleteSubscribe(userData.id);
     if (result) {
-      const subscriptions = await fetchtSubsribtionsById(userData.id);
-      setSubscribers(subscriptions.length);
-      setIsSubscriber(false);
+      fecthDataSubsribers();
     }
   };
 
@@ -77,8 +86,10 @@ export const UserBanner = ({ userData, showBtnSubsribe }: any) => {
       <StyledInfo>
         <StyledBannerUserName>{userData?.nickname || 'Тестовое имя'}</StyledBannerUserName>
         <StyledBannerUserInfo>Streamer</StyledBannerUserInfo>
-        <StyledBannerUserInfo>{subscribers} подписчиков</StyledBannerUserInfo>
-        {showBtnSubsribe &&
+        <StyledBannerUserInfo>
+          {subscribers && subscribers !== null ? subscribers.length : 0} подписчиков
+        </StyledBannerUserInfo>
+        {isNotProfileData &&
           (isSubscriber ? (
             <StyledFollowButton onClick={handlerDeleteSubscribe}>Отписаться</StyledFollowButton>
           ) : (
@@ -87,7 +98,7 @@ export const UserBanner = ({ userData, showBtnSubsribe }: any) => {
       </StyledInfo>
 
       {!userData?.backgroundImage && <BannerEffect />}
-      <StyledBannerAvatar src={`url(${userData?.profileImage}`} />
+      <StyledBannerAvatar src={`url(${userData?.profileImage})`} />
       <Socials />
     </StyledProfileSection>
   );

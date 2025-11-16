@@ -102,7 +102,7 @@ export const userProfile = () => async (dispatch: AppDispatch) => {
 export const fetchUserByNickname = (nickname: string) => async (dispatch: AppDispatch) => {
   try {
     dispatch(SelectUserFetch());
-    const response = await fetch(`${process.env.REACT_APP_API_USER}/public-profile-nickname?nickname=${nickname}`);
+    const response = await fetch(`${process.env.REACT_APP_API_USER}/by-nickname/${nickname}`);
     if (!response.ok) {
       if (response.status === 404) {
         return dispatch(SelectUserError('NOT_FOUND'));
@@ -137,86 +137,33 @@ export const fetchUserById = (id: number) => async (dispatch: AppDispatch) => {
   }
 };
 
-// subscribers
-export const fetchtSubsribtionsById = async (id: number) => {
+// проверки для регистрации
+export const checkExistEmail = async (email: string) => {
   try {
-    const response = await fetch(`${process.env.REACT_APP_API_USER}/${id}/subscriptions`);
-    if (!response.ok) {
-      console.error('Ошибка получения подписчиков', response.statusText);
-      return [];
-    }
-    const data = await response.json();
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    console.log('не удалось получить подписчиков');
-    return [];
-  }
-};
-
-export const subscribeToUser = async (id: number) => {
-  try {
-    const token = getCookie('tokenData');
-    const response = await fetch(`${process.env.REACT_APP_API_USER}/subscribe/${id}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ targetUserId: id }),
-    });
+    const response = await fetch(`${process.env.REACT_APP_API_USER}/exists/email/${email}`);
     if (!response.ok) {
       const error = await response.json();
-      console.error('Ошибка подписки на пользователя:', error.message || response.statusText);
+      console.error('Ошибка проверки почты:', error.message || response.statusText);
     }
     const data = await response.json();
-    return data;
+    return Boolean(data.exists);
   } catch (error) {
-    console.log('не удалось подписаться');
+    console.log('Не удалось проверить почту');
     return error;
   }
 };
 
-export const deleteSubscribe = async (id: number) => {
+export const checkExistNickname = async (nickname: string) => {
   try {
-    const token = getCookie('tokenData');
-    const response = await fetch(`${process.env.REACT_APP_API_USER}/unsubscribe/${id}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(`${process.env.REACT_APP_API_USER}/exists/nickname/${nickname}`);
     if (!response.ok) {
       const error = await response.json();
-      console.error('Ошибка отписки от пользователя:', error.message || response.statusText);
+      console.error('Ошибка проверки ника:', error.message || response.statusText);
     }
     const data = await response.json();
-    return data;
+    return Boolean(data.exists);
   } catch (error) {
-    console.log('не удалось отписаться');
+    console.log('Не удалось проверить ник');
     return error;
-  }
-};
-
-// is-subscribed
-export const isSubscribed = async (id: number) => {
-  try {
-    const token = getCookie('tokenData');
-    if (!token) return;
-    const response = await fetch(`${process.env.REACT_APP_API_USER}/is-subscribed/${id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!response.ok) {
-      const error = await response.json();
-      console.error('Ошибка подписчик ли:', error.message || response.statusText);
-    }
-    const data = await response.json();
-    return Boolean(data);
-  } catch (error) {
-    console.log('не удалось получить подписчик ли');
-    return false;
   }
 };

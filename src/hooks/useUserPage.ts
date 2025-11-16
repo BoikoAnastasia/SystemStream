@@ -83,7 +83,7 @@ export const useUserPage = (paramNickname: string | undefined) => {
   }, [currentStream?.hlsUrl]);
 
   const userData = profile?.nickname === paramNickname ? profile : selectedUser;
-  const showBtnSubscribe = profile?.nickname !== paramNickname;
+  const isNotProfileData = profile?.nickname !== paramNickname;
 
-  return { userData, currentStream, videoRef, isLoading, isError, showBtnSubscribe };
+  return { userData, currentStream, videoRef, isLoading, isError, isNotProfileData };
 };

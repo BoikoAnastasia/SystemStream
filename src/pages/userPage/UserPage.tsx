@@ -19,7 +19,7 @@ const testVideos: IVideoItem[] = [];
 
 export const UserPage: FC = appLayout((): JSX.Element => {
   const { nickname: paramNickname } = useParams<{ nickname: string }>();
-  const { userData, currentStream, videoRef, isLoading, isError, showBtnSubscribe } = useUserPage(paramNickname);
+  const { userData, currentStream, videoRef, isLoading, isError, isNotProfileData } = useUserPage(paramNickname);
 
   if (isLoading) {
     return <Loader />;
@@ -36,7 +36,7 @@ export const UserPage: FC = appLayout((): JSX.Element => {
   return (
     <ContainerBox>
       {currentStream?.isLive && <StreamPage videoRef={videoRef} streamInfo={currentStream} />}
-      <UserBanner userData={userData} showBtnSubsribe={showBtnSubscribe} />
+      <UserBanner userData={userData} isNotProfileData={isNotProfileData} />
       <TabsComponent
         propsChild={[<UserAbout userData={userData} />, <UserSchedule />, <SectionListVideo list={testVideos} />]}
         propTabsTitle={['Основная информация', 'Расписание стримов', 'Все стримы']}

@@ -1,6 +1,6 @@
 import { Dispatch, MouseEvent, SetStateAction, useState } from 'react';
 // reducer
-import { registrationUser } from '../../store/actions/UserActions';
+import { checkExistEmail, checkExistNickname, registrationUser } from '../../store/actions/UserActions';
 // formik
 import { Formik, Form } from 'formik';
 import { validationRegist } from '../../validation/validation';
@@ -8,6 +8,7 @@ import { validationRegist } from '../../validation/validation';
 import { Box, Checkbox, FormControl, FormControlLabel, InputAdornment } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+// styles
 import {
   StyledButtonsForm,
   StyledButtonForm,
@@ -16,10 +17,8 @@ import {
   StyledOutlinedInputModal,
   StyledTextFieldModal,
 } from '../StylesComponents';
+// types
 import { IModalForm } from '../../types/share';
-
-//TODO stepper?
-//TODO datepicker
 
 export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<string | null>> }) => {
   const [errorMessage, setErrorMessage] = useState('');
@@ -34,9 +33,28 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
     event.preventDefault();
   };
 
+  const checkIfUserExist = async (values: IModalForm) => {
+    if (!values.email || !values.username) return;
+    const resultNickname = await checkExistNickname(values.username);
+    if (resultNickname === true) {
+      setErrorMessage('Данный ник уже используется');
+      return false;
+    }
+    const resultEmail = await checkExistEmail(values.email);
+    if (resultEmail === true) {
+      setErrorMessage('Данная почта уже существует');
+      return false;
+    } else {
+      setErrorMessage('');
+      return true;
+    }
+  };
+
   const regUser = async (values: IModalForm) => {
     setErrorMessage('');
     setMessage('');
+    const resCheck = await checkIfUserExist(values);
+    if (!resCheck) return;
 
     const result = await registrationUser({
       username: values.username,
@@ -119,9 +137,7 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
             {touched.password && errors.password && (
               <Box sx={{ color: 'var(--error)', fontSize: '12px', marginTop: '4px' }}>{errors.password}</Box>
             )}
-            {errorMessage && (
-              <Box sx={{ color: 'var(--error)', fontSize: '14px', marginTop: '-10px' }}>{errorMessage}</Box>
-            )}
+            {errorMessage && <Box sx={{ color: 'var(--error)', fontSize: '14px' }}>{errorMessage}</Box>}
           </FormControl>
           <FormControlLabel
             sx={{
