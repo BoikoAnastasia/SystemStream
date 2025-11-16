@@ -1,4 +1,5 @@
 import { getCookie } from '../../utils/cookieFunctions';
+import { createGuestKey } from '../../utils/createGuestKey';
 
 // получить список подписок пользователя
 export const fetchtSubsribtionsById = async (id: number) => {
@@ -66,10 +67,10 @@ export const deleteSubscribe = async (id: number) => {
   }
 };
 
-// список подписчиков пользователя (тут или авторизованный или нет)
+// список подписчиков пользователя (авторизованный или гостевой ключ)
 export const streamerFolows = async (id: number) => {
   try {
-    const token = getCookie('tokenData');
+    const token = createGuestKey();
     if (!token) return;
     const response = await fetch(`${process.env.REACT_APP_API_SUBSCRIPTIONS}/${id}/subscribers`, {
       method: 'GET',
