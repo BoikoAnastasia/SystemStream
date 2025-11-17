@@ -56,8 +56,8 @@ export const StreamPage = ({
         >
           <HeaderStreamPage streamInfo={streamInfo} viewerCount={viewerCount} />
           <video
-            // ref={videoRef}
-            src={'./video/video-04.mp4'}
+            ref={videoRef}
+            // src={'./video/video-04.mp4'}
             autoPlay
             playsInline
             controls
