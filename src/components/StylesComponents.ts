@@ -422,6 +422,7 @@ export const StyledChatList = styled(Box)(() => ({
   flex: 1,
   padding: '20px 16px',
   overflowY: 'auto',
+  justifyContent: 'flex-end',
   '&::-webkit-scrollbar': {
     width: '5px',
   },
