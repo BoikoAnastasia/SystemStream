@@ -1,13 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import * as signalR from '@microsoft/signalr';
 import Hls from 'hls.js';
+// utils
 import { createGuestKey } from '../utils/createGuestKey';
 
-interface UseStreamHubProps {
-  nickname?: string;
-}
-
-export const useStreamHub = ({ nickname }: UseStreamHubProps) => {
+export const useStreamHub = ({ nickname }: { nickname: string | undefined }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<Hls | null>(null);
   const userTokenRef = useRef<string>(null);
@@ -17,13 +14,13 @@ export const useStreamHub = ({ nickname }: UseStreamHubProps) => {
   const [currentStream, setCurrentStream] = useState<any>(null);
   const [viewerCount, setViewerCount] = useState<number>(0);
 
-  if (!userTokenRef.current) {
-    userTokenRef.current = createGuestKey(); // только один раз
-  }
-
   // SignalR
   useEffect(() => {
     if (!nickname) return;
+
+    if (!userTokenRef.current) {
+      userTokenRef.current = createGuestKey();
+    }
 
     const hubConnection = new signalR.HubConnectionBuilder().withUrl(hubUrl).withAutomaticReconnect().build();
 

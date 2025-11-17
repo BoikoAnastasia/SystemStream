@@ -1,10 +1,16 @@
 import { getCookie } from './cookieFunctions';
 
 export const createGuestKey = () => {
-  let userToken = getCookie('tokenData');
-  if (!userToken) {
-    userToken = crypto.randomUUID();
-    localStorage.setItem('viewerSessionId', userToken);
+  // Авторизованный пользователь
+  const authToken = getCookie('tokenData');
+  if (authToken) return authToken;
+
+  // Гость
+  let guestId = localStorage.getItem('viewerSessionId');
+  if (!guestId) {
+    guestId = crypto.randomUUID();
+    localStorage.setItem('viewerSessionId', guestId);
   }
-  return userToken;
+
+  return guestId;
 };

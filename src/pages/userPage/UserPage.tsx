@@ -30,7 +30,8 @@ export const UserPage: FC = appLayout(() => {
 
   return (
     <ContainerBox>
-      {currentStream?.isLive && <StreamPage videoRef={videoRef} streamInfo={currentStream} viewerCount={viewerCount} />}
+      {/* {currentStream?.isLive && <StreamPage videoRef={videoRef} streamInfo={currentStream} viewerCount={viewerCount} />} */}
+      <StreamPage videoRef={videoRef} streamInfo={currentStream} viewerCount={viewerCount} />
       <UserBanner userData={userData} isNotProfileData={isNotProfileData} />
       <TabsComponent
         propsChild={[<UserAbout userData={userData} />, <UserSchedule />, <SectionListVideo list={testVideos} />]}

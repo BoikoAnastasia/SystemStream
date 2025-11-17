@@ -26,13 +26,13 @@ export const HeaderStreamPage = ({ streamInfo, viewerCount }: { streamInfo: IStr
       >
         <Avatar sx={{ gridArea: 'avatar' }} src="./img/users/user-01.jpg"></Avatar>
         <Box sx={{ gridArea: 'streamInfo', display: 'flex', alignItems: 'center' }}>
-          <StyledTitle style={{ marginRight: '10px' }}>{streamInfo.streamerName}</StyledTitle>
-          {streamInfo.isLive ? <StyledButtonLive>В эфире</StyledButtonLive> : <></>}
+          <StyledTitle style={{ marginRight: '10px' }}>{streamInfo?.streamerName}</StyledTitle>
+          {streamInfo?.isLive ? <StyledButtonLive>В эфире</StyledButtonLive> : <></>}
           <StyledButtonWathers>
             <VisibilityIcon sx={{ width: '10px', height: '10px' }} /> {String(viewerCount)}
           </StyledButtonWathers>
         </Box>
-        <StyledSpanDark style={{ gridArea: 'nameStream' }}>Сейчас в эфире: {streamInfo.streamName}</StyledSpanDark>
+        <StyledSpanDark style={{ gridArea: 'nameStream' }}>Сейчас в эфире: {streamInfo?.streamName}</StyledSpanDark>
       </Box>
     </StyledHeaderStreamPage>
   );

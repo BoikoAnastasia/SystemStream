@@ -89,7 +89,7 @@ export const Chat = ({
       currentUser: true,
       avatar: './img/users/user-04.jpg',
     };
-    setIistMessages((prev) => [...prev, newM]);
+    setIistMessages((prev) => [newM, ...prev]);
     setMessage('');
   };
 
@@ -101,7 +101,7 @@ export const Chat = ({
 
   useEffect(() => {
     if (listRef.current) {
-      listRef.current.scrollTop = listRef.current.scrollHeight;
+      listRef.current.scrollTop = 0;
     }
   }, [listMessages]);
 
@@ -112,6 +112,7 @@ export const Chat = ({
         flexDirection: 'column',
         overflow: 'hidden',
         height: '100%',
+        minWidth: '250px',
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid var(--sidebar)' }}>
@@ -132,6 +133,7 @@ export const Chat = ({
       <Box sx={{ position: 'relative', display: 'flex', gap: '12px', alignItems: 'center', marginTop: '20px' }}>
         <StyledChatTextField
           placeholder="Введите сообщение"
+          autoComplete="false"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && sendMessage()}

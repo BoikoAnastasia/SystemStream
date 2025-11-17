@@ -461,9 +461,10 @@ export const StyledChatCardMessage = styled(Box)(() => ({
 }));
 
 export const StyledChatTextField = styled(TextField)(() => ({
-  background: 'var(--button-dark)',
-  borderRadius: '12px',
+  flex: '0 0 auto',
   width: '100%',
+  borderRadius: '12px',
+  background: 'var(--button-dark)',
   // Input text color
   '& .MuiOutlinedInput-input': {
     color: 'var(--white)',

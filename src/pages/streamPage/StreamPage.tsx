@@ -46,6 +46,7 @@ export const StreamPage = ({
             flexDirection: 'column',
             flex: isOpen && !isMobile ? '0 1 70%' : '0 1 100%',
             height: '100%',
+            maxHeight: '830px',
             padding: '0 10px',
             zIndex: 1,
             backgroundColor: 'rgba(255,255,255,0.05)',
@@ -55,14 +56,16 @@ export const StreamPage = ({
         >
           <HeaderStreamPage streamInfo={streamInfo} viewerCount={viewerCount} />
           <video
-            ref={videoRef}
+            // ref={videoRef}
+            src={'./video/video-04.mp4'}
             autoPlay
             playsInline
             controls
             style={{
               borderRadius: '20px',
-              height: isMobile ? '250px' : '500px',
-              maxHeight: isOpen ? '800px' : '100%',
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
             }}
           />
         </Box>
@@ -71,6 +74,7 @@ export const StreamPage = ({
             display: isMobile ? 'none' : 'block',
             flex: isOpen ? '0 1 30%' : '0 1 5%',
             height: '100%',
+            maxHeight: '636px',
             transition: 'all .3s ease',
           }}
         >
