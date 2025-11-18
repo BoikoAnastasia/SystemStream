@@ -89,7 +89,7 @@ export const Chat = ({
       currentUser: true,
       avatar: './img/users/user-04.jpg',
     };
-    setIistMessages((prev) => [newM, ...prev]);
+    setIistMessages((prev) => [...prev, newM]);
     setMessage('');
   };
 

@@ -8,7 +8,7 @@ import { AppDispatch } from '../store/store';
 // context
 import { useNickname } from '../context/NicknameContext';
 // hooks
-import { useStreamHub } from './useStreamHub';
+import { useStreamHub } from './hubs/useStreamHub';
 
 export const useUserPage = (paramNickname?: string) => {
   const { nickname, setNickname } = useNickname();

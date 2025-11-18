@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as signalR from '@microsoft/signalr';
 import Hls from 'hls.js';
 // utils
-import { createGuestKey } from '../utils/createGuestKey';
+import { createGuestKey } from '../../utils/createGuestKey';
 
 export const useStreamHub = ({ nickname }: { nickname: string | undefined }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
