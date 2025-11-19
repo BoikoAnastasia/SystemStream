@@ -18,12 +18,31 @@ export const useNotificationHub = (addNotification: (n: INotification) => void) 
     hubRef.current = hub;
 
     hub.on('ReceiveNotification', (data) => {
+      // Проверяем, что данные существуют и содержат необходимые поля
+      if (!data) {
+        console.warn('Received notification with no data');
+        return;
+      }
+
+      const { type, streamerName, streamName } = data;
+
+      // Проверяем обязательные поля
+      if (!streamerName || !streamName) {
+        console.warn('Received notification with missing required fields:', data);
+        return;
+      }
+
+      // Создаем безопасные значения для всех полей
+      const safeType = type || 'info';
+      const safeStreamerName = streamerName || 'Неизвестный стример';
+      const safeStreamName = streamName || 'Новая трансляция';
+
       addNotification({
         id: Date.now(),
-        type: data.type,
+        type: safeType,
         title: 'Новый стрим!',
-        message: `${data.streamerName} начал трансляцию: ${data.streamName}`,
-        link: data.streamerName,
+        message: `${safeStreamerName} начал трансляцию: ${safeStreamName}`,
+        link: safeStreamerName,
       });
     });
 
@@ -35,5 +54,5 @@ export const useNotificationHub = (addNotification: (n: INotification) => void) 
     return () => {
       hub.stop().catch(console.error);
     };
-  }, [addNotification, hubUrl]);
+  }, [addNotification, hubUrl, token]);
 };
