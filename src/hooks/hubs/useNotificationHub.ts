@@ -1,14 +1,17 @@
 import { useEffect, useRef } from 'react';
 import * as signalR from '@microsoft/signalr';
 import { INotification } from '../../types/share';
+import { getCookie } from '../../utils/cookieFunctions';
 
 export const useNotificationHub = (addNotification: (n: INotification) => void) => {
   const hubRef = useRef<signalR.HubConnection | null>(null);
   const hubUrl = `${process.env.REACT_APP_API_LOCAL}/hubs/notificationHub`;
 
+  const token = getCookie('tokenData');
+
   useEffect(() => {
     const hub = new signalR.HubConnectionBuilder()
-      .withUrl(hubUrl, { withCredentials: true })
+      .withUrl(hubUrl, { accessTokenFactory: () => token || '' })
       .withAutomaticReconnect()
       .build();
 
