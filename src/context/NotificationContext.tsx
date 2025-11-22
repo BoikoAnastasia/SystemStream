@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useState } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 // hooks
 import { useNotificationHub } from '../hooks/hubs/useNotificationHub';
 // types
@@ -15,15 +15,19 @@ const NotificationContext = createContext<NotificationContextValue | undefined>(
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<INotification[]>([]);
 
-  const addNotification = (notification: INotification) => {
+  const addNotification = useCallback((notification: INotification) => {
     setNotifications((prev) => [notification, ...prev]);
-  };
+  }, []);
 
-  const removeNotification = (id: number) => {
+  const removeNotification = useCallback((id: number) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
+  }, []);
 
   useNotificationHub(addNotification);
+
+  useEffect(() => {
+    console.log('Provider notifications:', notifications);
+  }, [notifications]);
 
   return (
     <NotificationContext.Provider value={{ notifications, addNotification, removeNotification }}>

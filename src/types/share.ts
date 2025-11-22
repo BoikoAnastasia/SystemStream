@@ -64,7 +64,7 @@ export interface IStream {
   previewlUrl: null | string;
   hlsUrl: string;
   totalViews: number;
-  startedAt: string;
+  startedAt: string | Date;
   isLive: boolean;
 }
 

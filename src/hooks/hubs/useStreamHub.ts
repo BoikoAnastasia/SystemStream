@@ -58,33 +58,26 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
     };
 
     const handleStreamStatusChanged = (data: any) => {
-      console.log('SignalR StreamStatusChanged', data);
+      console.log('FULL StreamStatusChanged payload:', JSON.stringify(data, null, 2));
 
-      const status = ((data?.Status ?? data?.status) || '').toString().toLowerCase();
+      const isLive = data?.isLive ?? data?.IsLive ?? data?.status?.toString().toLowerCase() === 'live';
 
-      // если бек не прислал статус — игнорируем
-      if (!status) return;
+      if (!isLive) return;
 
-      if ((status === 'live' || status === 'started' || status === 'on') && data.Stream) {
-        const stream = data.Stream;
-        setCurrentStream({
-          streamId: stream.streamId ?? stream.StreamId ?? 0,
-          streamName: stream.streamName ?? stream.StreamName ?? 'Unknown',
-          streamerId: stream.streamerId ?? stream.StreamerId ?? 0,
-          streamerName: stream.streamerName ?? stream.StreamName ?? 'Unknown',
-          tags: stream.tags ?? [],
-          previewlUrl: stream.previewlUrl ?? null,
-          hlsUrl: stream.hlsUrl ?? stream.HlsUrl ?? '',
-          totalViews: stream.totalViews ?? 0,
-          startedAt: stream.startedAt ?? new Date().toISOString(),
-          isLive: true,
-        });
-        return;
-      }
+      const stream: IStream = {
+        streamId: data.streamId ?? 0,
+        streamName: data.streamName ?? '',
+        streamerName: data.streamerName ?? '',
+        streamerId: data.streamerId ?? 0,
+        tags: data.tags ?? [],
+        previewlUrl: data.previewUrl,
+        hlsUrl: data.hlsUrl,
+        startedAt: data.startedAt ? new Date(data.startedAt) : new Date(),
+        isLive: true,
+        totalViews: data.totalViews,
+      };
 
-      if (status === 'offline' || status === 'stopped') {
-        setCurrentStream(null);
-      }
+      handleStreamJoined(stream);
     };
 
     // Подписки
