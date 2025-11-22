@@ -24,7 +24,7 @@ export const HeaderNotificationMenu = () => {
     setAnchorEl(null);
   };
 
-  const handleNotificationClick = (link: string, id: string) => {
+  const handleNotificationClick = (link: string, id: number) => {
     removeNotification(id);
     navigate(link.startsWith('/') ? link : `/${link}`);
     handleClose();

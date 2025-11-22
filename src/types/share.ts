@@ -69,7 +69,8 @@ export interface IStream {
 }
 
 export interface INotification {
-  id: string;
+  id: number;
+  streamerId: number;
   date: string;
   type: string;
   title: string;

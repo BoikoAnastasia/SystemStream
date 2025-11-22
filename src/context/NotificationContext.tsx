@@ -7,7 +7,7 @@ import { INotification } from '../types/share';
 interface NotificationContextValue {
   notifications: INotification[];
   addNotification: (n: INotification) => void;
-  removeNotification: (id: string) => void;
+  removeNotification: (id: number) => void;
 }
 
 const NotificationContext = createContext<NotificationContextValue | undefined>(undefined);
@@ -19,7 +19,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     setNotifications((prev) => [notification, ...prev]);
   };
 
-  const removeNotification = (id: string) => {
+  const removeNotification = (id: number) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
