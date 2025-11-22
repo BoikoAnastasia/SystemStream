@@ -1,15 +1,16 @@
-// useNotificationHub.ts
 import { useEffect, useRef } from 'react';
 import * as signalR from '@microsoft/signalr';
 import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
 import { INotification } from '../../types/share';
 import { getCookie } from '../../utils/cookieFunctions';
+import { formatData } from '../../utils/formatData';
 
 interface StreamStartedPayload {
   StreamId: number;
   StreamerId: number;
   StreamerName: string;
   StreamName: string;
+  date: Date;
 }
 
 export const useNotificationHub = (addNotification: (n: INotification) => void) => {
@@ -43,8 +44,8 @@ export const useNotificationHub = (addNotification: (n: INotification) => void) 
         addNotification({
           id: Number(`${StreamId}${Date.now()}`),
           streamerId: StreamerId,
-          date: new Date().toISOString(),
-          type: 'stream-started',
+          date: formatData(data.date),
+          type: data.type,
           title: 'Новый стрим!',
           message: `${StreamerName} начал стрим "${StreamName}"`,
           link: `/${StreamerName}`,
