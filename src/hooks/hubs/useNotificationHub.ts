@@ -3,7 +3,6 @@ import * as signalR from '@microsoft/signalr';
 import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
 import { INotification } from '../../types/share';
 import { getCookie } from '../../utils/cookieFunctions';
-import { formatData } from '../../utils/formatData';
 
 interface StreamStartedPayload {
   StreamId: number;
@@ -37,14 +36,18 @@ export const useNotificationHub = (addNotification: (n: INotification) => void) 
         console.error('Failed to parse payload', e);
       }
 
+      console.log('==================');
+      console.log(data.type, typeof data.type);
+      console.log(data.date, typeof data.date);
+
       if (payload) {
         const { StreamId, StreamerId, StreamerName, StreamName } = payload;
 
         addNotification({
           id: Number(`${StreamId}${Date.now()}`),
           streamerId: StreamerId,
-          date: formatData(data.date),
-          type: data.type,
+          date: new Date().toISOString(),
+          type: data.type || 'stream-started',
           title: 'Новый стрим!',
           message: `${StreamerName} начал стрим "${StreamName}"`,
           link: `/${StreamerName}`,

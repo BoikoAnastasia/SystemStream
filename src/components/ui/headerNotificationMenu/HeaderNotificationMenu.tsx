@@ -8,6 +8,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 // styles, types
 import { IconNotidicationCount, StyledMenu } from '../../../layout/StyledLayout';
 import { INotification } from '../../../types/share';
+import { formatDate } from '../../../utils/formatDate';
 
 export const HeaderNotificationMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -69,7 +70,9 @@ export const HeaderNotificationMenu = () => {
               <notification.icon sx={{ gridArea: 'icon' }} />
               <Box sx={{ gridArea: 'title' }}>{notification.title}</Box>
               <Box sx={{ gridArea: 'message' }}>{notification.message}</Box>
-              <Box sx={{ gridArea: 'time', fontSize: '10px', gridColumn: 'span 1' }}>{notification.date}</Box>
+              <Box sx={{ gridArea: 'time', fontSize: '10px', gridColumn: 'span 1' }}>
+                {formatDate(new Date(notification.date))}
+              </Box>
             </MenuItem>
           ))
         ) : (
