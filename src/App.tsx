@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 // routers
 import { PrivateRoute, privateRouters, routers } from './routers/routers';
-import { Providers } from './Providers';
 // components
 import { NotFound } from './pages/NotFound/NotFound';
 import { Loader } from './components/ui/loader/Loader';
@@ -19,21 +18,19 @@ function App() {
   }
 
   return (
-    <Providers>
-      <Suspense fallback={<Loading />}>
-        <Routes>
-          <Route element={<PrivateRoute />}>
-            {privateRouters.map(({ path, Element }) => (
-              <Route key={path} path={path} element={<Element />} />
-            ))}
-          </Route>
-          {routers.map(({ path, Element, ...props }) => (
-            <Route key={path} path={path} element={<Element {...props} />} />
+    <Suspense fallback={<Loading />}>
+      <Routes>
+        <Route element={<PrivateRoute />}>
+          {privateRouters.map(({ path, Element }) => (
+            <Route key={path} path={path} element={<Element />} />
           ))}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-    </Providers>
+        </Route>
+        {routers.map(({ path, Element, ...props }) => (
+          <Route key={path} path={path} element={<Element {...props} />} />
+        ))}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
   );
 }
 

@@ -20,11 +20,8 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
   const [currentStream, setCurrentStream] = useState<IStream | null>(null);
   const [viewerCount, setViewerCount] = useState<number>(0);
 
-  // === SignalR connection ===
   useEffect(() => {
-    console.log('useStreamHub: userData', userData?.id);
     if (!nickname || !userData?.id) return;
-
     if (!userTokenRef.current) userTokenRef.current = createGuestKey();
 
     const hubConnection = new signalR.HubConnectionBuilder().withUrl(hubUrl).withAutomaticReconnect().build();
@@ -33,24 +30,9 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
 
     let interval: NodeJS.Timer | undefined;
 
-    const handleStreamJoined = (streamInfo: any) => {
-      console.log('SignalR StreamJoined', streamInfo);
-      if (!streamInfo) {
-        setCurrentStream(null);
-        return;
-      }
-      setCurrentStream({
-        streamId: streamInfo.streamId ?? streamInfo.StreamId ?? 0,
-        streamName: streamInfo.streamName ?? streamInfo.StreamName ?? 'Unknown',
-        streamerId: streamInfo.streamerId ?? streamInfo.StreamerId ?? 0,
-        streamerName: streamInfo.streamerName ?? streamInfo.StreamerName ?? 'Unknown',
-        tags: streamInfo.tags ?? [],
-        previewlUrl: streamInfo.previewlUrl ?? null,
-        hlsUrl: streamInfo.hlsUrl ?? streamInfo.HlsUrl ?? '',
-        totalViews: streamInfo.totalViews ?? 0,
-        startedAt: streamInfo.startedAt ?? new Date().toISOString(),
-        isLive: streamInfo.isLive ?? streamInfo.IsLive ?? false,
-      });
+    const handleStreamJoined = (streamInfo: IStream | null) => {
+      if (!streamInfo || !streamInfo.isLive) return;
+      setCurrentStream(streamInfo);
     };
 
     const handleUpdateViewerCount = (count: number) => {
@@ -58,58 +40,57 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
     };
 
     const handleStreamStatusChanged = (data: any) => {
-      console.log('FULL StreamStatusChanged payload:', JSON.stringify(data, null, 2));
+      if (!data) return;
 
-      const isLive = data?.isLive ?? data?.IsLive ?? data?.status?.toString().toLowerCase() === 'live';
+      const stream = data.Stream;
+      const status = (data?.status ?? data?.Status ?? '').toString().toLowerCase();
 
-      if (!isLive) return;
+      // если статус "live" и stream совпадает с текущим или еще не установлен
+      if ((status === 'live' || status === 'started' || status === 'on') && stream) {
+        if (!currentStream || stream.streamId === currentStream.streamId) {
+          setCurrentStream({
+            streamId: stream.streamId ?? 0,
+            streamName: stream.streamName ?? 'Unknown',
+            streamerId: stream.streamerId ?? 0,
+            streamerName: stream.streamerName ?? 'Unknown',
+            tags: stream.tags ?? [],
+            previewlUrl: stream.previewUrl ?? null,
+            hlsUrl: stream.hlsUrl ?? '',
+            totalViews: stream.totalViews ?? 0,
+            startedAt: stream.startedAt ?? new Date().toISOString(),
+            isLive: true,
+          });
+        }
+        return;
+      }
 
-      const stream: IStream = {
-        streamId: data.streamId ?? 0,
-        streamName: data.streamName ?? '',
-        streamerName: data.streamerName ?? '',
-        streamerId: data.streamerId ?? 0,
-        tags: data.tags ?? [],
-        previewlUrl: data.previewUrl,
-        hlsUrl: data.hlsUrl,
-        startedAt: data.startedAt ? new Date(data.startedAt) : new Date(),
-        isLive: true,
-        totalViews: data.totalViews,
-      };
-
-      handleStreamJoined(stream);
+      // если статус "offline" и streamId совпадает с текущим стримом — выключаем
+      if ((status === 'offline' || status === 'stopped') && (!stream || stream.streamId === currentStream?.streamId)) {
+        setCurrentStream(null);
+      }
     };
 
-    // Подписки
     hubConnection.on('StreamJoined', handleStreamJoined);
     hubConnection.on('UpdateViewerCount', handleUpdateViewerCount);
     hubConnection.on('StreamStatusChanged', handleStreamStatusChanged);
 
-    hubConnection.onclose((err) => {
-      console.warn('StreamHub connection closed', err);
-    });
-
-    // Старт соединения
     hubConnection
       .start()
       .then(() => {
         console.log('Connected to StreamHub');
         hubConnection.invoke('JoinStream', nickname, userTokenRef.current).catch(console.error);
 
-        // Авто-обновление статуса каждые 15 секунд
-        const streamerId = userData.id;
-        if (streamerId) {
-          hubConnection.invoke('UpdateStreamStatus', streamerId).catch(console.error);
+        if (userData.id) {
+          hubConnection.invoke('UpdateStreamStatus', userData.id).catch(console.error);
           interval = setInterval(() => {
             if (hubConnection.state === signalR.HubConnectionState.Connected) {
-              hubConnection.invoke('UpdateStreamStatus', streamerId).catch(console.error);
+              hubConnection.invoke('UpdateStreamStatus', userData.id).catch(console.error);
             }
           }, 15000);
         }
       })
       .catch(console.error);
 
-    // Cleanup при размонтировании
     return () => {
       if (interval) clearInterval(interval);
 
@@ -124,11 +105,10 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
       hubConnection.off('StreamJoined');
       hubConnection.off('UpdateViewerCount');
       hubConnection.off('StreamStatusChanged');
-      hubConnection.onclose(() => {});
     };
-  }, [nickname, hubUrl, userData?.id]);
+  }, [nickname, hubUrl, userData?.id, currentStream]);
 
-  // === HLS player ===
+  // HLS player
   useEffect(() => {
     const video = videoRef.current;
 
@@ -136,37 +116,32 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
       if (hlsRef.current) {
         try {
           hlsRef.current.stopLoad();
-        } catch (e) {}
+        } catch {}
         try {
           hlsRef.current.destroy();
-        } catch (e) {}
+        } catch {}
         hlsRef.current = null;
       }
       currentHlsUrlRef.current = null;
+
       if (video) {
         try {
           video.pause();
         } catch {}
         try {
           video.removeAttribute('src');
-          // для некоторых браузеров нужно вызвать load()
           video.load();
         } catch {}
       }
     };
 
-    // Если нет стрима или он оффлайн — очищаем плеер
     if (!currentStream || !video || !currentStream.isLive || !currentStream.hlsUrl) {
       cleanupPlayer();
       return;
     }
 
-    // Если уже загружен тот же URL — ничего не делаем
-    if (currentHlsUrlRef.current === currentStream.hlsUrl) {
-      return;
-    }
+    if (currentHlsUrlRef.current === currentStream.hlsUrl) return;
 
-    // иначе создаём новый
     cleanupPlayer();
 
     if (Hls.isSupported()) {
@@ -176,48 +151,27 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
 
       hls.loadSource(currentStream.hlsUrl);
       hls.attachMedia(video);
-      if (video) video.muted = true; // автоплей
+      video.muted = true;
+
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        video?.play().catch(() => {});
+        video.play().catch(() => {});
       });
 
-      hls.on(Hls.Events.ERROR, (event, data) => {
-        console.warn('hls error', event, data);
-        // если фатальная ошибка — очистим плеер
-        if (data && data.fatal) {
-          try {
-            if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-              hls.startLoad();
-            } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-              hls.recoverMediaError();
-            } else {
-              hls.destroy();
-              cleanupPlayer();
-            }
-          } catch (e) {
-            hls.destroy();
-            cleanupPlayer();
-          }
+      hls.on(Hls.Events.ERROR, (_, data) => {
+        if (data?.fatal) {
+          if (data.type === Hls.ErrorTypes.NETWORK_ERROR) hls.startLoad();
+          else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) hls.recoverMediaError();
+          else cleanupPlayer();
         }
       });
     } else {
-      // fallback: просто src
       video.src = currentStream.hlsUrl;
       video.muted = true;
       video.play().catch(() => {});
       currentHlsUrlRef.current = currentStream.hlsUrl;
     }
 
-    return () => {
-      // cleanup при смене currentStream
-      if (hlsRef.current) {
-        try {
-          hlsRef.current.destroy();
-        } catch {}
-        hlsRef.current = null;
-      }
-      currentHlsUrlRef.current = null;
-    };
+    return () => cleanupPlayer();
   }, [currentStream]);
 
   return { videoRef, currentStream, viewerCount, connection };

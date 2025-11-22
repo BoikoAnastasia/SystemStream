@@ -1,8 +1,6 @@
-import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
-// hooks
-import { useNotificationHub } from '../hooks/hubs/useNotificationHub';
-// types
+import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { INotification } from '../types/share';
+import { useNotificationHub } from '../hooks/hubs/useNotificationHub';
 
 interface NotificationContextValue {
   notifications: INotification[];
@@ -16,6 +14,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<INotification[]>([]);
 
   const addNotification = useCallback((notification: INotification) => {
+    console.log('Adding notification:', notification);
     setNotifications((prev) => [notification, ...prev]);
   }, []);
 
@@ -23,10 +22,11 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
+  // Подключаем SignalR хук
   useNotificationHub(addNotification);
 
   useEffect(() => {
-    console.log('Provider notifications:', notifications);
+    console.log('Provider notifications updated:', notifications);
   }, [notifications]);
 
   return (

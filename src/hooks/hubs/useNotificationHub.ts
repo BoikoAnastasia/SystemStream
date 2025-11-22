@@ -1,7 +1,6 @@
+// useNotificationHub.ts
 import { useEffect, useRef } from 'react';
 import * as signalR from '@microsoft/signalr';
-import { getCookie } from '../../utils/cookieFunctions';
-import { formatData } from '../../utils/formatData';
 import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
 import { INotification } from '../../types/share';
 
@@ -14,12 +13,10 @@ interface StreamStartedPayload {
 
 export const useNotificationHub = (addNotification: (n: INotification) => void) => {
   const hubRef = useRef<signalR.HubConnection | null>(null);
-  const hubUrl = `${process.env.REACT_APP_API_LOCAL}/hubs/notificationHub`;
-  const token = getCookie('tokenData');
+  const hubUrl = 'https://localhost:5001/hubs/notificationHub'; // Замени на свой URL
+  const token = 'demo-token'; // Токен если нужен
 
   useEffect(() => {
-    if (!token) return;
-
     const hub = new signalR.HubConnectionBuilder()
       .withUrl(hubUrl, { accessTokenFactory: () => token })
       .withAutomaticReconnect()
@@ -27,46 +24,41 @@ export const useNotificationHub = (addNotification: (n: INotification) => void) 
 
     hubRef.current = hub;
 
-    // Подписка на уведомления
     hub.on('ReceiveNotification', (data: any) => {
+      console.log('Raw notification payload:', data);
+
       if (!data) return;
 
       let payload: StreamStartedPayload | null = null;
       try {
-        if (data.payload) {
-          payload = JSON.parse(data.payload) as StreamStartedPayload;
-        }
+        payload = typeof data.payload === 'string' ? JSON.parse(data.payload) : data.payload;
       } catch (e) {
-        console.error('Bad payload', e);
+        console.error('Failed to parse payload', e);
       }
 
       if (payload) {
         const { StreamId, StreamerId, StreamerName, StreamName } = payload;
-        console.log('payload', payload);
+
         addNotification({
           id: Number(`${StreamId}${Date.now()}`),
           streamerId: StreamerId,
-          date: formatData(data.date),
-          type: data.type,
+          date: new Date().toISOString(),
+          type: 'stream-started',
           title: 'Новый стрим!',
           message: `${StreamerName} начал стрим "${StreamName}"`,
-          link: StreamerName,
+          link: `/${StreamerName}`,
           icon: SmartDisplayIcon,
         });
       }
     });
 
-    // Стартуем соединение
     hub
       .start()
       .then(() => console.log('Connected to NotificationHub'))
       .catch((err) => console.error('NotificationHub connection failed:', err));
 
-    // Очистка
     return () => {
-      if (hubRef.current && hubRef.current.state === signalR.HubConnectionState.Connected) {
-        hubRef.current.stop().catch(console.error);
-      }
+      hub.stop().catch(() => {});
     };
   }, [addNotification, hubUrl, token]);
 };
