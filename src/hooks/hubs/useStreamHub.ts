@@ -59,7 +59,12 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
 
     const handleStreamStatusChanged = (data: any) => {
       console.log('SignalR StreamStatusChanged', data);
+
       const status = ((data?.Status ?? data?.status) || '').toString().toLowerCase();
+
+      // если бек не прислал статус — игнорируем
+      if (!status) return;
+
       if ((status === 'live' || status === 'started' || status === 'on') && data.Stream) {
         const stream = data.Stream;
         setCurrentStream({
@@ -74,8 +79,10 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
           startedAt: stream.startedAt ?? new Date().toISOString(),
           isLive: true,
         });
-      } else {
-        // помечаем как offline
+        return;
+      }
+
+      if (status === 'offline' || status === 'stopped') {
         setCurrentStream(null);
       }
     };

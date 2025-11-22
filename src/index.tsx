@@ -1,17 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 // redux, store
 import { setupStore } from './store/store';
 import { Provider } from 'react-redux';
 // components
-import reportWebVitals from './reportWebVitals';
 import App from './App';
+import reportWebVitals from './reportWebVitals';
+import { Providers } from './Providers';
 // styles, theme
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';
 import './index.css';
 
-import { BrowserRouter } from 'react-router-dom';
 const store = setupStore();
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
@@ -20,7 +21,9 @@ root.render(
     <BrowserRouter>
       <React.StrictMode>
         <ThemeProvider theme={theme}>
-          <App />
+          <Providers>
+            <App />
+          </Providers>
         </ThemeProvider>
       </React.StrictMode>
     </BrowserRouter>
