@@ -20,7 +20,7 @@ import {
   StyledTextFieldModal,
 } from '../StylesComponents';
 // types
-import { IModalForm } from '../../types/share';
+import { IModalLoginForm } from '../../types/share';
 
 export const FormLogin = ({
   handleClose,
@@ -44,9 +44,9 @@ export const FormLogin = ({
     event.preventDefault();
   };
 
-  const checkUserAuth = async (values: IModalForm) => {
+  const checkUserAuth = async (values: IModalLoginForm) => {
     setErrorMessage('');
-    const isRight = await loginUser({ emailOrUsername: values.username, password: values.password });
+    const isRight = await loginUser({ loginOrEmail: values.loginOrEmail, password: values.password });
     if (isRight) {
       setMessage('Вы успешно вошли!');
       const action = await dispatch(userProfile());
@@ -63,7 +63,7 @@ export const FormLogin = ({
 
   return (
     <Formik
-      initialValues={{ username: '', password: '' }}
+      initialValues={{ loginOrEmail: '', password: '' }}
       enableReinitialize={false}
       validationSchema={validationLogin}
       onSubmit={checkUserAuth}
@@ -77,10 +77,10 @@ export const FormLogin = ({
             label="Логин или электронная почта"
             onChange={handleChange}
             onBlur={handleBlur}
-            value={values.username}
-            error={touched.username && Boolean(errors.username)}
-            helperText={touched.username && errors.username}
-            name="username"
+            value={values.loginOrEmail}
+            error={touched.loginOrEmail && Boolean(errors.loginOrEmail)}
+            helperText={touched.loginOrEmail && errors.loginOrEmail}
+            name="loginOrEmail"
             autoComplete="username"
           />
           <FormControl variant="outlined" sx={{ width: '100%' }}>

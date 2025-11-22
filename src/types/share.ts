@@ -132,10 +132,15 @@ export interface IMessage {
   avatar: null | string;
 }
 
-export interface IModalForm {
+export interface IModalRegistForm {
   password: string;
   username: string;
   email?: string;
+}
+
+export interface IModalLoginForm {
+  password: string;
+  loginOrEmail: string;
 }
 
 export type SidebarContextType = {

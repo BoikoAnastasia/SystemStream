@@ -8,14 +8,14 @@ import { getCookie, removeCookie, setCookie } from '../../utils/cookieFunctions'
 const { UserFetch, UserFetchError, UserFetchSuccess, UserLogout } = UserProfileSlice.actions;
 const { SelectUserFetch, SelectUserError, SelectUserFetchSuccess, Clear } = SelectUserSlice.actions;
 // user
-export const loginUser = async ({ emailOrUsername, password }: { emailOrUsername: string; password: string }) => {
+export const loginUser = async ({ loginOrEmail, password }: { loginOrEmail: string; password: string }) => {
   try {
     const response = await fetch(`${process.env.REACT_APP_API_USER}/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ Email: emailOrUsername, Password: password }),
+      body: JSON.stringify({ loginOrEmail: loginOrEmail, password: password }),
     });
     if (!response.ok) {
       const err = await response.json();
@@ -61,7 +61,7 @@ export const registrationUser = async ({
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ Nickname: username, Email: email, Password: password }),
+      body: JSON.stringify({ nickname: username, email: email, password: password }),
     });
     console.log('response: ', response);
     if (!response.ok) {

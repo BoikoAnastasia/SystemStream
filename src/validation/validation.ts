@@ -44,7 +44,7 @@ const fileImage = Yup.mixed<File>()
 
 // schemas
 export const validationLogin = Yup.object({
-  username: usernameOrEmailSchema,
+  loginOrEmail: usernameOrEmailSchema,
   password: notEmptyStringSchema,
 });
 

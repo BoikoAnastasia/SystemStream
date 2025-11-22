@@ -18,7 +18,7 @@ import {
   StyledTextFieldModal,
 } from '../StylesComponents';
 // types
-import { IModalForm } from '../../types/share';
+import { IModalRegistForm } from '../../types/share';
 
 export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<string | null>> }) => {
   const [errorMessage, setErrorMessage] = useState('');
@@ -33,7 +33,7 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
     event.preventDefault();
   };
 
-  const regUser = async (values: IModalForm, { setFieldError, setSubmitting, resetForm }: any) => {
+  const regUser = async (values: IModalRegistForm, { setFieldError, setSubmitting, resetForm }: any) => {
     setErrorMessage('');
     setSubmitting(true);
     if (!values.email || !values.username) return;
