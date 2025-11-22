@@ -76,7 +76,7 @@ export interface INotification {
   title: string;
   message: string;
   link: string | null;
-  icon: any;
+  icon: React.ElementType;
 }
 
 // components

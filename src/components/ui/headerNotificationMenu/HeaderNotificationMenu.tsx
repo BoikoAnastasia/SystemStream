@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // context
 import { useNotification } from '../../../context/NotificationContext';
@@ -29,6 +29,10 @@ export const HeaderNotificationMenu = () => {
     navigate(link.startsWith('/') ? link : `/${link}`);
     handleClose();
   };
+
+  useEffect(() => {
+    console.log('notifications:', notifications);
+  }, [notifications]);
 
   return (
     <>

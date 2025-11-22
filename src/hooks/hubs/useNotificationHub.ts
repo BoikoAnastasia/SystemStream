@@ -44,7 +44,7 @@ export const useNotificationHub = (addNotification: (n: INotification) => void) 
         const { StreamId, StreamerId, StreamerName, StreamName } = payload;
         console.log('payload', payload);
         addNotification({
-          id: StreamId,
+          id: Number(`${StreamId}${Date.now()}`),
           streamerId: StreamerId,
           date: formatData(data.date),
           type: data.type,

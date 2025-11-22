@@ -13,6 +13,7 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<Hls | null>(null);
   const userTokenRef = useRef<string | null>(null);
+  const currentHlsUrlRef = useRef<string | null>(null);
   const hubUrl = `${process.env.REACT_APP_API_LOCAL}/hubs/streamHub`;
 
   const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
@@ -21,7 +22,7 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
 
   // === SignalR connection ===
   useEffect(() => {
-    console.log('userData', userData?.id);
+    console.log('useStreamHub: userData', userData?.id);
     if (!nickname || !userData?.id) return;
 
     if (!userTokenRef.current) userTokenRef.current = createGuestKey();
@@ -30,10 +31,10 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
 
     setConnection(hubConnection);
 
-    let interval: NodeJS.Timer;
+    let interval: NodeJS.Timer | undefined;
 
-    // Подписки
-    hubConnection.on('StreamJoined', (streamInfo: any) => {
+    const handleStreamJoined = (streamInfo: any) => {
+      console.log('SignalR StreamJoined', streamInfo);
       if (!streamInfo) {
         setCurrentStream(null);
         return;
@@ -50,30 +51,42 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
         startedAt: streamInfo.startedAt ?? new Date().toISOString(),
         isLive: streamInfo.isLive ?? streamInfo.IsLive ?? false,
       });
-    });
+    };
 
-    hubConnection.on('UpdateViewerCount', (count: number) => {
+    const handleUpdateViewerCount = (count: number) => {
       setViewerCount(count);
-    });
+    };
 
-    hubConnection.on('StreamStatusChanged', (data: any) => {
-      if (data.Status === 'Live' && data.Stream) {
+    const handleStreamStatusChanged = (data: any) => {
+      console.log('SignalR StreamStatusChanged', data);
+      const status = ((data?.Status ?? data?.status) || '').toString().toLowerCase();
+      if ((status === 'live' || status === 'started' || status === 'on') && data.Stream) {
         const stream = data.Stream;
         setCurrentStream({
           streamId: stream.streamId ?? stream.StreamId ?? 0,
           streamName: stream.streamName ?? stream.StreamName ?? 'Unknown',
           streamerId: stream.streamerId ?? stream.StreamerId ?? 0,
-          streamerName: stream.streamerName ?? stream.StreamerName ?? 'Unknown',
+          streamerName: stream.streamerName ?? stream.StreamName ?? 'Unknown',
           tags: stream.tags ?? [],
           previewlUrl: stream.previewlUrl ?? null,
           hlsUrl: stream.hlsUrl ?? stream.HlsUrl ?? '',
           totalViews: stream.totalViews ?? 0,
           startedAt: stream.startedAt ?? new Date().toISOString(),
-          isLive: stream.isLive ?? stream.IsLive ?? true,
+          isLive: true,
         });
       } else {
+        // помечаем как offline
         setCurrentStream(null);
       }
+    };
+
+    // Подписки
+    hubConnection.on('StreamJoined', handleStreamJoined);
+    hubConnection.on('UpdateViewerCount', handleUpdateViewerCount);
+    hubConnection.on('StreamStatusChanged', handleStreamStatusChanged);
+
+    hubConnection.onclose((err) => {
+      console.warn('StreamHub connection closed', err);
     });
 
     // Старт соединения
@@ -81,7 +94,6 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
       .start()
       .then(() => {
         console.log('Connected to StreamHub');
-        // Присоединяемся к стриму
         hubConnection.invoke('JoinStream', nickname, userTokenRef.current).catch(console.error);
 
         // Авто-обновление статуса каждые 15 секунд
@@ -102,53 +114,109 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
       if (interval) clearInterval(interval);
 
       if (hubConnection.state === signalR.HubConnectionState.Connected) {
-        hubConnection.invoke('LeaveStream', nickname, userTokenRef.current).finally(() => hubConnection.stop());
+        hubConnection
+          .invoke('LeaveStream', nickname, userTokenRef.current)
+          .finally(() => hubConnection.stop().catch(() => {}));
+      } else {
+        hubConnection.stop().catch(() => {});
       }
 
       hubConnection.off('StreamJoined');
       hubConnection.off('UpdateViewerCount');
       hubConnection.off('StreamStatusChanged');
+      hubConnection.onclose(() => {});
     };
   }, [nickname, hubUrl, userData?.id]);
 
   // === HLS player ===
   useEffect(() => {
-    if (!currentStream || !videoRef.current || !currentStream.isLive || !currentStream.hlsUrl) {
-      // Очищаем плеер если оффлайн
+    const video = videoRef.current;
+
+    const cleanupPlayer = () => {
       if (hlsRef.current) {
-        hlsRef.current.destroy();
+        try {
+          hlsRef.current.stopLoad();
+        } catch (e) {}
+        try {
+          hlsRef.current.destroy();
+        } catch (e) {}
         hlsRef.current = null;
       }
-      if (videoRef.current) videoRef.current.src = '';
+      currentHlsUrlRef.current = null;
+      if (video) {
+        try {
+          video.pause();
+        } catch {}
+        try {
+          video.removeAttribute('src');
+          // для некоторых браузеров нужно вызвать load()
+          video.load();
+        } catch {}
+      }
+    };
+
+    // Если нет стрима или он оффлайн — очищаем плеер
+    if (!currentStream || !video || !currentStream.isLive || !currentStream.hlsUrl) {
+      cleanupPlayer();
       return;
     }
 
-    // Если HLS уже играет тот же URL — ничего не делаем
-    if (hlsRef.current && hlsRef.current.url === currentStream.hlsUrl) return;
-
-    if (hlsRef.current) {
-      hlsRef.current.destroy();
-      hlsRef.current = null;
+    // Если уже загружен тот же URL — ничего не делаем
+    if (currentHlsUrlRef.current === currentStream.hlsUrl) {
+      return;
     }
+
+    // иначе создаём новый
+    cleanupPlayer();
 
     if (Hls.isSupported()) {
       const hls = new Hls();
-      hls.loadSource(currentStream.hlsUrl);
-      hls.attachMedia(videoRef.current);
-      videoRef.current.muted = true; // для autoplay
-      hls.on(Hls.Events.MANIFEST_PARSED, () => videoRef.current?.play().catch(() => {}));
       hlsRef.current = hls;
+      currentHlsUrlRef.current = currentStream.hlsUrl;
+
+      hls.loadSource(currentStream.hlsUrl);
+      hls.attachMedia(video);
+      if (video) video.muted = true; // автоплей
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video?.play().catch(() => {});
+      });
+
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        console.warn('hls error', event, data);
+        // если фатальная ошибка — очистим плеер
+        if (data && data.fatal) {
+          try {
+            if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+              hls.startLoad();
+            } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+              hls.recoverMediaError();
+            } else {
+              hls.destroy();
+              cleanupPlayer();
+            }
+          } catch (e) {
+            hls.destroy();
+            cleanupPlayer();
+          }
+        }
+      });
     } else {
-      videoRef.current.src = currentStream.hlsUrl;
-      videoRef.current.muted = true;
-      videoRef.current.play().catch(() => {});
+      // fallback: просто src
+      video.src = currentStream.hlsUrl;
+      video.muted = true;
+      video.play().catch(() => {});
+      currentHlsUrlRef.current = currentStream.hlsUrl;
     }
 
     return () => {
+      // cleanup при смене currentStream
       if (hlsRef.current) {
-        hlsRef.current.destroy();
+        try {
+          hlsRef.current.destroy();
+        } catch {}
         hlsRef.current = null;
       }
+      currentHlsUrlRef.current = null;
     };
   }, [currentStream]);
 

@@ -16,7 +16,7 @@ export const StreamPage = ({
   viewerCount,
 }: {
   videoRef: React.RefObject<HTMLVideoElement | null>;
-  streamInfo: IStream;
+  streamInfo: IStream | null;
   viewerCount: number;
 }) => {
   const { isMobile } = useDeviceDetect();
@@ -54,10 +54,14 @@ export const StreamPage = ({
             transition: 'all .3s ease',
           }}
         >
-          <HeaderStreamPage streamInfo={streamInfo} viewerCount={viewerCount} />
+          {streamInfo ? (
+            <HeaderStreamPage streamInfo={streamInfo} viewerCount={viewerCount} />
+          ) : (
+            <HeaderStreamPage streamInfo={null} viewerCount={viewerCount} /> /* или показать placeholder */
+          )}{' '}
           <video
+            key={streamInfo?.hlsUrl ?? 'no-stream'}
             ref={videoRef}
-            // src={'./video/video-04.mp4'}
             autoPlay
             playsInline
             controls
