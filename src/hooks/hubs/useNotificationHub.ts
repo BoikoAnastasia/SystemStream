@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import * as signalR from '@microsoft/signalr';
 import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
 import { INotification } from '../../types/share';
+import { getCookie } from '../../utils/cookieFunctions';
 
 interface StreamStartedPayload {
   StreamId: number;
@@ -13,8 +14,8 @@ interface StreamStartedPayload {
 
 export const useNotificationHub = (addNotification: (n: INotification) => void) => {
   const hubRef = useRef<signalR.HubConnection | null>(null);
-  const hubUrl = 'https://localhost:5001/hubs/notificationHub'; // Замени на свой URL
-  const token = 'demo-token'; // Токен если нужен
+  const hubUrl = `${process.env.REACT_APP_API_LOCAL}/hubs/notificationHub`;
+  const token = getCookie('tokenData');
 
   useEffect(() => {
     const hub = new signalR.HubConnectionBuilder()
