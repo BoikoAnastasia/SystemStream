@@ -35,13 +35,15 @@ export const useUserPage = (paramNickname?: string) => {
   }, [paramNickname, profile, dispatch, Clear]);
 
   // SignalR + HLS (только для стрима)
-  const { videoRef, currentStream, viewerCount, connection } = useStreamHub({
-    nickname: nickname || paramNickname,
-  });
 
   // Определяем данные пользователя
   const userData = profile?.nickname === paramNickname ? profile : selectedUser;
   const isNotProfileData = profile?.nickname !== paramNickname;
+
+  const { videoRef, currentStream, viewerCount, connection } = useStreamHub({
+    nickname: nickname || paramNickname,
+    userData,
+  });
 
   return {
     userData,

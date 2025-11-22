@@ -4,7 +4,7 @@ import Hls from 'hls.js';
 import { createGuestKey } from '../../utils/createGuestKey';
 import { IStream } from '../../types/share';
 
-export const useStreamHub = ({ nickname }: { nickname: string | undefined }) => {
+export const useStreamHub = ({ nickname, userData }: { nickname: string | undefined; userData: any }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<Hls | null>(null);
   const userTokenRef = useRef<string | null>(null);
@@ -32,6 +32,7 @@ export const useStreamHub = ({ nickname }: { nickname: string | undefined }) => 
 
         // StreamJoined
         hubConnection.on('StreamJoined', (streamInfo: any) => {
+          console.log('StreamJoined:', streamInfo);
           if (!streamInfo) {
             setCurrentStream(null);
             return;
@@ -57,6 +58,7 @@ export const useStreamHub = ({ nickname }: { nickname: string | undefined }) => 
 
         // StreamStatusChanged
         hubConnection.on('StreamStatusChanged', (data: any) => {
+          console.log('Stream status changed:', data);
           if (data.Status === 'Live' && data.Stream) {
             const stream = data.Stream;
             setCurrentStream({
@@ -77,6 +79,16 @@ export const useStreamHub = ({ nickname }: { nickname: string | undefined }) => 
         });
 
         hubConnection.invoke('JoinStream', nickname, userTokenRef.current).catch(console.error);
+
+        const streamerId = userData?.id;
+        hubConnection.invoke('UpdateStreamStatus', streamerId).catch(console.error);
+
+        const interval = setInterval(() => {
+          hubConnection.invoke('UpdateStreamStatus', streamerId).catch(console.error);
+        }, 15000); // каждые 15 секунд
+
+        // Очистка интервала при размонтировании
+        return () => clearInterval(interval);
       })
       .catch(console.error);
 

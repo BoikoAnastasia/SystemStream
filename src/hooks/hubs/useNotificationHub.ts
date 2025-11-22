@@ -32,6 +32,7 @@ export const useNotificationHub = (addNotification: (n: INotification) => void) 
     hubRef.current = hub;
 
     hub.on('ReceiveNotification', (data) => {
+      console.log('ReceiveNotification', data);
       if (!data) return;
 
       let payload: StreamStartedPayload | null = null;
