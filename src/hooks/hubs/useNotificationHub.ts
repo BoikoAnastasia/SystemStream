@@ -10,7 +10,6 @@ interface StreamStartedPayload {
   StreamerId: number;
   StreamerName: string;
   StreamName: string;
-  date: Date;
 }
 
 export const useNotificationHub = (addNotification: (n: INotification) => void) => {
@@ -51,6 +50,7 @@ export const useNotificationHub = (addNotification: (n: INotification) => void) 
           link: `/${StreamerName}`,
           icon: SmartDisplayIcon,
         });
+        console.log('Notification added');
       }
     });
 
