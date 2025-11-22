@@ -60,12 +60,12 @@ export const HeaderNotificationMenu = () => {
             <MenuItem
               sx={{ display: 'grid', gridTemplateAreas: `'icon title time' 'icon message message'`, gap: '5px 10px' }}
               key={notification.id}
-              onClick={() => handleNotificationClick(notification.link, notification.id)}
+              onClick={() => handleNotificationClick(notification.link || '/', notification.id)}
             >
               <notification.icon sx={{ gridArea: 'icon' }} />
               <Box sx={{ gridArea: 'title' }}>{notification.title}</Box>
               <Box sx={{ gridArea: 'message' }}>{notification.message}</Box>
-              <Box sx={{ gridArea: 'time', fontSize: '10px', gridColumn: 'span 1' }}>{notification.id}</Box>
+              <Box sx={{ gridArea: 'time', fontSize: '10px', gridColumn: 'span 1' }}>{notification.date}</Box>
             </MenuItem>
           ))
         ) : (

@@ -32,12 +32,22 @@ export const useStreamHub = ({ nickname }: { nickname: string | undefined }) => 
         console.log('Connected to StreamHub');
 
         hubConnection.on('StreamJoined', (streamInfo) => {
-          console.log('Stream started:', streamInfo);
+          console.log('Stream joined:', streamInfo);
           setCurrentStream(streamInfo);
         });
 
         hubConnection.on('UpdateViewerCount', (count) => {
           setViewerCount(count);
+        });
+
+        hubConnection.on('StreamStatusChanged', (data) => {
+          console.log('Stream status changed:', data);
+
+          if (data.Status === 'Live') {
+            setCurrentStream(data.Stream);
+          } else {
+            setCurrentStream({ isLive: false });
+          }
         });
 
         hubConnection.invoke('JoinStream', nickname, userTokenRef.current).catch(console.error);

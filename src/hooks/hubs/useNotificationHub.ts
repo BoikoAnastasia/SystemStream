@@ -1,8 +1,12 @@
 import { useEffect, useRef } from 'react';
 import * as signalR from '@microsoft/signalr';
-import { INotification } from '../../types/share';
+// utils
 import { getCookie } from '../../utils/cookieFunctions';
+import { formatData } from '../../utils/formatData';
+// mui
 import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
+// types
+import { INotification } from '../../types/share';
 
 export const useNotificationHub = (addNotification: (n: INotification) => void) => {
   const hubRef = useRef<signalR.HubConnection | null>(null);
@@ -10,62 +14,28 @@ export const useNotificationHub = (addNotification: (n: INotification) => void) 
 
   const token = getCookie('tokenData');
 
-  // useEffect(() => {
-
-  //   const safeStreamerName = 'Вася';
-  //   const safeStreamName = 'Васин стрим';
-  //   addNotification({
-  //     id: crypto.randomUUID(),
-  //     date: Date.now().toLocaleString(),
-  //     type: "fsdfsdf",
-  //     title: 'Новый стрим!',
-  //     message: `${safeStreamerName} начал трансляцию: ${safeStreamName}`,
-  //     link: safeStreamerName,
-  //     icon: SmartDisplayIcon
-  //   });
-  // }, [])
-
   useEffect(() => {
     if (!token) return;
 
     const hub = new signalR.HubConnectionBuilder()
-      .withUrl(hubUrl, { accessTokenFactory: () => token || '' })
+      .withUrl(hubUrl, { accessTokenFactory: () => token })
       .withAutomaticReconnect()
       .build();
 
     hubRef.current = hub;
 
     hub.on('ReceiveNotification', (data) => {
-      // Проверяем, что данные существуют и содержат необходимые поля
-      if (!data) {
-        console.warn('Received notification with no data');
-        return;
-      }
+      if (!data) return;
 
-      const { type, streamerName, streamName, dateStream } = data;
-
-      // Проверяем обязательные поля
-      if (!streamerName || !streamName) {
-        console.warn('Received notification with missing required fields:', data);
-        return;
-      }
-
-      // Создаем безопасные значения для всех полей
-      const safeType = type || 'info';
-      const safeStreamerName = streamerName || 'Неизвестный стример';
-      const safeStreamName = streamName || 'Новая трансляция';
-
-      const date = new Date(dateStream);
-      console.log(date);
-      console.log(date.toLocaleString());
-      //TODO по типу добавлять картинку
+      const { Type, Message, Date: date, StreamerId } = data;
+      console.log('RAW notification:', data);
       addNotification({
         id: crypto.randomUUID(),
-        date: date,
-        type: safeType,
-        title: 'Новый стрим!',
-        message: `${safeStreamerName} начал трансляцию: ${safeStreamName}`,
-        link: safeStreamerName,
+        type: Type || 'info',
+        date: formatData(date),
+        title: Type === 'stream' ? 'Новый стрим!' : 'Уведомление',
+        message: Message,
+        link: StreamerId ? `/stream/${StreamerId}` : null,
         icon: SmartDisplayIcon,
       });
     });

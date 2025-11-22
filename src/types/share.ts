@@ -70,11 +70,11 @@ export interface IStream {
 
 export interface INotification {
   id: string;
-  date: Date | string;
+  date: string;
   type: string;
   title: string;
   message: string;
-  link: string;
+  link: string | null;
   icon: any;
 }
 
