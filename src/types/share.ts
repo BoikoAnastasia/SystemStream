@@ -34,6 +34,14 @@ export interface IProfile {
   cashBalance: number;
 }
 
+export interface IProfileChange {
+  email: string | null;
+  password: string | null;
+  profileDescription: string | null;
+  profileImage: string | null;
+  backgroundImage: string | null;
+}
+
 export interface ISubscriber {
   nickname: string;
   profileImage: string;
@@ -61,11 +69,13 @@ export interface IStream {
 }
 
 export interface INotification {
-  id: number;
+  id: string;
+  date: Date | string;
   type: string;
   title: string;
   message: string;
   link: string;
+  icon: any;
 }
 
 // components

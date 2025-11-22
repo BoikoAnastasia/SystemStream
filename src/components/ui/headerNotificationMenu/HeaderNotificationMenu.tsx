@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 // context
 import { useNotification } from '../../../context/NotificationContext';
 // mui
-import { IconButton, MenuItem } from '@mui/material';
+import { Box, IconButton, MenuItem } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 // styles, types
 import { IconNotidicationCount, StyledMenu } from '../../../layout/StyledLayout';
@@ -24,7 +24,7 @@ export const HeaderNotificationMenu = () => {
     setAnchorEl(null);
   };
 
-  const handleNotificationClick = (link: string, id: number) => {
+  const handleNotificationClick = (link: string, id: string) => {
     removeNotification(id);
     navigate(link.startsWith('/') ? link : `/${link}`);
     handleClose();
@@ -57,8 +57,15 @@ export const HeaderNotificationMenu = () => {
       >
         {notifications.length !== 0 ? (
           notifications.map((notification: INotification) => (
-            <MenuItem onClick={() => handleNotificationClick(notification.link, notification.id)}>
-              {notification.message}
+            <MenuItem
+              sx={{ display: 'grid', gridTemplateAreas: `'icon title time' 'icon message message'`, gap: '5px 10px' }}
+              key={notification.id}
+              onClick={() => handleNotificationClick(notification.link, notification.id)}
+            >
+              <notification.icon sx={{ gridArea: 'icon' }} />
+              <Box sx={{ gridArea: 'title' }}>{notification.title}</Box>
+              <Box sx={{ gridArea: 'message' }}>{notification.message}</Box>
+              <Box sx={{ gridArea: 'time', fontSize: '10px', gridColumn: 'span 1' }}>{notification.id}</Box>
             </MenuItem>
           ))
         ) : (

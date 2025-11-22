@@ -33,24 +33,8 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
     event.preventDefault();
   };
 
-  const checkIfUserExist = async (values: IModalForm) => {
-    if (!values.email || !values.username) return;
-    const resultNickname = await checkExistNickname(values.username);
-    if (resultNickname === true) {
-      setErrorMessage('Данный ник уже используется');
-      return false;
-    }
-    const resultEmail = await checkExistEmail(values.email);
-    if (resultEmail === true) {
-      setErrorMessage('Данная почта уже существует');
-      return false;
-    } else {
-      setErrorMessage('');
-      return true;
-    }
-  };
-
   const regUser = async (values: IModalForm, { setFieldError, setSubmitting, resetForm }: any) => {
+    setErrorMessage('');
     setSubmitting(true);
     if (!values.email || !values.username) return;
     // проверка никнейма
@@ -63,6 +47,7 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
 
     // проверка email
     const resultEmail = await checkExistEmail(values.email);
+    setErrorMessage('');
     if (resultEmail === true) {
       setFieldError('email', 'Данная почта уже существует');
       setSubmitting(false);

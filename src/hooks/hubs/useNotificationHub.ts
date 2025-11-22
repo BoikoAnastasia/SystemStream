@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import * as signalR from '@microsoft/signalr';
 import { INotification } from '../../types/share';
 import { getCookie } from '../../utils/cookieFunctions';
+import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
 
 export const useNotificationHub = (addNotification: (n: INotification) => void) => {
   const hubRef = useRef<signalR.HubConnection | null>(null);
@@ -9,7 +10,24 @@ export const useNotificationHub = (addNotification: (n: INotification) => void) 
 
   const token = getCookie('tokenData');
 
+  // useEffect(() => {
+
+  //   const safeStreamerName = 'Вася';
+  //   const safeStreamName = 'Васин стрим';
+  //   addNotification({
+  //     id: crypto.randomUUID(),
+  //     date: Date.now().toLocaleString(),
+  //     type: "fsdfsdf",
+  //     title: 'Новый стрим!',
+  //     message: `${safeStreamerName} начал трансляцию: ${safeStreamName}`,
+  //     link: safeStreamerName,
+  //     icon: SmartDisplayIcon
+  //   });
+  // }, [])
+
   useEffect(() => {
+    if (!token) return;
+
     const hub = new signalR.HubConnectionBuilder()
       .withUrl(hubUrl, { accessTokenFactory: () => token || '' })
       .withAutomaticReconnect()
@@ -24,7 +42,7 @@ export const useNotificationHub = (addNotification: (n: INotification) => void) 
         return;
       }
 
-      const { type, streamerName, streamName } = data;
+      const { type, streamerName, streamName, dateStream } = data;
 
       // Проверяем обязательные поля
       if (!streamerName || !streamName) {
@@ -37,12 +55,18 @@ export const useNotificationHub = (addNotification: (n: INotification) => void) 
       const safeStreamerName = streamerName || 'Неизвестный стример';
       const safeStreamName = streamName || 'Новая трансляция';
 
+      const date = new Date(dateStream);
+      console.log(date);
+      console.log(date.toLocaleString());
+      //TODO по типу добавлять картинку
       addNotification({
-        id: Date.now(),
+        id: crypto.randomUUID(),
+        date: date,
         type: safeType,
         title: 'Новый стрим!',
         message: `${safeStreamerName} начал трансляцию: ${safeStreamName}`,
         link: safeStreamerName,
+        icon: SmartDisplayIcon,
       });
     });
 

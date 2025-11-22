@@ -29,6 +29,19 @@ export const email = Yup.string()
     return emailRegex.test(value);
   });
 
+const fileImage = Yup.mixed<File>()
+  .nullable()
+  .notRequired()
+  .test('fileFormat', 'Неверный формат изображения', (value) => {
+    if (!value) return true;
+    const type = (value as File).type.toLowerCase();
+    return type === 'image/jpeg' || type === 'image/jpg' || type === 'image/png' || type === 'image/gif';
+  })
+  .test('fileSize', 'Файл слишком большой (макс. 5MB)', (value) => {
+    if (!value) return true;
+    return (value as File).size <= 5000000;
+  });
+
 // schemas
 export const validationLogin = Yup.object({
   username: usernameOrEmailSchema,
@@ -39,4 +52,24 @@ export const validationRegist = Yup.object({
   username: username,
   email: email,
   password: passwordSchema,
+});
+
+export const validationChangeProfile = Yup.object({
+  email: Yup.string()
+    .nullable()
+    .notRequired()
+    .test('email', 'Введите корректный email', (value) => {
+      if (!value) return true;
+      return emailRegex.test(value);
+    }),
+  password: Yup.string()
+    .nullable()
+    .notRequired()
+    .test('password', 'Минимум 6 символов, должна быть хотя бы одна буква и цифра', (value) => {
+      if (!value) return true;
+      return value.length >= 6 && /[A-Za-zА-Яа-я]/.test(value) && /\d/.test(value);
+    }),
+  profileDescription: Yup.string().max(500, 'Описание не может быть больше 500 символов').nullable().notRequired(),
+  profileImage: fileImage,
+  backgroundImage: fileImage,
 });

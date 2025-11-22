@@ -14,6 +14,8 @@ import { IStream } from '../../../../types/share';
 
 export const HeaderStreamPage = ({ streamInfo, viewerCount }: { streamInfo: IStream; viewerCount: Number }) => {
   return (
+    // if streamInfo!==null
+
     <StyledHeaderStreamPage>
       <Box
         sx={{

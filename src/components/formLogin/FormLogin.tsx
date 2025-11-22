@@ -44,7 +44,7 @@ export const FormLogin = ({
     event.preventDefault();
   };
 
-  const CheckUserAuth = async (values: IModalForm) => {
+  const checkUserAuth = async (values: IModalForm) => {
     setErrorMessage('');
     const isRight = await loginUser({ emailOrUsername: values.username, password: values.password });
     if (isRight) {
@@ -66,7 +66,7 @@ export const FormLogin = ({
       initialValues={{ username: '', password: '' }}
       enableReinitialize={false}
       validationSchema={validationLogin}
-      onSubmit={CheckUserAuth}
+      onSubmit={checkUserAuth}
       autoComplete="on"
     >
       {({ values, handleChange, handleBlur, touched, errors }) => (

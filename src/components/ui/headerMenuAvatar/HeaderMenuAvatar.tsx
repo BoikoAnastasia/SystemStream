@@ -13,6 +13,11 @@ import { ModalComponent } from '../../modal/ModalComponent';
 // mui
 import { IconButton, MenuItem } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
+import SavingsIcon from '@mui/icons-material/Savings';
+import SettingsIcon from '@mui/icons-material/Settings';
+import PermIdentityIcon from '@mui/icons-material/PermIdentity';
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 export const HeaderMenuAvatar = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -29,12 +34,20 @@ export const HeaderMenuAvatar = () => {
     {
       authOnly: true,
       href: `/${profile?.nickname}`,
+      icon: PermIdentityIcon,
       value: 'Профиль',
     },
     {
       authOnly: true,
       href: '/settings',
+      icon: SettingsIcon,
       value: 'Настройки',
+    },
+    {
+      authOnly: true,
+      href: '/settings',
+      icon: SavingsIcon,
+      value: 'Баланс: 0 руб',
     },
   ];
 
@@ -84,20 +97,29 @@ export const HeaderMenuAvatar = () => {
           .filter((item) => (item.authOnly ? isAuth : true))
           .map((item, index) => (
             <MenuItem
-              sx={{ '&.MuiMenuItem-root': { color: 'var(--white)' } }}
+              sx={{ '&.MuiMenuItem-root': { color: 'var(--white)', display: 'flex', gap: '4px' } }}
               key={index}
               component={Link}
               to={item.href}
             >
+              {item.icon && <item.icon />}
               {item.value}
             </MenuItem>
           ))}
         {isAuth ? (
-          <MenuItem sx={{ '&.MuiMenuItem-root': { color: 'var(--white)' } }} onClick={logout}>
+          <MenuItem
+            sx={{ '&.MuiMenuItem-root': { color: 'var(--white)', display: 'flex', gap: '4px' } }}
+            onClick={logout}
+          >
+            <LogoutIcon />
             Выйти
           </MenuItem>
         ) : (
-          <MenuItem sx={{ '&.MuiMenuItem-root': { color: 'var(--white)' } }} onClick={handleOpenModal}>
+          <MenuItem
+            sx={{ '&.MuiMenuItem-root': { color: 'var(--white)', display: 'flex', gap: '4px' } }}
+            onClick={handleOpenModal}
+          >
+            <LoginIcon />
             Войти
           </MenuItem>
         )}

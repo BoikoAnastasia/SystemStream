@@ -39,8 +39,10 @@ export const UserBanner = ({ userData, isNotProfileData }: any) => {
     const dataSubsribers = await getSubsribers();
     setSubscribers(dataSubsribers);
   };
+
   const isUserAlreadySubsribers = () => {
     if (!data || !subscribers) return;
+    console.log(subscribers);
     const subsribed = subscribers.some((user: any) => user.id === data?.id);
     setIsSubscriber(subsribed);
   };
@@ -98,7 +100,7 @@ export const UserBanner = ({ userData, isNotProfileData }: any) => {
       </StyledInfo>
 
       {!userData?.backgroundImage && <BannerEffect />}
-      <StyledBannerAvatar src={`url(${userData?.profileImage})`} />
+      <StyledBannerAvatar src={userData?.profileImage} />
       <Socials />
     </StyledProfileSection>
   );

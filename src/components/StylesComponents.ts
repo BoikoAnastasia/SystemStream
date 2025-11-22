@@ -943,3 +943,18 @@ export const StyledAvatarWrap = styled('div')({
   alignItems: 'center',
   justifyContent: 'center',
 });
+
+// SettingsChangeProfile
+export const StyledListSettings = styled(List)({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '20px',
+  marginBottom: '30px',
+});
+
+export const StyleListItemSettings = styled(ListItem)({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  padding: 0,
+});

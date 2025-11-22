@@ -32,6 +32,7 @@ export const useStreamHub = ({ nickname }: { nickname: string | undefined }) => 
         console.log('Connected to StreamHub');
 
         hubConnection.on('StreamJoined', (streamInfo) => {
+          console.log('Stream started:', streamInfo);
           setCurrentStream(streamInfo);
         });
 
