@@ -22,23 +22,26 @@ export const useUserPage = (paramNickname?: string) => {
     if (paramNickname) setNickname(paramNickname);
   }, [paramNickname, setNickname]);
 
-  // Загружаем профиль пользователя через redux
   useEffect(() => {
-    if (!paramNickname) return;
-
+    if (!paramNickname) {
+      dispatch(Clear());
+      return;
+    }
     if (profile && profile.nickname === paramNickname) {
       dispatch(Clear());
       return;
     }
 
     dispatch(fetchUserByNickname(paramNickname));
-  }, [paramNickname, profile, dispatch, Clear]);
-
-  // SignalR + HLS (только для стрима)
+  }, [paramNickname, profile, dispatch]);
 
   // Определяем данные пользователя
-  const userData = profile?.nickname === paramNickname ? profile : selectedUser;
-  const isNotProfileData = profile?.nickname !== paramNickname;
+  const isOwnPage = !paramNickname || profile?.nickname === paramNickname;
+
+  const userData = isOwnPage ? profile : selectedUser;
+  const isNotProfileData = !isOwnPage;
+
+  console.log(userData);
 
   const { videoRef, currentStream, viewerCount, connection } = useStreamHub({
     nickname: nickname || paramNickname,

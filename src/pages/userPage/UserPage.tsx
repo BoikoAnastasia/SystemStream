@@ -1,6 +1,9 @@
 import { FC } from 'react';
 import { useParams } from 'react-router-dom';
+// pages
 import { appLayout } from '../../layout';
+import { StreamPage } from '../streamPage/StreamPage';
+// components
 import { TabsComponent } from '../../components/ui/tabs/TabsComponent';
 import { UserAbout } from './components/userAbout/UserAbout';
 import { UserSchedule } from './components/userSchedule/UserSchedule';
@@ -8,8 +11,8 @@ import { SectionListVideo } from '../../components/sectionListVideo/SectionListV
 import { ContainerBox, StyledBannerUserInfo } from '../../components/StylesComponents';
 import { UserBanner } from './components/userBanner/UserBanner';
 import { Loader } from '../../components/ui/loader/Loader';
+// hooks
 import { useUserPage } from '../../hooks/useUserPage';
-import { StreamPage } from '../streamPage/StreamPage';
 
 const testVideos: any = [];
 
@@ -33,7 +36,6 @@ export const UserPage: FC = appLayout(() => {
       {currentStream?.isLive && currentStream.hlsUrl && (
         <StreamPage videoRef={videoRef} streamInfo={currentStream} viewerCount={viewerCount} />
       )}
-      {/* <StreamPage videoRef={videoRef} streamInfo={currentStream} viewerCount={viewerCount} /> */}
       <UserBanner userData={userData} isNotProfileData={isNotProfileData} />
       <TabsComponent
         propsChild={[<UserAbout userData={userData} />, <UserSchedule />, <SectionListVideo list={testVideos} />]}

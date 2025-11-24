@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 // store
-import { fetchtSubsribtionsById } from '../../store/actions/SubscribersActions';
+import { fetchtSubsribtionsMy } from '../../store/actions/SubscribersActions';
 // components
 import { Logo } from '../logo/Logo';
 import { useDrawer } from '../../context/DrawerContext';
@@ -57,7 +57,7 @@ export const DrawerComponent = () => {
   useEffect(() => {
     if (!data) return;
     const fetchSubsribers = async () => {
-      const users = await fetchtSubsribtionsById(data?.id);
+      const users = await fetchtSubsribtionsMy();
       setSubscribers(users);
     };
     fetchSubsribers();

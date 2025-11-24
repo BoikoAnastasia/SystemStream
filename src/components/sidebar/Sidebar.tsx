@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 // store
-import { fetchtSubsribtionsById } from '../../store/actions/SubscribersActions';
+import { fetchtSubsribtionsMy } from '../../store/actions/SubscribersActions';
 // components
 import { CardDrawer } from '../cardDrawer/CardDrawer';
 // mui
@@ -22,7 +22,7 @@ export const Sidebar = () => {
   useEffect(() => {
     if (!data) return;
     const fetchSubsribers = async () => {
-      const users = await fetchtSubsribtionsById(data?.id);
+      const users = await fetchtSubsribtionsMy();
       setSubscribers(users);
     };
     fetchSubsribers();

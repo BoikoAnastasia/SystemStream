@@ -5,12 +5,7 @@ import { useHeaderModal } from '../../../../context/HeaderModalContext';
 import { Socials } from '../../../../components/socials/Socials';
 import { BannerEffect } from '../../../../components/ui/bannerEffect/BannerEffect';
 // store
-import {
-  deleteSubscribe,
-  fetchtSubsribtionsById,
-  streamerFolows,
-  subscribeToUser,
-} from '../../../../store/actions/SubscribersActions';
+import { deleteSubscribe, streamerFolows, subscribeToUser } from '../../../../store/actions/SubscribersActions';
 // hooks
 import { useAppSelector } from '../../../../hooks/redux';
 // styles
@@ -24,57 +19,49 @@ import {
 } from '../../../../components/StylesComponents';
 
 export const UserBanner = ({ userData, isNotProfileData }: any) => {
-  const { isAuth } = useAppSelector((state) => state.user);
+  const { isAuth, data: currentUser } = useAppSelector((state) => state.user);
   const { setOpen } = useHeaderModal();
-  const { data } = useAppSelector((state) => state.user);
 
   const [subscribers, setSubscribers] = useState([]);
   const [isSubscriber, setIsSubscriber] = useState(false);
 
-  const getSubsribers = async () => {
-    return isNotProfileData ? await streamerFolows(userData.id) : await fetchtSubsribtionsById(userData.id);
+  const fetchSubscribers = async () => {
+    if (!userData) return;
+
+    let result;
+    result = await streamerFolows(userData.id);
+
+    setSubscribers(result || []);
   };
 
-  const fecthDataSubsribers = async () => {
-    const dataSubsribers = await getSubsribers();
-    setSubscribers(dataSubsribers);
-  };
+  // Проверяем, подписан ли текущий юзер
+  const checkIsSubscribed = () => {
+    if (!currentUser || !subscribers) return;
 
-  const isUserAlreadySubsribers = () => {
-    if (!data || !subscribers) return;
-    console.log(subscribers);
-    const subsribed = subscribers.some((user: any) => user.id === data?.id);
-    setIsSubscriber(subsribed);
+    setIsSubscriber(subscribers.some((u: any) => u.id === currentUser.id));
   };
 
   useEffect(() => {
-    isUserAlreadySubsribers();
+    checkIsSubscribed();
   }, [subscribers]);
 
   useEffect(() => {
-    if (!userData) return;
-    fecthDataSubsribers();
+    fetchSubscribers();
   }, [userData]);
 
   const handlerSubscribe = async () => {
-    if (!userData) return;
     if (!isAuth) {
       setOpen(true);
       return;
     }
 
     const result = await subscribeToUser(userData.id);
-    if (result) {
-      fecthDataSubsribers();
-    }
+    if (result) fetchSubscribers();
   };
 
   const handlerDeleteSubscribe = async () => {
-    if (!userData) return;
     const result = await deleteSubscribe(userData.id);
-    if (result) {
-      fecthDataSubsribers();
-    }
+    if (result) fetchSubscribers();
   };
 
   return (
@@ -86,11 +73,11 @@ export const UserBanner = ({ userData, isNotProfileData }: any) => {
       }}
     >
       <StyledInfo>
-        <StyledBannerUserName>{userData?.nickname || 'Тестовое имя'}</StyledBannerUserName>
+        <StyledBannerUserName>{userData?.nickname}</StyledBannerUserName>
         <StyledBannerUserInfo>Streamer</StyledBannerUserInfo>
-        <StyledBannerUserInfo>
-          {subscribers && subscribers !== null ? subscribers.length : 0} подписчиков
-        </StyledBannerUserInfo>
+        <StyledBannerUserInfo>{subscribers.length} подписчиков</StyledBannerUserInfo>
+
+        {/* Показывать кнопку можно только на чужом профиле */}
         {isNotProfileData &&
           (isSubscriber ? (
             <StyledFollowButton onClick={handlerDeleteSubscribe}>Отписаться</StyledFollowButton>
