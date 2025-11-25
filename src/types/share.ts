@@ -20,8 +20,22 @@ export interface IStreamSlice {
   isLoading: boolean;
 }
 
-// data
+export interface INotificationSlice {
+  paged: {
+    notifications: INotificationUnified[];
+    totalCount: number;
+    page: number;
+    limit: number;
+  };
+  live: INotificationUnified[];
+  isError: string | null | boolean;
+  isLoading: boolean;
+}
 
+// Types
+export type NotificationsType = 'NewFollower' | 'streamstarted';
+
+// data
 export interface IProfile {
   id: number;
   email: string;
@@ -68,15 +82,27 @@ export interface IStream {
   isLive: boolean;
 }
 
-export interface INotification {
+export interface INotificationBase {
+  type: NotificationsType;
+  payload: string;
+  date?: string;
+  id?: number;
+  isRead?: boolean;
+  createdAt?: string;
+  totalCount?: number;
+  page?: number;
+  limit?: number;
+  notifications?: any[];
+}
+
+export interface INotificationUnified {
   id: number;
-  streamerId: number;
-  date: string;
-  type: string;
   title: string;
   message: string;
   link: string | null;
+  date: string;
   icon: React.ElementType;
+  isRead: boolean;
 }
 
 // components

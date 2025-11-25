@@ -1,4 +1,4 @@
-import { Box, Menu, MenuItem } from '@mui/material';
+import { Box, Menu, MenuItem, Pagination } from '@mui/material';
 import { styled } from '@mui/system';
 
 export const StyleHeader = styled(Box)(() => ({
@@ -65,4 +65,24 @@ export const IconNotidicationCount = styled(Box)(() => ({
   height: '10px',
   borderRadius: '50%',
   background: '#ff0000',
+}));
+
+export const StyledPaginationMenu = styled(Pagination)(() => ({
+  '& .MuiPagination-ul': { justifyContent: 'center' },
+  '& .MuiPaginationItem-root': {
+    color: 'var(--video-card-name)',
+    borderRadius: '8px',
+    border: '1px solid transparent',
+    transition: 'all 0.2s ease',
+  },
+  '& .MuiPaginationItem-root:hover': {
+    backgroundColor: 'var(--background-card)',
+    borderColor: 'var(--background-tab)',
+  },
+
+  '& .Mui-selected': {
+    backgroundColor: 'var(--sidebar-hover) !important',
+    color: 'var(--white)',
+    borderRadius: '8px',
+  },
 }));

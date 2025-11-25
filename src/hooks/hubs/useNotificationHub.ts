@@ -1,20 +1,21 @@
 import { useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
 import * as signalR from '@microsoft/signalr';
-import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
-import { INotification } from '../../types/share';
+// store
+import { AppDispatch } from '../../store/store';
+import { NotificationSlice } from '../../store/slices/NotificationSlice';
+// utils
 import { getCookie } from '../../utils/cookieFunctions';
+// types
+import { INotificationBase } from '../../types/share';
 
-interface StreamStartedPayload {
-  StreamId: number;
-  StreamerId: number;
-  StreamerName: string;
-  StreamName: string;
-}
-
-export const useNotificationHub = (addNotification: (n: INotification) => void) => {
+export const useNotificationHub = (addNotification: (n: INotificationBase) => void) => {
   const hubRef = useRef<signalR.HubConnection | null>(null);
   const hubUrl = `${process.env.REACT_APP_API_LOCAL}/hubs/notificationHub`;
   const token = getCookie('tokenData');
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { AddNotification } = NotificationSlice.actions;
 
   useEffect(() => {
     const hub = new signalR.HubConnectionBuilder()
@@ -28,33 +29,7 @@ export const useNotificationHub = (addNotification: (n: INotification) => void) 
       console.log('Raw notification payload:', data);
 
       if (!data) return;
-
-      let payload: StreamStartedPayload | null = null;
-      try {
-        payload = typeof data.payload === 'string' ? JSON.parse(data.payload) : data.payload;
-      } catch (e) {
-        console.error('Failed to parse payload', e);
-      }
-
-      console.log('==================');
-      console.log(data.type, typeof data.type);
-      console.log(data.date, typeof data.date);
-
-      if (payload) {
-        const { StreamId, StreamerId, StreamerName, StreamName } = payload;
-
-        addNotification({
-          id: Number(`${StreamId}${Date.now()}`),
-          streamerId: StreamerId,
-          date: new Date().toISOString(),
-          type: data.type || 'stream-started',
-          title: 'Новый стрим!',
-          message: `${StreamerName} начал стрим "${StreamName}"`,
-          link: `/${StreamerName}`,
-          icon: SmartDisplayIcon,
-        });
-        console.log('Notification added');
-      }
+      dispatch(AddNotification(data));
     });
 
     hub
@@ -65,5 +40,5 @@ export const useNotificationHub = (addNotification: (n: INotification) => void) 
     return () => {
       hub.stop().catch(() => {});
     };
-  }, [addNotification, hubUrl, token]);
+  }, [AddNotification, dispatch, hubUrl, token]);
 };
