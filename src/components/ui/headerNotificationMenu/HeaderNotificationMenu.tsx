@@ -8,7 +8,7 @@ import {
   notificationAllRead,
   notificationMarkRead,
   notificationWithPagination,
-  SelectAllNotification,
+  selectAllNotificationsUnified,
 } from '../../../store/actions/NotificationActions';
 import { MarkAsRead } from '../../../store/slices/NotificationSlice';
 //  components
@@ -30,10 +30,7 @@ export const HeaderNotificationMenu = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const open = Boolean(anchorEl);
-
-  const live = useAppSelector((state) => state.notiications.live.filter((n) => !n.isRead));
-  const paged = useAppSelector(SelectAllNotification);
-  const notifications = [...live, ...paged];
+  const notifications = useAppSelector(selectAllNotificationsUnified);
   const { page, limit, totalCount } = useAppSelector((state) => state.notiications.paged);
 
   useEffect(() => {
@@ -83,7 +80,7 @@ export const HeaderNotificationMenu = () => {
       >
         <NotificationsIcon sx={{ color: 'var(--white)' }} fontSize="medium" />
 
-        {notifications.length !== 0 && <IconNotidicationCount />}
+        {notifications.some((n) => !n.isRead) && <IconNotidicationCount />}
       </IconButton>
       <StyledMenu
         id="basic-menu"
@@ -96,7 +93,7 @@ export const HeaderNotificationMenu = () => {
           },
         }}
       >
-        {notifications.length !== 0 ? (
+        {notifications.length > 0 ? (
           notifications.map((notification: INotificationUnified) => (
             <MenuItem
               sx={{
@@ -134,7 +131,12 @@ export const HeaderNotificationMenu = () => {
           <MenuItem>Уведомлений нет</MenuItem>
         )}
         {notifications.length > 0 && [
-          <PaginationComponent key="pagination" count={pageCount} pageCurrent={page} />,
+          <PaginationComponent
+            key="pagination"
+            count={pageCount}
+            pageCurrent={page}
+            functionDispatch={notificationWithPagination}
+          />,
           <MenuItem key="markAll" sx={{ justifyContent: 'center' }} onClick={handleMarkAllRead}>
             Отметить все, как прочитанные
           </MenuItem>,

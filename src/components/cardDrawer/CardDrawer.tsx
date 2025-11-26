@@ -4,7 +4,7 @@ import { Avatar, Box, Button } from '@mui/material';
 // types
 import { ISubscriber } from '../../types/share';
 // styles
-import { CardDrawerTypography } from '../StylesComponents';
+import { CardDrawerBoxWatch, CardDrawerTypography } from '../StylesComponents';
 
 interface ICardDrawerProps {
   card: ISubscriber;
@@ -12,7 +12,7 @@ interface ICardDrawerProps {
 }
 
 export const CardDrawer = ({ card, variant = 'full' }: ICardDrawerProps) => {
-  const { nickname, profileImage, isOnline, streamersLeague, previewlUrl, streamName } = card;
+  const { nickname, profileImage, isOnline, streamersLeague, streamName } = card;
   const navigate = useNavigate();
 
   return (
@@ -20,7 +20,7 @@ export const CardDrawer = ({ card, variant = 'full' }: ICardDrawerProps) => {
       <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
         <Box sx={{ position: 'relative' }}>
           <Avatar alt="avatar" src={profileImage} sx={{ width: '50px', height: '50px' }} />
-          {/* <CardDrawerBoxWatch>{views}</CardDrawerBoxWatch> */}
+          {isOnline && <CardDrawerBoxWatch>Live</CardDrawerBoxWatch>}
         </Box>
         {variant === 'full' && (
           <Box sx={{ width: '150px' }}>

@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 // store
-import { fetchtSubsribtionsMy } from '../../store/actions/SubscribersActions';
+import { AppDispatch } from '../../store/store';
+import { fetchUserOnlineStreams, selectStreams } from '../../store/actions/StreamsActions';
 // components
 import { CardDrawer } from '../cardDrawer/CardDrawer';
 // mui
@@ -10,27 +12,33 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import { useDrawer } from '../../context/DrawerContext';
 import { useAppSelector } from '../../hooks/redux';
 // types
-import { ISubscriber } from '../../types/share';
+import { IStreamOnline } from '../../types/share';
 // styles
 import { StyledSidebar, StyledSidebarList, StyledSidebarListItem } from '../StylesComponents';
 
 export const Sidebar = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const { setOpen } = useDrawer();
-  const { data } = useAppSelector((state) => state.user);
-  const [subscribers, setSubscribers] = useState<ISubscriber[] | null>(null);
+  const streams = useAppSelector(selectStreams);
+  // const { data } = useAppSelector((state) => state.user);
+  // const [subscribers, setSubscribers] = useState<ISubscriber[] | null>(null);
+
+  // useEffect(() => {
+  //   if (!data) return;
+  //   const fetchSubsribers = async () => {
+  //     const users = await fetchtSubsribtionsMy();
+  //     setSubscribers(users);
+  //   };
+  //   fetchSubsribers();
+  // }, [data]);
 
   useEffect(() => {
-    if (!data) return;
-    const fetchSubsribers = async () => {
-      const users = await fetchtSubsribtionsMy();
-      setSubscribers(users);
-    };
-    fetchSubsribers();
-  }, [data]);
+    if (!streams || streams.length === 0) dispatch(fetchUserOnlineStreams());
+  }, [dispatch, streams]);
 
   return (
     <StyledSidebar style={{ width: 'auto', padding: '9px 5px 0' }}>
-      <Box>
+      <Box style={{ margin: '0 auto' }}>
         <Button onClick={() => setOpen(true)}>
           <FirstPageIcon
             fontSize="large"
@@ -38,7 +46,15 @@ export const Sidebar = () => {
           />
         </Button>
       </Box>
-      {subscribers && (
+      <StyledSidebarList sx={{ height: '100%', overflowX: 'hidden', flex: 1 }}>
+        {(streams ?? []).map((stream: IStreamOnline) => (
+          <StyledSidebarListItem key={stream.streamId}>
+            <CardDrawer card={stream} />
+          </StyledSidebarListItem>
+        ))}
+      </StyledSidebarList>
+
+      {/* {subscribers && (
         <StyledSidebarList sx={{ height: '100%', overflowX: 'hidden', flex: 1 }}>
           {subscribers.map((card) => (
             <StyledSidebarListItem key={card.nickname}>
@@ -46,7 +62,7 @@ export const Sidebar = () => {
             </StyledSidebarListItem>
           ))}
         </StyledSidebarList>
-      )}
+      )} */}
     </StyledSidebar>
   );
 };

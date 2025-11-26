@@ -12,6 +12,7 @@ import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 // types
 import { INotificationBase } from '../../types/share';
+import { createSelector } from '@reduxjs/toolkit';
 
 export const notificationWithPagination =
   (page = 1, limit = 5) =>
@@ -120,10 +121,24 @@ export const mapHubNotification = (data: INotificationBase) => {
       };
   }
 };
-export const SelectAllNotification = (state: RootState) => {
-  return [...state.notiications.paged.notifications].sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
-};
+export const selectNotifications = (state: RootState) => state.notiications.paged.notifications;
 
+export const SelectAllNotification = createSelector([selectNotifications], (notifications) => {
+  if (!notifications) return [];
+  return notifications.slice().sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+});
+const selectLiveNotifications = (state: RootState) => state.notiications.live;
+const selectPagedNotifications = SelectAllNotification;
+
+export const selectUnreadNotifications = createSelector([selectLiveNotifications], (live) =>
+  live.filter((n) => !n.isRead)
+);
+
+// объединяем live + paged
+export const selectAllNotificationsUnified = createSelector(
+  [selectUnreadNotifications, selectPagedNotifications],
+  (live, paged) => [...live, ...paged]
+);
 // export const SelectAllNotification = (state: RootState) => {
 //   const live = state.notiications.live;
 //   const paged = state.notiications.paged.notifications;

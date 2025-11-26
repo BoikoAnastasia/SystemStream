@@ -17,7 +17,6 @@ export const HeaderStreamPage = ({ streamInfo, viewerCount }: { streamInfo: IStr
     return (
       <StyledHeaderStreamPage>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Avatar src="./img/users/user-01.jpg" />
           <StyledTitle>Стрим оффлайн</StyledTitle>
           <StyledButtonWathers>
             <VisibilityIcon sx={{ width: '10px', height: '10px' }} /> {String(viewerCount)}
@@ -39,7 +38,7 @@ export const HeaderStreamPage = ({ streamInfo, viewerCount }: { streamInfo: IStr
           alignItems: 'center',
         }}
       >
-        <Avatar sx={{ gridArea: 'avatar' }} src="./img/users/user-01.jpg"></Avatar>
+        <Avatar sx={{ gridArea: 'avatar' }} src={streamInfo.previewlUrl}></Avatar>
 
         <Box sx={{ gridArea: 'streamInfo', display: 'flex', alignItems: 'center' }}>
           <StyledTitle style={{ marginRight: '10px' }}>{streamInfo.streamerName}</StyledTitle>

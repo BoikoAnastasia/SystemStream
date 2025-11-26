@@ -32,6 +32,12 @@ export interface INotificationSlice {
   isLoading: boolean;
 }
 
+export interface IStreamsSlice {
+  data: null | IStreamsData;
+  isError: string | null | boolean;
+  isLoading: boolean;
+}
+
 // Types
 export type NotificationsType = 'NewFollower' | 'streamstarted';
 
@@ -65,6 +71,24 @@ export interface ISubscriber {
   streamName: string;
 }
 
+export interface IStreamOnline {
+  nickname: string;
+  profileImage: string;
+  isOnline: boolean;
+  streamersLeague: string;
+  previewlUrl: string;
+  streamName: string;
+  streamId: number | null;
+  totalCount?: number;
+}
+
+export interface IStreamsData {
+  totalStreams: number;
+  page: number;
+  pageSize: number;
+  streams: IStreamOnline[];
+}
+
 export interface ISetting {
   streamKey: string;
 }
@@ -75,7 +99,7 @@ export interface IStream {
   streamerName: string;
   streamerId: number;
   tags: Array<string>;
-  previewlUrl: null | string;
+  previewlUrl: string;
   hlsUrl: string;
   totalViews: number;
   startedAt: string | Date;

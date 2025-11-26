@@ -3,13 +3,13 @@ import { VideoView } from '../videoView/VideoView';
 // styles
 import { StyledVideoGrid } from '../StylesComponents';
 // types
-import { IVideoItem } from '../../types/share';
+import { IStreamOnline } from '../../types/share';
 
-export const SectionListVideo = ({ list }: { list: IVideoItem[] }) => {
+export const SectionListVideo = ({ list }: { list: IStreamOnline[] }) => {
   return (
     <StyledVideoGrid>
-      {list.map((item) => (
-        <VideoView item={item} key={item.id} />
+      {(list ?? []).map((item) => (
+        <VideoView item={item} key={item.streamId} />
       ))}
     </StyledVideoGrid>
   );

@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 // store
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../store/store';
+import { fetchUserOnlineStreams, selectStreams } from '../../store/actions/StreamsActions';
 import { fetchtSubsribtionsMy } from '../../store/actions/SubscribersActions';
 // components
 import { Logo } from '../logo/Logo';
@@ -22,7 +25,7 @@ import {
   StyledSidebarName,
 } from '../StylesComponents';
 // types
-import { ISubscriber } from '../../types/share';
+import { IStreamOnline, ISubscriber } from '../../types/share';
 
 interface IButtonInfo {
   icon: OverridableComponent<SvgIconTypeMap<{}, 'svg'>> & {
@@ -51,7 +54,9 @@ export const DrawerComponent = () => {
       href: '#',
     },
   ];
+  const dispatch = useDispatch<AppDispatch>();
   const { data } = useAppSelector((state) => state.user);
+  const streams = useAppSelector(selectStreams);
   const [subscribers, setSubscribers] = useState<ISubscriber[] | null>(null);
 
   useEffect(() => {
@@ -62,6 +67,10 @@ export const DrawerComponent = () => {
     };
     fetchSubsribers();
   }, [data]);
+
+  useEffect(() => {
+    if (!streams || streams.length === 0) dispatch(fetchUserOnlineStreams());
+  }, [dispatch, streams]);
 
   return (
     <StyledDrawer open={open} onClose={() => setOpen(false)}>
@@ -87,7 +96,7 @@ export const DrawerComponent = () => {
             </StyledSidebarListItem>
           ))}
         </StyledSidebarList>
-        <StyledSidebarName>Сейчас в эфире</StyledSidebarName>
+        <StyledSidebarName>Ваши подписки:</StyledSidebarName>
         {subscribers && (
           <StyledSidebarList sx={{ height: '100%', overflowX: 'hidden', flex: 1 }}>
             {subscribers.map((card) => (
@@ -97,6 +106,12 @@ export const DrawerComponent = () => {
             ))}
           </StyledSidebarList>
         )}
+        <StyledSidebarName>Сейчас в эфире:</StyledSidebarName>
+        {(streams ?? []).map((stream: IStreamOnline) => (
+          <StyledSidebarListItem key={stream.streamId}>
+            <CardDrawer card={stream} />
+          </StyledSidebarListItem>
+        ))}
       </Box>
     </StyledDrawer>
   );

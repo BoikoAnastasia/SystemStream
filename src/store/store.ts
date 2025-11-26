@@ -11,6 +11,7 @@ const rootReducer = combineReducers({
   settings: SettingsSlice.reducer,
   stream: StreamSlice.reducer,
   notiications: NotificationSlice.reducer,
+  streams: StreamSlice.reducer,
 });
 
 export const setupStore = () => {

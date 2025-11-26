@@ -3,7 +3,6 @@ import { createGuestKey } from '../../utils/createGuestKey';
 
 // получить список подписок пользователя
 export const fetchtSubsribtionsMy = async () => {
-  console.log('fetchtSubsribtionsMy');
   try {
     const token = getCookie('tokenData');
     const response = await fetch(`${process.env.REACT_APP_API_SUBSCRIPTIONS}/me/following`, {
@@ -70,7 +69,6 @@ export const deleteSubscribe = async (id: number) => {
 
 // список подписчиков пользователя (авторизованный или гостевой ключ)
 export const streamerFolows = async (id: number) => {
-  console.log('streamerFolows');
   try {
     const token = createGuestKey();
     if (!token) return;
