@@ -7,7 +7,7 @@ const initialState: INotificationSlice = {
     notifications: [],
     page: 1,
     limit: 5,
-    totalCount: 1,
+    totalCount: 0,
   },
   live: [],
   isError: false,

@@ -3,7 +3,7 @@ import { IStreamsData, IStreamsSlice } from '../../types/share';
 
 const initialState: IStreamsSlice = {
   data: {
-    totalStreams: 1,
+    totalStreams: 0,
     page: 1,
     pageSize: 25,
     streams: [],

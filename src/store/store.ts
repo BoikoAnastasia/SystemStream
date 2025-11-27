@@ -4,6 +4,7 @@ import { SelectUserSlice } from './slices/SelectUserSlice';
 import { SettingsSlice } from './slices/SettingsSlice';
 import { StreamSlice } from './slices/StreamSlice';
 import { NotificationSlice } from './slices/NotificationSlice';
+import { StreamsHistorySlice } from './slices/StreamsHistorySlice';
 
 const rootReducer = combineReducers({
   user: UserProfileSlice.reducer,
@@ -12,6 +13,7 @@ const rootReducer = combineReducers({
   stream: StreamSlice.reducer,
   notiications: NotificationSlice.reducer,
   streams: StreamSlice.reducer,
+  userStreams: StreamsHistorySlice.reducer,
 });
 
 export const setupStore = () => {

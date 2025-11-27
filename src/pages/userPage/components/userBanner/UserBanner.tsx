@@ -17,12 +17,13 @@ import {
   StyledInfo,
   StyledProfileSection,
 } from '../../../../components/StylesComponents';
+import { ISubscriber } from '../../../../types/share';
 
 export const UserBanner = ({ userData, isNotProfileData }: any) => {
   const { isAuth, data: currentUser } = useAppSelector((state) => state.user);
   const { setOpen } = useHeaderModal();
 
-  const [subscribers, setSubscribers] = useState([]);
+  const [subscribers, setSubscribers] = useState<ISubscriber[]>([]);
   const [isSubscriber, setIsSubscriber] = useState(false);
 
   const fetchSubscribers = async () => {
@@ -31,13 +32,12 @@ export const UserBanner = ({ userData, isNotProfileData }: any) => {
     let result;
     result = await streamerFolows(userData.id);
 
-    setSubscribers(result || []);
+    setSubscribers(Array.isArray(result) ? result : []);
   };
 
   // Проверяем, подписан ли текущий юзер
   const checkIsSubscribed = () => {
-    if (!currentUser || !subscribers) return;
-
+    if (!currentUser || !Array.isArray(subscribers)) return;
     setIsSubscriber(subscribers.some((u: any) => u.id === currentUser.id));
   };
 

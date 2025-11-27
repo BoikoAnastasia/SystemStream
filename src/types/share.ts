@@ -38,6 +38,13 @@ export interface IStreamsSlice {
   isLoading: boolean;
 }
 
+export interface IStreamsHistorySlice {
+  data: null | IStreamHistoryData;
+  isError: string | null | boolean;
+  isLoading: boolean;
+  lastNickname: string | null;
+}
+
 // Types
 export type NotificationsType = 'NewFollower' | 'streamstarted';
 
@@ -104,6 +111,21 @@ export interface IStream {
   totalViews: number;
   startedAt: string | Date;
   isLive: boolean;
+}
+export interface IStreamHistoryData {
+  page: number;
+  pageSize: number;
+  totalStreams: number;
+  streams: IStreamHistory[];
+  nickname: string | null;
+}
+
+export interface IStreamHistory {
+  id: number;
+  startedAt: string;
+  endedAt: string;
+  hasRecord: boolean;
+  recordPath: string;
 }
 
 export interface INotificationBase {
