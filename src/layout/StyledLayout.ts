@@ -68,7 +68,6 @@ export const IconNotidicationCount = styled(Box)(() => ({
 }));
 
 export const StyledPaginationMenu = styled(Pagination)(() => ({
-  marginTop: 'auto',
   '& .MuiPagination-ul': { justifyContent: 'center' },
   '& .MuiPaginationItem-root': {
     color: 'var(--video-card-name)',

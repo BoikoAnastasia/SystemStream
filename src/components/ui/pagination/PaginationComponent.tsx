@@ -25,7 +25,7 @@ export const PaginationComponent = ({
   };
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} sx={{ marginTop: 'auto' }}>
       <StyledPaginationMenu
         count={count}
         page={pageCurrent}
