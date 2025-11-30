@@ -23,8 +23,10 @@ export const fetchUserOnlineStreams =
         const errorData = await response.json();
         console.log('errorData: ', errorData);
         dispatch(StreamsSliceFetchError(errorData));
+        return;
       }
       const data = await response.json();
+      console.log('data stream: ', data);
       dispatch(StreamsSliceFetchSuccess(data));
     } catch (error) {
       console.log('Не получилось получить онлайн стримы пользователя');

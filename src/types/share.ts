@@ -87,7 +87,7 @@ export interface ISubscriber {
   profileImage: string;
   isOnline: boolean;
   streamersLeague: string;
-  previewlUrl: string;
+  previewUrl: string;
   streamName: string;
 }
 
@@ -96,7 +96,7 @@ export interface IStreamOnline {
   profileImage: string;
   isOnline: boolean;
   streamersLeague: string;
-  previewlUrl: string;
+  previewUrl: string;
   streamName: string;
   streamId: number | null;
   totalCount?: number;
@@ -119,7 +119,7 @@ export interface IStream {
   streamerName: string;
   streamerId: number;
   tags: Array<string>;
-  previewlUrl: string;
+  previewUrl: string;
   hlsUrl: string;
   totalViews: number;
   startedAt: string | Date;

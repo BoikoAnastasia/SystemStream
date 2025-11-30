@@ -38,7 +38,7 @@ export const HeaderStreamPage = ({ streamInfo, viewerCount }: { streamInfo: IStr
           alignItems: 'center',
         }}
       >
-        <Avatar sx={{ gridArea: 'avatar' }} src={streamInfo.previewlUrl}></Avatar>
+        <Avatar sx={{ gridArea: 'avatar' }} src={streamInfo.previewUrl}></Avatar>
 
         <Box sx={{ gridArea: 'streamInfo', display: 'flex', alignItems: 'center' }}>
           <StyledTitle style={{ marginRight: '10px' }}>{streamInfo.streamerName}</StyledTitle>

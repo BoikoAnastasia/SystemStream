@@ -20,7 +20,7 @@ export const VideoView = ({ item }: { item: IStreamOnline }) => {
   return (
     <StyledVideoCard>
       <StyledVideoCardLink to={item.nickname} />
-      <CardMedia component="img" height="200" image={useCheckedImage(item.previewlUrl)} alt="video preview" />
+      <CardMedia component="img" height="200" image={useCheckedImage(item.previewUrl)} alt="video preview" />
       {item.isOnline ? (
         <StyledButtonLive sx={{ position: 'absolute', top: '5px', left: '5px' }}>LIVE</StyledButtonLive>
       ) : (
