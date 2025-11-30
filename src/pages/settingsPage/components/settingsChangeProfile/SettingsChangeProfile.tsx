@@ -3,9 +3,13 @@ import { useDispatch } from 'react-redux';
 // store
 import { AppDispatch } from '../../../../store/store';
 import { checkExistEmail, checkExistNickname } from '../../../../store/actions/UserActions';
-import { changeProfileData } from '../../../../store/actions/SettingsActions';
+import {
+  changeProfileData,
+  settingBackgroundImage,
+  settingProfileImage,
+} from '../../../../store/actions/SettingsActions';
 // formik
-import { Formik, Form, FieldArray } from 'formik';
+import { Formik, Form, FieldArray, Field } from 'formik';
 // validation
 import { validationChangeProfile } from '../../../../validation/validation';
 // mui, style, types
@@ -33,6 +37,16 @@ const ListSettingsProfile: { label?: string; type: string; value: ProfileField; 
     { type: 'field', label: 'Введите текущий пароль', value: 'currentPassword', title: 'Текущий пароль:' },
     { type: 'field', label: 'Введите новый пароль', value: 'newPassword', title: 'Изменить пароль:' },
     { type: 'field', label: 'Введите описание', value: 'profileDescription', title: 'Изменить описание профиля:' },
+    {
+      type: 'file',
+      value: 'profileImage',
+      title: 'Изменить картинку профиля:',
+    },
+    {
+      type: 'file',
+      value: 'backgroundImage',
+      title: 'Изменить фоновую картинку:',
+    },
   ];
 
 const ListSettingsSocial: { label?: string; value: string }[] = [
@@ -85,12 +99,21 @@ export const SettingsChangeProfile = () => {
       ...values,
       socialLinks: (values.socialLinks || []).filter((link) => link.url && link.url.trim() !== ''),
     };
+    delete profileData.backgroundImage;
+    delete profileData.profileImage;
 
     try {
       const result = await dispatch(changeProfileData(profileData));
       setMessage(result?.message || '');
     } catch (error) {
       setMessage('Ошибка отправки данных');
+    }
+    if (values.profileImage) {
+      console.log(values.profileImage);
+      dispatch(settingProfileImage(values.profileImage));
+    }
+    if (values.backgroundImage) {
+      dispatch(settingBackgroundImage(values.backgroundImage));
     }
 
     setSubmitting(false);
@@ -115,15 +138,35 @@ export const SettingsChangeProfile = () => {
                   <StyledNameComponents sx={{ display: 'block', marginBottom: '10px' }}>
                     {item.title}
                   </StyledNameComponents>
-                  <StyledTextFieldModal
-                    label={item.label}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    value={values[item.value]}
-                    error={touched[item.value] && Boolean(errors[item.value])}
-                    helperText={touched[item.value] && errors[item.value]}
-                    name={item.value}
-                  />
+                  {item.type === 'field' ? (
+                    <StyledTextFieldModal
+                      label={item.label}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values[item.value]}
+                      error={touched[item.value] && Boolean(errors[item.value])}
+                      helperText={touched[item.value] && errors[item.value]}
+                      name={item.value}
+                    />
+                  ) : (
+                    <Field name={item.value}>
+                      {({ form }: any) => (
+                        <>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(event) => {
+                              form.setFieldValue(item.value, event.currentTarget.files?.[0] || null);
+                            }}
+                            disabled={item.disabled || false}
+                          />
+                          {form.touched[item.value] && form.errors[item.value] && (
+                            <div style={{ color: 'red', fontSize: '12px' }}>{form.errors[item.value]}</div>
+                          )}
+                        </>
+                      )}
+                    </Field>
+                  )}
                 </StyleListItemSettings>
               ))}
             </StyledListSettings>

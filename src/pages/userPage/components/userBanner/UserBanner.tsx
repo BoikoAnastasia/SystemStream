@@ -42,6 +42,7 @@ export const UserBanner = ({ userData, isNotProfileData }: any) => {
   };
 
   useEffect(() => {
+    console.log(`${process.env.REACT_APP_API_USER}${userData.profileImage}`);
     checkIsSubscribed();
   }, [subscribers]);
 
@@ -67,7 +68,7 @@ export const UserBanner = ({ userData, isNotProfileData }: any) => {
   return (
     <StyledProfileSection
       sx={{
-        backgroundImage: `url(${userData?.backgroundImage})`,
+        backgroundImage: `${process.env.REACT_APP_API_USER}${userData.backgroundImage}`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -87,7 +88,11 @@ export const UserBanner = ({ userData, isNotProfileData }: any) => {
       </StyledInfo>
 
       {!userData?.backgroundImage && <BannerEffect />}
-      <StyledBannerAvatar src={userData?.profileImage} />
+      <StyledBannerAvatar
+        src={
+          userData?.profileImage ? `${process.env.REACT_APP_API_USER}${userData.profileImage}` : '/default-avatar.jpg'
+        }
+      />
       <Socials socials={currentUser?.socialLinks} />
     </StyledProfileSection>
   );

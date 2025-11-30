@@ -72,8 +72,8 @@ export interface IProfileChange {
   profileDescription: string | null;
   currentPassword: string | null;
   newPassword: string | null;
-  profileImage: string | null | undefined;
-  backgroundImage: string | null | undefined;
+  profileImage: File | null | undefined;
+  backgroundImage: File | null | undefined;
   socialLinks: ISocialLink[] | null;
 }
 
