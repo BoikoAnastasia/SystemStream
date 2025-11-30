@@ -14,10 +14,9 @@ import { CatalogUsers } from '../../components/catalogUsers/CatalogUsers';
 import { Loader } from '../../components/ui/loader/Loader';
 import { PaginationComponent } from '../../components/ui/pagination/PaginationComponent';
 // mui
-import { Box } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 // types
 import { IStreamOnline, IUser } from '../../types/share';
-import { StreamsSliceFetchSuccess } from '../../store/slices/StreamsSlice';
 
 export const testStreams: IStreamOnline[] = [
   {
@@ -269,8 +268,6 @@ export const MainPage: FC = appLayout((): JSX.Element => {
   const streams = data?.streams ?? [];
   const { page = 1, pageSize = 25, totalStreams = 0 } = data ?? {};
   const pageCount = Math.ceil(totalStreams / pageSize);
-
-  if (isLoading) return <Loader />;
 
   useEffect(() => {
     if (!data && !isLoading) {
