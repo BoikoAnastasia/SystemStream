@@ -263,9 +263,10 @@ const testUsers: IUser[] = [
 
 export const MainPage: FC = appLayout((): JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
-  const streams = useAppSelector(selectStreams);
-  const { page, totalStreams, pageSize, isLoading } = useAppSelector((state) => state.streams);
-
+  const { data, isLoading } = useAppSelector((state) => state.streams);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const streams = data?.streams ?? [];
+  const { page = 1, pageSize = 25, totalStreams = 0 } = data ?? {};
   const pageCount = Math.ceil(totalStreams / pageSize);
 
   if (isLoading) return <Loader />;

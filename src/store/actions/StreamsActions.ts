@@ -3,6 +3,7 @@ import { StreamsSliceFetch, StreamsSliceFetchError, StreamsSliceFetchSuccess } f
 import { createGuestKey } from '../../utils/createGuestKey';
 import { createSelector } from '@reduxjs/toolkit';
 import { StreamsHistoryFetch, StreamsHistoryFetchError } from '../slices/StreamsHistorySlice';
+import { IStreamsData } from '../../types/share';
 
 export const fetchUserOnlineStreams =
   (page = 1, pageSize = 25) =>
@@ -26,8 +27,15 @@ export const fetchUserOnlineStreams =
         return;
       }
       const data = await response.json();
-      console.log('data stream: ', data);
-      dispatch(StreamsSliceFetchSuccess(data));
+      const mappedData: IStreamsData = {
+        ...data,
+        streams: data.streams.map((s: any) => ({
+          ...s,
+          previewUrl: s.previewUrl ?? '',
+          streamId: s.streamId ?? null,
+        })),
+      };
+      dispatch(StreamsSliceFetchSuccess(mappedData));
     } catch (error) {
       console.log('Не получилось получить онлайн стримы пользователя');
       dispatch(StreamsSliceFetchError(error));
