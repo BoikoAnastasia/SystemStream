@@ -11,10 +11,12 @@ import { useDrawer } from '../context/DrawerContext';
 // mui
 import { Box, Button } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import { useAppSelector } from '../hooks/redux';
 
 export const Header = () => {
   const { isMobile } = useDeviceDetect();
   const { open, setOpen } = useDrawer();
+  const { isAuth } = useAppSelector((state) => state.user);
 
   return (
     <StyleHeader>
@@ -27,7 +29,7 @@ export const Header = () => {
 
           <StyleHeaderBlock>
             <SearchInput width={'200px'} />
-            <HeaderNotificationMenu />
+            {isAuth ? <HeaderNotificationMenu /> : <></>}
             <HeaderMenuAvatar />
           </StyleHeaderBlock>
         </Box>

@@ -46,7 +46,7 @@ export interface IStreamsHistorySlice {
 }
 
 // Types
-export type NotificationsType = 'NewFollower' | 'streamstarted';
+export type NotificationsType = 'NewFollower' | 'StreamStarted';
 
 // data
 export interface IProfile {

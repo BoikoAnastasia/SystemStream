@@ -109,7 +109,7 @@ export const mapHubNotification = (data: INotificationBase) => {
         icon: PersonAddIcon,
         isRead: data.isRead || false,
       };
-    case 'streamstarted':
+    case 'StreamStarted':
       return {
         id: payload.StreamId,
         date: data.date || data.createdAt || new Date().toISOString(),
