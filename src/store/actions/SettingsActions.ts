@@ -2,28 +2,13 @@ import { AppDispatch } from '../store';
 // actions, utils
 import { userProfile } from './UserActions';
 import { getCookie } from '../../utils/cookieFunctions';
-import { fileToBase64 } from '../../utils/fileToBase64';
 // types
 import { IProfileChange } from '../../types/share';
 
 export const changeProfileData = (data: IProfileChange) => async (dispatch: AppDispatch) => {
   try {
     const token = getCookie('tokenData');
-    if (!token) return { success: false, message: 'Токен не найден' };
-
-    const payload: any = {};
-
-    for (const [key, value] of Object.entries(data)) {
-      if (value !== null && value !== undefined && value !== '') {
-        if ((key === 'profileImage' || key === 'backgroundImage') && value instanceof File) {
-          payload[key] = await fileToBase64(value);
-        } else {
-          payload[key] = value;
-        }
-      }
-    }
-
-    if (Object.keys(payload).length === 0) return { success: false, message: 'Нет данных для обновления' };
+    if (!token) return;
 
     const response = await fetch(`${process.env.REACT_APP_API_USER}/profile`, {
       method: 'PUT',
@@ -31,7 +16,7 @@ export const changeProfileData = (data: IProfileChange) => async (dispatch: AppD
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(data),
     });
 
     if (!response.ok) {
@@ -47,5 +32,53 @@ export const changeProfileData = (data: IProfileChange) => async (dispatch: AppD
     return { success: true, message: resData.message || 'Профиль успешно обновлен', data: resData };
   } catch (error: any) {
     return { success: false, message: error.message || 'Произошла ошибка при подключении к серверу' };
+  }
+};
+
+export const settingProfileImage = async (image: any) => {
+  const token = getCookie('tokenData');
+  if (!token || !image) return;
+  try {
+    const formData = new FormData();
+    formData.append('file', image);
+    const response = await fetch(`${process.env.REACT_APP_API_USER}/upload/profile-image`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      method: 'POST',
+      body: formData,
+    });
+    if (!response.ok) {
+      const errData = await response.json();
+      return errData;
+    }
+    const data = response.json();
+    return data;
+  } catch (error) {
+    console.log('Не удалось загрузить новое изображение профиля', error);
+  }
+};
+
+export const settingBackgroundImage = async (image: any) => {
+  const token = getCookie('tokenData');
+  if (!token || !image) return;
+  const formData = new FormData();
+  formData.append('file', image);
+  try {
+    const response = await fetch(`${process.env.REACT_APP_API_USER}/upload/background-image`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      method: 'POST',
+      body: formData,
+    });
+    if (!response.ok) {
+      const errData = await response.json();
+      return errData;
+    }
+    const data = response.json();
+    return data;
+  } catch (error) {
+    console.log('Не удалось загрузить новое изображение профиля', error);
   }
 };

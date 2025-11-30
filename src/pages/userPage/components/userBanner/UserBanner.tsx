@@ -88,7 +88,7 @@ export const UserBanner = ({ userData, isNotProfileData }: any) => {
 
       {!userData?.backgroundImage && <BannerEffect />}
       <StyledBannerAvatar src={userData?.profileImage} />
-      <Socials />
+      <Socials socials={currentUser?.socialLinks} />
     </StyledProfileSection>
   );
 };

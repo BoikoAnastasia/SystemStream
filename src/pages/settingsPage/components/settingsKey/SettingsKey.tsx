@@ -35,24 +35,25 @@ export const SettingsKey = () => {
   };
 
   useEffect(() => {
-    if (data !== null) {
+    getStreamKey();
+  }, []);
+
+  useEffect(() => {
+    if (data?.streamKey) {
       setStreamKey(data.streamKey);
+    } else {
+      setStreamKey('');
     }
   }, [data]);
 
   const getStreamKey = () => {
+    if (data?.streamKey) return;
     dispatch(fetchStreamKey());
   };
 
   const changeKey = () => {
     dispatch(postStreamKey());
   };
-
-  useEffect(() => {
-    if (data !== null) {
-      setStreamKey(data.streamKey);
-    }
-  }, [data]);
 
   return (
     <>

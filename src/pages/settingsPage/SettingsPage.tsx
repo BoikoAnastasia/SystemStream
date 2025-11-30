@@ -1,4 +1,4 @@
-import { ComponentType, FC, JSX, useState } from 'react';
+import { ComponentType, FC, JSX, useEffect, useState } from 'react';
 // components
 import { settingLayout } from '../../layout/SettingLayout';
 // mui
@@ -10,31 +10,40 @@ import { SettingsChangeProfile } from './components/settingsChangeProfile/Settin
 interface IListSettings {
   value: string;
   title: string;
-  href: string;
   component?: ComponentType<any>;
 }
 const itemsList: IListSettings[] = [
   {
     value: 'key',
     title: 'Настройки профиля',
-    href: '#',
     component: SettingsChangeProfile,
   },
   {
     value: 'stream',
     title: 'Настройки стрима',
     component: SettingsKey,
-    href: '#',
   },
   {
     value: 'balance',
     title: 'Пополнить баланс',
-    href: '#',
   },
 ];
 
 export const SettingsPage: FC = settingLayout((): JSX.Element => {
   const [selectedItem, setSelectedItem] = useState<IListSettings | null>(itemsList[0]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('settings-selected');
+    if (saved) {
+      const found = itemsList.find((i) => i.value === saved);
+      if (found) setSelectedItem(found);
+    }
+  }, []);
+
+  const handleSelect = (item: IListSettings) => {
+    setSelectedItem(item);
+    localStorage.setItem('settings-selected', item.value);
+  };
 
   return (
     <Box sx={{ display: 'flex', width: '100%' }} className="container">
@@ -44,7 +53,7 @@ export const SettingsPage: FC = settingLayout((): JSX.Element => {
             {itemsList &&
               itemsList.map((item: IListSettings) => (
                 <ListItem disablePadding key={item.value}>
-                  <ListItemButton href={item.href} onClick={() => setSelectedItem(item)}>
+                  <ListItemButton onClick={() => handleSelect(item)}>
                     <ListItemText primary={item.title} />
                   </ListItemButton>
                 </ListItem>

@@ -59,14 +59,27 @@ export interface IProfile {
   registrationDate: Date;
   isOnline: boolean;
   cashBalance: number;
+  socialLinks: ISocialLink[] | null;
+}
+export interface ISocialLink {
+  platform: string;
+  url: string;
 }
 
 export interface IProfileChange {
+  nickname: string;
   email: string | null;
-  password: string | null;
   profileDescription: string | null;
-  profileImage: string | null;
-  backgroundImage: string | null;
+  currentPassword: string | null;
+  newPassword: string | null;
+  profileImage: string | null | undefined;
+  backgroundImage: string | null | undefined;
+  socialLinks: ISocialLink[] | null;
+}
+
+export interface ISocials {
+  platform: string;
+  url: string;
 }
 
 export interface ISubscriber {

@@ -55,6 +55,7 @@ export const validationRegist = Yup.object({
 });
 
 export const validationChangeProfile = Yup.object({
+  nickname: Yup.string().notRequired().min(6, 'минимум 6 символов'),
   email: Yup.string()
     .nullable()
     .notRequired()
@@ -62,7 +63,14 @@ export const validationChangeProfile = Yup.object({
       if (!value) return true;
       return emailRegex.test(value);
     }),
-  password: Yup.string()
+  currentPassword: Yup.string()
+    .nullable()
+    .notRequired()
+    .test('password', 'Минимум 6 символов, должна быть хотя бы одна буква и цифра', (value) => {
+      if (!value) return true;
+      return value.length >= 6 && /[A-Za-zА-Яа-я]/.test(value) && /\d/.test(value);
+    }),
+  newPassword: Yup.string()
     .nullable()
     .notRequired()
     .test('password', 'Минимум 6 символов, должна быть хотя бы одна буква и цифра', (value) => {
@@ -72,4 +80,10 @@ export const validationChangeProfile = Yup.object({
   profileDescription: Yup.string().max(500, 'Описание не может быть больше 500 символов').nullable().notRequired(),
   profileImage: fileImage,
   backgroundImage: fileImage,
+  socialLinks: Yup.array().of(
+    Yup.object().shape({
+      platform: Yup.string(),
+      url: Yup.string().url('Некорректная ссылка'),
+    })
+  ),
 });
