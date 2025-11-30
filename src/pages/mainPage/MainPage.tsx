@@ -5,7 +5,7 @@ import { appLayout } from '../../layout/index';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../../hooks/redux';
 import { AppDispatch } from '../../store/store';
-import { fetchUserOnlineStreams, selectStreams } from '../../store/actions/StreamsActions';
+import { fetchUserOnlineStreams } from '../../store/actions/StreamsActions';
 // components
 import { TabsComponent } from '../../components/ui/tabs/TabsComponent';
 import { SectionListVideo } from '../../components/sectionListVideo/SectionListVideo';

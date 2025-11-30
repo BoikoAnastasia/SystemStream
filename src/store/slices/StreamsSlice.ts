@@ -21,7 +21,12 @@ export const StreamsSlice = createSlice({
       state.isLoading = true;
     },
     StreamsSliceFetchSuccess: (state, action: PayloadAction<IStreamsData>) => {
-      state.data = action.payload;
+      state.data = {
+        ...action.payload,
+        streams: Array.isArray(action.payload.streams)
+          ? action.payload.streams
+          : Object.values(action.payload.streams ?? {}),
+      };
       state.isError = null;
       state.isLoading = false;
     },
