@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 // store
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../store/store';
-import { fetchUserOnlineStreams, selectStreams } from '../../store/actions/StreamsActions';
+import { selectStreams } from '../../store/actions/StreamsActions';
 import { fetchtSubsribtionsMy } from '../../store/actions/SubscribersActions';
 // components
 import { Logo } from '../logo/Logo';
@@ -54,7 +52,7 @@ export const DrawerComponent = () => {
       href: '#',
     },
   ];
-  const dispatch = useDispatch<AppDispatch>();
+  // const dispatch = useDispatch<AppDispatch>();
   const { data } = useAppSelector((state) => state.user);
   const streams = useAppSelector(selectStreams);
   const [subscribers, setSubscribers] = useState<ISubscriber[] | null>(null);
@@ -67,10 +65,6 @@ export const DrawerComponent = () => {
     };
     fetchSubsribers();
   }, [data]);
-
-  useEffect(() => {
-    if (!streams || streams.length === 0) dispatch(fetchUserOnlineStreams());
-  }, [dispatch, streams]);
 
   return (
     <StyledDrawer open={open} onClose={() => setOpen(false)}>

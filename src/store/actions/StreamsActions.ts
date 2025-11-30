@@ -65,6 +65,6 @@ export const fecthStreamHistory =
     }
   };
 
-export const selectStreamsData = (state: RootState) => state.streams?.data?.streams;
+export const selectStreamsData = (state: RootState) => state.streams.data;
 
-export const selectStreams = createSelector([selectStreamsData], (streams) => streams ?? []);
+export const selectStreams = createSelector([selectStreamsData], (data) => data?.streams ?? []);

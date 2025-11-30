@@ -1,8 +1,5 @@
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 // store
-import { AppDispatch } from '../../store/store';
-import { fetchUserOnlineStreams, selectStreams } from '../../store/actions/StreamsActions';
+import { selectStreams } from '../../store/actions/StreamsActions';
 // components
 import { CardDrawer } from '../cardDrawer/CardDrawer';
 // mui
@@ -17,7 +14,6 @@ import { IStreamOnline } from '../../types/share';
 import { StyledSidebar, StyledSidebarList, StyledSidebarListItem } from '../StylesComponents';
 
 export const Sidebar = () => {
-  const dispatch = useDispatch<AppDispatch>();
   const { setOpen } = useDrawer();
   const streams = useAppSelector(selectStreams);
   // const { data } = useAppSelector((state) => state.user);
@@ -32,10 +28,6 @@ export const Sidebar = () => {
   //   fetchSubsribers();
   // }, [data]);
 
-  useEffect(() => {
-    if (!streams || streams.length === 0) dispatch(fetchUserOnlineStreams());
-  }, [dispatch, streams]);
-
   return (
     <StyledSidebar style={{ width: 'auto', padding: '9px 5px 0' }}>
       <Box style={{ margin: '0 auto' }}>
@@ -49,7 +41,7 @@ export const Sidebar = () => {
       <StyledSidebarList sx={{ height: '100%', overflowX: 'hidden', flex: 1 }}>
         {(streams ?? []).map((stream: IStreamOnline) => (
           <StyledSidebarListItem key={stream.streamId}>
-            <CardDrawer card={stream} />
+            <CardDrawer variant={'compact'} card={stream} />
           </StyledSidebarListItem>
         ))}
       </StyledSidebarList>

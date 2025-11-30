@@ -2,12 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IStreamsData, IStreamsSlice } from '../../types/share';
 
 const initialState: IStreamsSlice = {
-  data: {
-    totalStreams: 0,
-    page: 1,
-    pageSize: 25,
-    streams: [],
-  },
+  data: null,
   isError: false,
   isLoading: false,
 };
@@ -21,14 +16,11 @@ export const StreamsSlice = createSlice({
       state.isLoading = true;
     },
     StreamsSliceFetchSuccess: (state, action: PayloadAction<IStreamsData>) => {
-      state.data = {
-        ...action.payload,
-        streams: Array.isArray(action.payload.streams)
-          ? action.payload.streams
-          : Object.values(action.payload.streams ?? {}),
-      };
+      state.data = action.payload;
       state.isError = null;
       state.isLoading = false;
+
+      console.log('New state.data:', state.data);
     },
     StreamsSliceFetchError: (state, action) => {
       state.isError = action.payload;

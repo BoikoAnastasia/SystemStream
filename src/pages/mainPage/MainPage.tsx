@@ -17,6 +17,7 @@ import { PaginationComponent } from '../../components/ui/pagination/PaginationCo
 import { Box } from '@mui/material';
 // types
 import { IStreamOnline, IUser } from '../../types/share';
+import { StreamsSliceFetchSuccess } from '../../store/slices/StreamsSlice';
 
 export const testStreams: IStreamOnline[] = [
   {
@@ -272,8 +273,10 @@ export const MainPage: FC = appLayout((): JSX.Element => {
   if (isLoading) return <Loader />;
 
   useEffect(() => {
-    if (streams.length === 0) dispatch(fetchUserOnlineStreams());
-  }, [dispatch, streams]);
+    if (!data && !isLoading) {
+      dispatch(fetchUserOnlineStreams());
+    }
+  }, [dispatch, data, isLoading]);
 
   const TabsComponents = [
     isLoading ? (
