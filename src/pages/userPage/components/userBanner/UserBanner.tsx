@@ -68,7 +68,7 @@ export const UserBanner = ({ userData, isNotProfileData }: any) => {
   return (
     <StyledProfileSection
       sx={{
-        backgroundImage: `${process.env.REACT_APP_API_USER}${userData.backgroundImage}`,
+        backgroundImage: userData?.backgroundImage && `${process.env.REACT_APP_API_USER}${userData?.backgroundImage}`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
