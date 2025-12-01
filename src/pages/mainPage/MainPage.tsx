@@ -270,28 +270,28 @@ export const MainPage: FC = appLayout((): JSX.Element => {
   const pageCount = Math.ceil(totalStreams / pageSize);
 
   useEffect(() => {
-    if (!data?.streams?.length) {
+    if (!data && !isLoading) {
       dispatch(fetchUserOnlineStreams());
     }
-  }, [dispatch, data?.streams]);
+  }, [dispatch, data, isLoading]);
 
-  const TabsComponents = [
+  const getTabsComponents = () => [
     isLoading ? (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }} key="loader">
         <Loader />
       </Box>
     ) : (
-      <SectionListVideo list={streams} />
+      <SectionListVideo list={streams} key="live" />
     ),
-    <SectionListVideo list={testStreams} />,
-    <CatalogUsers list={testUsers} />,
+    <SectionListVideo list={testStreams} key="videos" />,
+    <CatalogUsers list={testUsers} key="users" />,
   ];
 
   return (
     <>
       <Box sx={{ display: 'flex', width: '100%', height: '100%' }} className="page">
         <ContainerBox>
-          <TabsComponent propsChild={TabsComponents} propTabsTitle={['Live', 'Видео', 'Клипы', 'Пользователи']} />
+          <TabsComponent propsChild={getTabsComponents()} propTabsTitle={['Live', 'Видео', 'Клипы', 'Пользователи']} />
           {streams.length > 0 && (
             <PaginationComponent
               isSmall={false}

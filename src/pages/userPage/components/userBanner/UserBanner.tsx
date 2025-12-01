@@ -68,7 +68,7 @@ export const UserBanner = ({ userData, isNotProfileData }: any) => {
   return (
     <StyledProfileSection
       sx={{
-        backgroundImage: userData?.backgroundImage && `${process.env.REACT_APP_API_USER}${userData?.backgroundImage}`,
+        backgroundImage: `url(${process.env.REACT_APP_API_LOCAL}${userData?.backgroundImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -90,7 +90,7 @@ export const UserBanner = ({ userData, isNotProfileData }: any) => {
       {!userData?.backgroundImage && <BannerEffect />}
       <StyledBannerAvatar
         src={
-          userData?.profileImage ? `${process.env.REACT_APP_API_USER}${userData?.profileImage}` : '/default-avatar.jpg'
+          userData?.profileImage ? `${process.env.REACT_APP_API_LOCAL}${userData?.profileImage}` : '/default-avatar.jpg'
         }
       />
       <Socials socials={currentUser?.socialLinks} />

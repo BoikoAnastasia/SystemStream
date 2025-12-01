@@ -19,8 +19,6 @@ export const StreamsSlice = createSlice({
       state.data = action.payload;
       state.isError = null;
       state.isLoading = false;
-
-      console.log('New state.data:', state.data);
     },
     StreamsSliceFetchError: (state, action) => {
       state.isError = action.payload;
