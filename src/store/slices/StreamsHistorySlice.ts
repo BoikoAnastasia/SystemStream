@@ -16,8 +16,8 @@ export const StreamsHistorySlice = createSlice({
       state.isError = null;
       state.isLoading = true;
     },
-    StreamsHistoryFetchSuccess: (state, action: PayloadAction<IStreamHistoryData>) => {
-      state.data = action.payload;
+    StreamsHistoryFetchSuccess: (state, action: PayloadAction<{ data: IStreamHistoryData; nickname: string }>) => {
+      state.data = action.payload.data;
       state.lastNickname = action.payload.nickname;
       state.isError = null;
       state.isLoading = false;

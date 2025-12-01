@@ -2,7 +2,11 @@ import { AppDispatch, RootState } from '../store';
 import { StreamsSliceFetch, StreamsSliceFetchError, StreamsSliceFetchSuccess } from '../slices/StreamsSlice';
 import { createGuestKey } from '../../utils/createGuestKey';
 import { createSelector } from '@reduxjs/toolkit';
-import { StreamsHistoryFetch, StreamsHistoryFetchError } from '../slices/StreamsHistorySlice';
+import {
+  StreamsHistoryFetch,
+  StreamsHistoryFetchError,
+  StreamsHistoryFetchSuccess,
+} from '../slices/StreamsHistorySlice';
 import { IStreamsData } from '../../types/share';
 
 export const fetchUserOnlineStreams =
@@ -58,7 +62,7 @@ export const fecthStreamHistory =
       }
       const data = await response.json();
       console.log(data);
-      dispatch(StreamsSliceFetchSuccess(data));
+      dispatch(StreamsHistoryFetchSuccess({ data, nickname }));
     } catch (error) {
       console.log('Не получилось получить историю стримов пользователя');
       dispatch(StreamsHistoryFetchError(error));

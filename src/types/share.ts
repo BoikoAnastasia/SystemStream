@@ -130,7 +130,6 @@ export interface IStreamHistoryData {
   pageSize: number;
   totalStreams: number;
   streams: IStreamHistory[];
-  nickname: string | null;
 }
 
 export interface IStreamHistory {

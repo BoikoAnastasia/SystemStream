@@ -23,7 +23,14 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
 
   const hubUrl = `${process.env.REACT_APP_API_LOCAL}/hubs/streamHub`;
 
-  // ------------- SIGNALR CONNECTION -------------
+  // === Главное: стабильные ссылки на обработчики ===
+  const handlersRef = useRef({
+    handleStreamJoined: (streamInfo: any) => {},
+    handleUpdateViewerCount: (count: number) => {},
+    handleStreamStatusChanged: (data: any) => {},
+  });
+
+  // ================== SIGNALR CONNECTION ==================
   useEffect(() => {
     if (!nickname || !userData?.id) return;
 
@@ -31,7 +38,7 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
       userTokenRef.current = createGuestKey();
     }
 
-    // Не создаём новое соединение, если старое ещё активно
+    // Уже есть подключение → не создаём новое
     if (hubRef.current && hubRef.current.state !== signalR.HubConnectionState.Disconnected) {
       return;
     }
@@ -40,8 +47,8 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
 
     hubRef.current = hub;
 
-    // ------------------ HANDLERS ------------------
-    const handleStreamJoined = (streamInfo: any) => {
+    // ----------- Обработчики с правильной ссылкой -----------
+    handlersRef.current.handleStreamJoined = (streamInfo: any) => {
       if (!streamInfo) return setCurrentStream(null);
 
       const streamId = streamInfo.streamId ?? streamInfo.StreamId ?? 0;
@@ -64,15 +71,15 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
       );
     };
 
-    const handleUpdateViewerCount = (count: number) => {
+    handlersRef.current.handleUpdateViewerCount = (count: number) => {
       setViewerCount(count);
     };
 
-    const handleStreamStatusChanged = (data: any) => {
+    handlersRef.current.handleStreamStatusChanged = (data: any) => {
       const status = (data?.status ?? data?.Status ?? '').toLowerCase();
 
       if (['live', 'started', 'on'].includes(status) && data.stream) {
-        return handleStreamJoined(data.stream);
+        return handlersRef.current.handleStreamJoined(data.stream);
       }
 
       if (['offline', 'stopped'].includes(status)) {
@@ -80,25 +87,23 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
       }
     };
 
-    // Чистим старые обработчики, чтобы избежать дублирования
-    hub.off('StreamJoined');
-    hub.off('UpdateViewerCount');
-    hub.off('StreamStatusChanged');
+    // ---------- удаляем старые обработчики (если соединение было) ----------
+    hub.off('StreamJoined', handlersRef.current.handleStreamJoined);
+    hub.off('UpdateViewerCount', handlersRef.current.handleUpdateViewerCount);
+    hub.off('StreamStatusChanged', handlersRef.current.handleStreamStatusChanged);
 
-    // Новый подписки
-    hub.on('StreamJoined', handleStreamJoined);
-    hub.on('UpdateViewerCount', handleUpdateViewerCount);
-    hub.on('StreamStatusChanged', handleStreamStatusChanged);
+    // ---------- подписки ----------
+    hub.on('StreamJoined', handlersRef.current.handleStreamJoined);
+    hub.on('UpdateViewerCount', handlersRef.current.handleUpdateViewerCount);
+    hub.on('StreamStatusChanged', handlersRef.current.handleStreamStatusChanged);
 
-    // ---------------- CONNECTION START ----------------
+    // ---------- старт подключения ----------
     hub
       .start()
       .then(() => {
-        console.log('[SignalR] Connected');
-
         hub.invoke('JoinStream', nickname, userTokenRef.current).catch(console.error);
 
-        // Интервал создаётся только если его нет
+        // Статус обновляем раз в 15 сек
         if (!intervalRef.current) {
           intervalRef.current = setInterval(() => {
             if (hub.state === signalR.HubConnectionState.Connected) {
@@ -109,30 +114,28 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
       })
       .catch(console.error);
 
-    // Реконнект → повторный JoinStream
+    // Автовосстановление
     hub.onreconnected(() => {
-      console.log('[SignalR] Reconnected');
       hub.invoke('JoinStream', nickname, userTokenRef.current).catch(console.error);
     });
 
+    // ---------- cleanup ----------
     return () => {
-      console.log('[SignalR] Cleanup');
-
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
 
-      hub.off('StreamJoined');
-      hub.off('UpdateViewerCount');
-      hub.off('StreamStatusChanged');
+      hub.off('StreamJoined', handlersRef.current.handleStreamJoined);
+      hub.off('UpdateViewerCount', handlersRef.current.handleUpdateViewerCount);
+      hub.off('StreamStatusChanged', handlersRef.current.handleStreamStatusChanged);
 
       hub.stop().catch(() => {});
       hubRef.current = null;
     };
   }, [nickname, userData?.id, hubUrl]);
 
-  // -------------------- HLS player --------------------
+  // ========================= HLS =========================
   useEffect(() => {
     const video = videoRef.current;
 
@@ -144,7 +147,6 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
         } catch {}
         hlsRef.current = null;
       }
-
       currentHlsUrlRef.current = null;
 
       if (video) {
@@ -161,7 +163,7 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
       return;
     }
 
-    // Не загружай тот же самый стрим повторно
+    // Повторная загрузка того же источника → не надо
     if (currentStreamIdRef.current === currentStream.streamId && currentHlsUrlRef.current === currentStream.hlsUrl) {
       return;
     }
@@ -177,7 +179,6 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
 
       hls.loadSource(currentStream.hlsUrl);
       hls.attachMedia(video);
-
       video.muted = true;
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}));
