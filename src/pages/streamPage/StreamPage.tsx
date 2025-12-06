@@ -8,16 +8,20 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 // hooks
 import { useDeviceDetect } from '../../hooks/useDeviceDetect';
 // types
-import { IStream } from '../../types/share';
+import { IChatMessage, IStream } from '../../types/share';
 
 export const StreamPage = ({
   videoRef,
   streamInfo,
   viewerCount,
+  messages,
+  sendMessage,
 }: {
   videoRef: React.RefObject<HTMLVideoElement | null>;
   streamInfo: IStream | null;
   viewerCount: number;
+  messages: IChatMessage[];
+  sendMessage: (text: string) => void;
 }) => {
   const { isMobile } = useDeviceDetect();
   const [isOpen, setIsOpen] = useState(true);
@@ -83,7 +87,7 @@ export const StreamPage = ({
           }}
         >
           {isOpen ? (
-            <Chat isOpen={isOpen} setIsOpen={setIsOpen} />
+            <Chat isOpen={isOpen} setIsOpen={setIsOpen} messages={messages} sendMessage={sendMessage} />
           ) : (
             <Box>
               <Button onClick={() => setIsOpen(!isOpen)}>

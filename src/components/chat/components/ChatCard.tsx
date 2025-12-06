@@ -1,13 +1,13 @@
 import { StyledChatCard, StyledChatCardMessage, StyledChatCardNickname } from '../../StylesComponents';
 
-import { IMessage } from '../../../types/share';
+import { IChatMessage } from '../../../types/share';
 
-export const ChatCard = ({ msg, customColor }: { msg: IMessage; customColor: string }) => {
-  const { nickname, message } = msg;
+export const ChatCard = ({ msg, customColor }: { msg: IChatMessage; customColor: string }) => {
+  const { username, text } = msg;
   return (
     <StyledChatCard>
-      <StyledChatCardNickname customColor={customColor}>{nickname}:</StyledChatCardNickname>
-      <StyledChatCardMessage>{message}</StyledChatCardMessage>
+      <StyledChatCardNickname customColor={customColor}>{username}:</StyledChatCardNickname>
+      <StyledChatCardMessage>{text}</StyledChatCardMessage>
     </StyledChatCard>
   );
 };

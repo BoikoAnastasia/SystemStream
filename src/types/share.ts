@@ -210,15 +210,6 @@ export interface IUserItem {
 export type IListVideo = IVideoItem[];
 export type IListUsers = IUserItem[];
 
-// Message
-export interface IMessage {
-  id: string | number;
-  nickname: string;
-  message: string;
-  currentUser: boolean;
-  avatar: null | string;
-}
-
 export interface IModalRegistForm {
   password: string;
   username: string;
@@ -267,4 +258,14 @@ export interface IUser {
   name: string;
   avatar?: string;
   live?: boolean;
+}
+
+// Chat
+export interface IChatMessage {
+  userId: number;
+  username: string;
+  text: string;
+  role: string;
+  timestamp: string;
+  offsetSeconds: number;
 }

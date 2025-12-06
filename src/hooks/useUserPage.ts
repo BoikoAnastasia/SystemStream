@@ -9,6 +9,7 @@ import { AppDispatch } from '../store/store';
 import { useNickname } from '../context/NicknameContext';
 // hooks
 import { useStreamHub } from './hubs/useStreamHub';
+import { useChat } from './hubs/useChat';
 
 export const useUserPage = (paramNickname?: string) => {
   const { nickname, setNickname } = useNickname();
@@ -41,12 +42,13 @@ export const useUserPage = (paramNickname?: string) => {
   const userData = isOwnPage ? profile : selectedUser;
   const isNotProfileData = !isOwnPage;
 
-  console.log(userData);
+  // console.log(userData);
 
   const { videoRef, currentStream, viewerCount, connection } = useStreamHub({
     nickname: nickname || paramNickname,
     userData,
   });
+  const { messages, sendMessage } = useChat(connection, nickname || paramNickname);
 
   return {
     userData,
@@ -57,5 +59,7 @@ export const useUserPage = (paramNickname?: string) => {
     connection,
     isLoading,
     isError,
+    messages,
+    sendMessage,
   };
 };

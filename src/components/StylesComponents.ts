@@ -377,9 +377,11 @@ export const StyledInputLabel = styled(InputLabel)(() => ({
 export const StyledIconButton = styled(IconButton)(() => ({
   color: 'var(--input-border)',
   borderRadius: 0,
+  backgroundColor: '#0000006e',
   // background: 'var(--background-tabs)',
   '&:hover': {
     color: 'var(--white)',
+    backgroundColor: '#00000086',
   },
 }));
 
@@ -724,7 +726,7 @@ export const StyledSocials = styled(Box)({
   justifyContent: 'center',
   gap: '20px',
   width: '100%',
-  padding: '0 20px',
+  padding: '0',
   '@media (max-width: 768px)': {
     position: 'relative',
     gridTemplateColumns: 'repeat(2, minmax(150px, 1fr))',
