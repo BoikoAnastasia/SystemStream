@@ -12,11 +12,11 @@ import { SectionListVideo } from '../../components/sectionListVideo/SectionListV
 import { ContainerBox } from '../../components/StylesComponents';
 import { CatalogUsers } from '../../components/catalogUsers/CatalogUsers';
 import { PaginationComponent } from '../../components/ui/pagination/PaginationComponent';
+import { ContentWrapperSwitch } from '../../components/сontentWrapperSwitch/ContentWrapperSwitch';
 // mui
 import { Box } from '@mui/material';
 // types
 import { IStreamOnline, IUser } from '../../types/share';
-import { ContentWrapperSwitch } from '../../components/сontentWrapperSwitch/ContentWrapperSwitch';
 
 export const testStreams: IStreamOnline[] = [
   {

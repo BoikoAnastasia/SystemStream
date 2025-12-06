@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 // redux
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../../../../hooks/redux';
@@ -35,10 +35,6 @@ export const SettingsKey = () => {
   };
 
   useEffect(() => {
-    getStreamKey();
-  }, []);
-
-  useEffect(() => {
     if (data?.streamKey) {
       setStreamKey(data.streamKey);
     } else {
@@ -46,10 +42,14 @@ export const SettingsKey = () => {
     }
   }, [data]);
 
-  const getStreamKey = () => {
+  const getStreamKey = useCallback(() => {
     if (data?.streamKey) return;
     dispatch(fetchStreamKey());
-  };
+  }, [data, dispatch]);
+
+  useEffect(() => {
+    getStreamKey();
+  }, [getStreamKey]);
 
   const changeKey = () => {
     dispatch(postStreamKey());

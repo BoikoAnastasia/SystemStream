@@ -31,7 +31,7 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
   const sendMessage = async (text: string) => {
     if (!hub || !isReady || !streamNickname) return;
     try {
-      await hub.invoke('SendChatMessage', streamNickname, text);
+      await hub.invoke('SendChatMessage', text);
     } catch (error) {
       console.error(error);
     }

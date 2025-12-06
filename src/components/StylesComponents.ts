@@ -374,7 +374,7 @@ export const StyledInputLabel = styled(InputLabel)(() => ({
   },
 }));
 
-export const StyledIconButton = styled(IconButton)(() => ({
+export const StyledSocialButton = styled(IconButton)(() => ({
   color: 'var(--input-border)',
   borderRadius: 0,
   backgroundColor: '#0000006e',
@@ -382,6 +382,15 @@ export const StyledIconButton = styled(IconButton)(() => ({
   '&:hover': {
     color: 'var(--white)',
     backgroundColor: '#00000086',
+  },
+}));
+
+export const StyledIconButton = styled(IconButton)(() => ({
+  color: 'var(--input-border)',
+  borderRadius: 0,
+  // background: 'var(--background-tabs)',
+  '&:hover': {
+    color: 'var(--white)',
   },
 }));
 
@@ -684,6 +693,9 @@ export const StyledInfo = styled(Box)({
   alignItems: 'flex-start',
   gap: '6px',
   maxWidth: '50%',
+  padding: '20px',
+  borderRadius: '8px',
+  backgroundColor: '#0000001c',
   zIndex: 2,
   '@media (max-width: 768px)': {
     maxWidth: '100%',

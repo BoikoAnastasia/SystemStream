@@ -5,7 +5,7 @@ import YouTubeIcon from '@mui/icons-material/YouTube';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import { Typography } from '@mui/material';
 // styles
-import { StyledIconButton, StyledSocials } from '../StylesComponents';
+import { StyledSocialButton, StyledSocials } from '../StylesComponents';
 import { ISocialLink } from '../../types/share';
 
 export const Socials = ({ socials }: { socials: ISocialLink[] | null | undefined }) => {
@@ -32,10 +32,10 @@ export const Socials = ({ socials }: { socials: ISocialLink[] | null | undefined
     <StyledSocials>
       {socials &&
         socials.map((social: ISocialLink) => (
-          <StyledIconButton onClick={() => window.open(social.url, '_blank')} key={social.platform}>
+          <StyledSocialButton onClick={() => window.open(social.url, '_blank')} key={social.platform}>
             {getIconSocial(social.platform)}
             <Typography sx={{ color: 'var(--white)' }}>{social.platform}</Typography>
-          </StyledIconButton>
+          </StyledSocialButton>
         ))}
     </StyledSocials>
   );

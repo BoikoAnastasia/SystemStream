@@ -12,6 +12,9 @@ import {
 import { Formik, Form, FieldArray, Field } from 'formik';
 // validation
 import { validationChangeProfile } from '../../../../validation/validation';
+//hooks, context
+import { useAppSelector } from '../../../../hooks/redux';
+import { useHeaderModal } from '../../../../context/HeaderModalContext';
 // mui, style, types
 import { Box, MenuItem } from '@mui/material';
 import {
@@ -27,14 +30,15 @@ import {
   StyleListItemSettings,
 } from '../../../../components/StylesComponents';
 import { IProfileChange, ISocialLink } from '../../../../types/share';
+
 type ProfileField = keyof IProfileChange;
 
 const ListSettingsProfile: { label?: string; type: string; value: ProfileField; title: string; disabled?: boolean }[] =
   [
-    { type: 'field', label: 'Введите почту', value: 'email', title: 'Изменить почту:' },
     { type: 'field', label: 'Введите ник', value: 'nickname', title: 'Изменить ник:' },
-    { type: 'field', label: 'Введите текущий пароль', value: 'currentPassword', title: 'Текущий пароль:' },
+    { type: 'field', label: 'Введите почту', value: 'email', title: 'Изменить почту:' },
     { type: 'field', label: 'Введите новый пароль', value: 'newPassword', title: 'Изменить пароль:' },
+    { type: 'field', label: 'Введите текущий пароль', value: 'currentPassword', title: 'Текущий пароль:' },
     { type: 'field', label: 'Введите описание', value: 'profileDescription', title: 'Изменить описание профиля:' },
     {
       type: 'file',
@@ -55,26 +59,27 @@ const ListSettingsSocial: { label?: string; value: string }[] = [
   { label: 'Twitter', value: 'twitter' },
 ];
 
-const initialValues: IProfileChange = {
-  nickname: '',
-  email: '',
-  currentPassword: '',
-  newPassword: '',
-  profileDescription: '',
-  profileImage: null,
-  backgroundImage: null,
-  socialLinks: [],
-};
-
 export const SettingsChangeProfile = () => {
   const [message, setMessage] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState('');
   const dispatch = useDispatch<AppDispatch>();
+  const { data: userData } = useAppSelector((state) => state.user);
+  const { showAlert } = useHeaderModal();
+
+  const initialValues: IProfileChange = {
+    nickname: '',
+    email: '',
+    currentPassword: '',
+    newPassword: '',
+    profileDescription: userData ? userData.profileDescription : '',
+    profileImage: null,
+    backgroundImage: null,
+    socialLinks: userData ? userData.socialLinks : [],
+  };
 
   const checkChangeProfile = async (values: IProfileChange, { setFieldError, setSubmitting }: any) => {
     setMessage('');
     setSubmitting(true);
-
     try {
       // проверка никнейма
       if (values.nickname) {
@@ -82,6 +87,7 @@ export const SettingsChangeProfile = () => {
         if (!nicknameResult.success) throw new Error(nicknameResult.message);
         if (nicknameResult.data?.exists) {
           setFieldError('username', 'Данный ник уже используется');
+          return;
         }
       }
 
@@ -91,6 +97,7 @@ export const SettingsChangeProfile = () => {
         if (!emailResult.success) throw new Error(emailResult.message);
         if (emailResult.data?.exists) {
           setFieldError('email', 'Данная почта уже существует');
+          return;
         }
       }
 
@@ -102,17 +109,21 @@ export const SettingsChangeProfile = () => {
       delete profileData.backgroundImage;
       delete profileData.profileImage;
 
-      const result = await dispatch(changeProfileData(profileData));
-      setMessage(result?.message || '');
+      const changeProfileResult = await dispatch(changeProfileData(profileData));
+      if (!changeProfileResult.success) {
+        throw new Error(changeProfileResult.message);
+      }
+
       if (values.profileImage) {
-        console.log(values.profileImage);
         dispatch(settingProfileImage(values.profileImage));
       }
+
       if (values.backgroundImage) {
         dispatch(settingBackgroundImage(values.backgroundImage));
       }
+      showAlert('Профиль обновлен.', 'success');
     } catch (error: any) {
-      setMessage(error.message || 'Произошла ошибка');
+      showAlert('Произошла ошибка.', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -123,7 +134,7 @@ export const SettingsChangeProfile = () => {
       initialValues={initialValues}
       validationSchema={validationChangeProfile}
       onSubmit={checkChangeProfile}
-      enableReinitialize={false}
+      enableReinitialize={true}
     >
       {({ values, handleChange, handleBlur, touched, errors, resetForm, setFieldValue }) => {
         const socialLinks = values.socialLinks || [];
@@ -264,11 +275,19 @@ export const SettingsChangeProfile = () => {
               {message && <Box sx={{ fontSize: '22px', mt: 2 }}>{message}</Box>}
             </StyledListSettings>
 
-            <Box sx={{ display: 'flex', gap: '40px', justifyContent: 'flex-end', marginBottom: '40px' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                gap: '40px',
+                justifyContent: 'flex-end',
+                alignItems: 'flex-end',
+                marginBottom: '40px',
+              }}
+            >
               <StyledFilterButton type="button" onClick={() => resetForm()}>
                 Отмена
               </StyledFilterButton>
-              <StyledFollowButton type="submit" sx={{ fontWeight: 500, width: '150px', height: '45px' }}>
+              <StyledFollowButton type="submit" sx={{ fontWeight: 500, width: '150px', height: '45px', margin: 0 }}>
                 Сохранить
               </StyledFollowButton>
             </Box>

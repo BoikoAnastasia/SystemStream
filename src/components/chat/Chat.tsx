@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useAppSelector } from '../../hooks/redux';
 // components
 import { ChatCard } from './components/ChatCard';
 // utils
@@ -26,6 +27,7 @@ export const Chat = ({
   const listRef = useRef<HTMLDivElement | null>(null);
   const [text, setText] = useState('');
   const colorMap = useRef<{ [key: string]: string }>({});
+  const { isAuth } = useAppSelector((state) => state.user);
 
   const getUserColor = (nickname: string) => {
     if (!colorMap.current[nickname]) {
@@ -75,13 +77,17 @@ export const Chat = ({
       {/* Message box */}
       <Box sx={{ position: 'relative', display: 'flex', gap: '12px', alignItems: 'center', marginTop: '20px' }}>
         <StyledChatTextField
-          placeholder="Введите сообщение"
+          placeholder={isAuth ? 'Введите сообщение' : 'Только для авторизованных'}
           autoComplete="false"
           value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setText(e.target.value)}
+          onKeyDown={(e: React.KeyboardEvent) => e.key === 'Enter' && handleSend()}
         />
-        <Button onClick={handleSend} sx={{ position: 'absolute', right: '0', borderRadius: '12px', minWidth: 'auto' }}>
+        <Button
+          disabled={!isAuth}
+          onClick={handleSend}
+          sx={{ position: 'absolute', right: '0', borderRadius: '12px', minWidth: 'auto' }}
+        >
           <SendIcon sx={{ color: 'var(--white)' }} />
         </Button>
       </Box>

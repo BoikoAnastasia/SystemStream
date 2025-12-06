@@ -1,3 +1,5 @@
+import { AppDispatch } from '../store/store';
+
 interface IApiResponse<T = any> {
   success: boolean;
   data?: T;
@@ -5,7 +7,12 @@ interface IApiResponse<T = any> {
   code?: number;
 }
 
-export const handleApiRequest = async <T = any>(url: string, options?: RequestInit): Promise<IApiResponse<T>> => {
+export const handleApiRequest = async <T = any>(
+  url: string,
+  options?: RequestInit,
+  dispatch?: AppDispatch,
+  onSuccess?: (data: T) => void
+): Promise<IApiResponse<T>> => {
   try {
     const response = await fetch(url, options);
     const data = await response.json();
@@ -14,6 +21,10 @@ export const handleApiRequest = async <T = any>(url: string, options?: RequestIn
       // Можно проверять код ошибки и формировать сообщение
       const message = data?.message || `Ошибка сервера (${response.status})`;
       return { success: false, message, code: response.status };
+    }
+
+    if (dispatch && onSuccess) {
+      onSuccess(data);
     }
 
     return { success: true, data, message: 'OK', code: response.status };
