@@ -16,15 +16,11 @@ import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 // styles
 import {
-  CardDrawerTypography,
-  StyledChatTextField,
   StyledDrawer,
-  StyledNameComponents,
   StyledSidebarLink,
   StyledSidebarList,
   StyledSidebarListItem,
   StyledSidebarName,
-  StyledSpanDark,
 } from '../StylesComponents';
 // types
 import { IStreamOnline, ISubscriber } from '../../types/share';

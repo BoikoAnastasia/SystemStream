@@ -76,12 +76,7 @@ export const UserBanner = ({ userData, isNotProfileData }: any) => {
     >
       <StyledInfo>
         <StyledBannerUserName>{userData?.nickname}</StyledBannerUserName>
-        <StyledBannerUserInfo>
-          {subscribers.length
-            ? subscribers.length === 1 && `${subscribers.length} подписчик`
-            : `${subscribers.length} подписчиков`}
-        </StyledBannerUserInfo>
-
+        <StyledBannerUserInfo>{subscribers.length} подписчиков</StyledBannerUserInfo>
         {/* Показывать кнопку можно только на чужом профиле */}
         {isNotProfileData &&
           (isSubscriber ? (
