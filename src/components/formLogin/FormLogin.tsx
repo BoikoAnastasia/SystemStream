@@ -18,6 +18,7 @@ import {
   StyledInputLabel,
   StyledOutlinedInputModal,
   StyledTextFieldModal,
+  StyledFollowButton,
 } from '../StylesComponents';
 // types
 import { IModalLoginForm } from '../../types/share';
@@ -51,7 +52,6 @@ export const FormLogin = ({
       setMessage('Вы успешно вошли!');
       const action = await dispatch(userProfile());
       const userData = action?.payload;
-
       handleClose();
       if (userData?.nickname) navigate(`/${userData.nickname}`);
       else navigate('/');
@@ -117,9 +117,7 @@ export const FormLogin = ({
             <Box sx={{ color: 'var(--error)', fontSize: '14px', marginTop: '-10px' }}>{errorMessage}</Box>
           )}
           <StyledButtonsForm>
-            <StyledButtonForm variant="contained" type="submit">
-              Войти
-            </StyledButtonForm>
+            <StyledFollowButton type="submit">Войти</StyledFollowButton>
             <Box sx={{ color: 'var(--white)', fontSize: '14px' }}>или</Box>
             <StyledButtonForm bgcolor={'var(--background-line)'} c={'var(--input-background)'}>
               Продолжить с помощью Google

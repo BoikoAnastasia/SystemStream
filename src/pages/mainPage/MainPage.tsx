@@ -11,12 +11,12 @@ import { TabsComponent } from '../../components/ui/tabs/TabsComponent';
 import { SectionListVideo } from '../../components/sectionListVideo/SectionListVideo';
 import { ContainerBox } from '../../components/StylesComponents';
 import { CatalogUsers } from '../../components/catalogUsers/CatalogUsers';
-import { Loader } from '../../components/ui/loader/Loader';
 import { PaginationComponent } from '../../components/ui/pagination/PaginationComponent';
 // mui
 import { Box } from '@mui/material';
 // types
 import { IStreamOnline, IUser } from '../../types/share';
+import { ContentWrapperSwitch } from '../../components/сontentWrapperSwitch/ContentWrapperSwitch';
 
 export const testStreams: IStreamOnline[] = [
   {
@@ -263,7 +263,7 @@ const testUsers: IUser[] = [
 
 export const MainPage: FC = appLayout((): JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
-  const { data, isLoading } = useAppSelector((state) => state.streams);
+  const { data, isLoading, isError } = useAppSelector((state) => state.streams);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const streams = data?.streams ?? [];
   const { page = 1, pageSize = 25, totalStreams = 0 } = data ?? {};
@@ -276,13 +276,16 @@ export const MainPage: FC = appLayout((): JSX.Element => {
   }, [dispatch, data, isLoading]);
 
   const getTabsComponents = () => [
-    isLoading ? (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }} key="loader">
-        <Loader />
-      </Box>
-    ) : (
-      <SectionListVideo list={streams} key="live" />
-    ),
+    <ContentWrapperSwitch
+      isLoading={isLoading}
+      isError={isError}
+      data={streams}
+      text={'Пока нет Live стримов'}
+      onRetry={fetchUserOnlineStreams}
+    >
+      <SectionListVideo list={streams} key="live" />,
+    </ContentWrapperSwitch>,
+    <SectionListVideo list={testStreams} key="videos" />,
     <SectionListVideo list={testStreams} key="videos" />,
     <CatalogUsers list={testUsers} key="users" />,
   ];

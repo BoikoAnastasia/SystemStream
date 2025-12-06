@@ -1,0 +1,23 @@
+interface IApiResponse<T = any> {
+  success: boolean;
+  data?: T;
+  message: string;
+  code?: number;
+}
+
+export const handleApiRequest = async <T = any>(url: string, options?: RequestInit): Promise<IApiResponse<T>> => {
+  try {
+    const response = await fetch(url, options);
+    const data = await response.json();
+
+    if (!response.ok) {
+      // Можно проверять код ошибки и формировать сообщение
+      const message = data?.message || `Ошибка сервера (${response.status})`;
+      return { success: false, message, code: response.status };
+    }
+
+    return { success: true, data, message: 'OK', code: response.status };
+  } catch (error: any) {
+    return { success: false, message: error.message || 'Неизвестная ошибка' };
+  }
+};

@@ -5,8 +5,6 @@ import { AppDispatch } from '../../../store/store';
 import { useDispatch } from 'react-redux';
 import { logoutUser } from '../../../store/actions/UserActions';
 import { useAppSelector } from '../../../hooks/redux';
-// context
-import { useHeaderModal } from '../../../context/HeaderModalContext';
 // components
 import { StyledMenu } from '../../../layout/StyledLayout';
 import { ModalComponent } from '../../modal/ModalComponent';
@@ -24,7 +22,7 @@ export const HeaderMenuAvatar = () => {
   const { data: profile, isAuth } = useAppSelector((state) => state.user);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { setOpen: setOpenModal } = useHeaderModal();
+  const [openModal, setOpenModal] = useState(false);
   const menuData = [
     // {
     //   authOnly: true,
@@ -124,7 +122,7 @@ export const HeaderMenuAvatar = () => {
           </MenuItem>
         )}
       </StyledMenu>
-      <ModalComponent title="Войти или зарегистрироваться" />
+      <ModalComponent open={openModal} setOpen={setOpenModal} title="Войти или зарегистрироваться" />
     </>
   );
 };

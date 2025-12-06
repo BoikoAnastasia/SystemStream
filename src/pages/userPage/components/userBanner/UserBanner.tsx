@@ -21,7 +21,7 @@ import { ISubscriber } from '../../../../types/share';
 
 export const UserBanner = ({ userData, isNotProfileData }: any) => {
   const { isAuth, data: currentUser } = useAppSelector((state) => state.user);
-  const { setOpen } = useHeaderModal();
+  // const { setOpen } = useHeaderModal();
 
   const [subscribers, setSubscribers] = useState<ISubscriber[]>([]);
   const [isSubscriber, setIsSubscriber] = useState(false);
@@ -42,7 +42,6 @@ export const UserBanner = ({ userData, isNotProfileData }: any) => {
   };
 
   useEffect(() => {
-    // console.log(`${process.env.REACT_APP_API_USER}${userData.profileImage}`);
     checkIsSubscribed();
   }, [subscribers]);
 
@@ -52,7 +51,7 @@ export const UserBanner = ({ userData, isNotProfileData }: any) => {
 
   const handlerSubscribe = async () => {
     if (!isAuth) {
-      setOpen(true);
+      // setOpen(true);
       return;
     }
 

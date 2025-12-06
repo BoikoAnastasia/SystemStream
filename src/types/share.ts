@@ -48,6 +48,8 @@ export interface IStreamsHistorySlice {
 // Types
 export type NotificationsType = 'NewFollower' | 'StreamStarted';
 
+export type AlertType = 'success' | 'error' | 'info' | 'warning';
+
 // data
 export interface IProfile {
   id: number;
@@ -233,6 +235,10 @@ export type SidebarContextType = {
   setOpen: (s: boolean) => void;
 };
 
+export type ModalContextType = {
+  showAlert: (message: string, type?: AlertType) => void;
+};
+
 export type CardDrawerType = {
   avatar: string;
   views: string;
@@ -250,6 +256,10 @@ export interface ICardDrawerTypography {
 
 export interface StyledButtonSearchProps {
   h?: string;
+}
+
+export interface StyledAlertMessageProps {
+  type?: string;
 }
 
 export interface IUser {

@@ -4,6 +4,7 @@ import { UserProfileSlice } from '../slices/UserProfileSlice';
 import { SelectUserSlice } from '../slices/SelectUserSlice';
 // utils
 import { getCookie, removeCookie, setCookie } from '../../utils/cookieFunctions';
+import { handleApiRequest } from '../../utils/handleApiRequest';
 
 const { UserFetch, UserFetchError, UserFetchSuccess, UserLogout } = UserProfileSlice.actions;
 const { SelectUserFetch, SelectUserError, SelectUserFetchSuccess, Clear } = SelectUserSlice.actions;
@@ -46,36 +47,14 @@ export const logoutUser = () => async (dispatch: AppDispatch) => {
   }
 };
 
-export const registrationUser = async ({
-  username,
-  email,
-  password,
-}: {
-  username: string;
-  email: string;
-  password: string;
-}) => {
-  try {
-    const response = await fetch(`${process.env.REACT_APP_API_USER}/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ nickname: username, email: email, password: password }),
-    });
-    console.log('response: ', response);
-    if (!response.ok) {
-      console.log('response.json: ', response);
-      const errorData = await response.json();
-      console.log('errorData: ', errorData);
-      return { success: false, message: errorData.message || `Ошибка: ${response.status}` };
-    }
-    const result = await response.json();
-    console.log('result: ', result);
-    return { success: true, data: result };
-  } catch (e: any) {
-    return { success: false, message: e.message || 'Ошибка регистрации' };
-  }
+export const registrationUser = async (username: string, email: string, password: string) => {
+  return handleApiRequest(`${process.env.REACT_APP_API_USER}/register`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ nickname: username, email: email, password: password }),
+  });
 };
 
 // profile
@@ -139,31 +118,9 @@ export const fetchUserById = (id: number) => async (dispatch: AppDispatch) => {
 
 // проверки для регистрации
 export const checkExistEmail = async (email: string) => {
-  try {
-    const response = await fetch(`${process.env.REACT_APP_API_USER}/exists/email/${email}`);
-    if (!response.ok) {
-      const error = await response.json();
-      console.error('Ошибка проверки почты:', error.message || response.statusText);
-    }
-    const data = await response.json();
-    return Boolean(data.exists);
-  } catch (error) {
-    console.log('Не удалось проверить почту');
-    return error;
-  }
+  return handleApiRequest<{ exists: boolean }>(`${process.env.REACT_APP_API_USER}/exists/email/${email}`);
 };
 
 export const checkExistNickname = async (nickname: string) => {
-  try {
-    const response = await fetch(`${process.env.REACT_APP_API_USER}/exists/nickname/${nickname}`);
-    if (!response.ok) {
-      const error = await response.json();
-      console.error('Ошибка проверки ника:', error.message || response.statusText);
-    }
-    const data = await response.json();
-    return Boolean(data.exists);
-  } catch (error) {
-    console.log('Не удалось проверить ник');
-    return error;
-  }
+  return handleApiRequest<{ exists: boolean }>(`${process.env.REACT_APP_API_USER}/exists/nickname/${nickname}`);
 };

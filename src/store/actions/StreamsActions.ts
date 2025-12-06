@@ -26,8 +26,7 @@ export const fetchUserOnlineStreams =
       );
       if (!response.ok) {
         const errorData = await response.json();
-        console.log('errorData: ', errorData);
-        dispatch(StreamsSliceFetchError(errorData));
+        dispatch(StreamsSliceFetchError(errorData.message || 'Не удалось получить стримы'));
         return;
       }
       const data = await response.json();
@@ -42,7 +41,7 @@ export const fetchUserOnlineStreams =
       dispatch(StreamsSliceFetchSuccess(mappedData));
     } catch (error) {
       console.log('Не получилось получить онлайн стримы пользователя');
-      dispatch(StreamsSliceFetchError(error));
+      dispatch(StreamsSliceFetchError(error instanceof Error ? error.message : 'Неизвестная ошибка'));
     }
   };
 
@@ -58,10 +57,9 @@ export const fecthStreamHistory =
       if (!response.ok) {
         const errorData = await response.json();
         dispatch(StreamsHistoryFetchError(errorData));
-        console.log('errorData: ', errorData);
+        return;
       }
       const data = await response.json();
-      console.log(data);
       dispatch(StreamsHistoryFetchSuccess({ data, nickname }));
     } catch (error) {
       console.log('Не получилось получить историю стримов пользователя');

@@ -20,7 +20,13 @@ import {
   Typography,
 } from '@mui/material';
 import { keyframes } from '@emotion/react';
-import { ICardDrawerTypography, IStyledButtonDark, IStyledButtonForm, StyledButtonSearchProps } from '../types/share';
+import {
+  ICardDrawerTypography,
+  IStyledButtonDark,
+  IStyledButtonForm,
+  StyledAlertMessageProps,
+  StyledButtonSearchProps,
+} from '../types/share';
 
 const animloader = keyframes`
   0% {
@@ -121,6 +127,15 @@ export const StyledNameComponents = styled('h4')(() => ({
   fontSize: '18px',
   fontWeight: 500,
   color: 'var(--white)',
+}));
+
+export const StyledAlertText = styled('span', {
+  shouldForwardProp: (prop) => prop !== 'type',
+})<StyledAlertMessageProps>(({ type }) => ({
+  fontSize: '16px',
+  fontWeight: 500,
+  lineHeight: 1.2,
+  color: type,
 }));
 
 export const StyledSpanDark = styled('span')(() => ({

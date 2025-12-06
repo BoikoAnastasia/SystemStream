@@ -11,24 +11,25 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 // styles
 import {
   StyledButtonsForm,
-  StyledButtonForm,
   StyledIconButton,
   StyledInputLabel,
   StyledOutlinedInputModal,
   StyledTextFieldModal,
+  StyledFollowButton,
 } from '../StylesComponents';
 // types
 import { IModalRegistForm } from '../../types/share';
+import { useHeaderModal } from '../../context/HeaderModalContext';
 
 export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<string | null>> }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const { showAlert } = useHeaderModal();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
-
   const handleMouseUpPassword = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
@@ -37,38 +38,36 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
     setErrorMessage('');
     setSubmitting(true);
     if (!values.email || !values.username) return;
-    // проверка никнейма
-    const resultNickname = await checkExistNickname(values.username);
-    if (resultNickname === true) {
-      setFieldError('username', 'Данный ник уже используется');
-      setSubmitting(false);
-      return;
-    }
 
-    // проверка email
-    const resultEmail = await checkExistEmail(values.email);
-    setErrorMessage('');
-    if (resultEmail === true) {
-      setFieldError('email', 'Данная почта уже существует');
-      setSubmitting(false);
-      return;
-    }
+    try {
+      // проверка никнейма
+      const nicknameResult = await checkExistNickname(values.username);
+      if (!nicknameResult.success) throw new Error(nicknameResult.message);
+      if (nicknameResult.data?.exists) {
+        setFieldError('username', 'Данный ник уже используется');
+        return;
+      }
 
-    // регистрация
-    const result = await registrationUser({
-      username: values.username,
-      password: values.password,
-      email: values.email!,
-    });
+      // проверка email
+      const emailResult = await checkExistEmail(values.email);
+      if (!emailResult.success) throw new Error(emailResult.message);
+      if (emailResult.data?.exists) {
+        setFieldError('email', 'Данная почта уже существует');
+        return;
+      }
 
-    if (result.success) {
-      setMessage('Вы успешно прошли регистрацию! Теперь авторизуйтесь.');
+      // регистрация
+      const registrationResult = await registrationUser(values.username, values.email!, values.password);
+      if (!registrationResult.success) {
+        throw new Error(registrationResult.message);
+      }
+      showAlert('Вы успешно прошли регистрацию! Теперь авторизуйтесь.', 'success');
       resetForm();
-    } else {
-      setMessage(result.message);
+    } catch (error: any) {
+      showAlert('Произошла ошибка.', 'error');
+    } finally {
+      setSubmitting(false);
     }
-
-    setSubmitting(false);
   };
 
   return (
@@ -159,7 +158,7 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
             }
           />
           <StyledButtonsForm>
-            <StyledButtonForm type="submit">Зарегистрироваться</StyledButtonForm>
+            <StyledFollowButton type="submit">Зарегистрироваться</StyledFollowButton>
           </StyledButtonsForm>
         </Form>
       )}

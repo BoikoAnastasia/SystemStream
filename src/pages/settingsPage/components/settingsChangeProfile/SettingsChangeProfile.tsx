@@ -27,7 +27,6 @@ import {
   StyleListItemSettings,
 } from '../../../../components/StylesComponents';
 import { IProfileChange, ISocialLink } from '../../../../types/share';
-
 type ProfileField = keyof IProfileChange;
 
 const ListSettingsProfile: { label?: string; type: string; value: ProfileField; title: string; disabled?: boolean }[] =
@@ -76,47 +75,47 @@ export const SettingsChangeProfile = () => {
     setMessage('');
     setSubmitting(true);
 
-    if (values.email) {
-      const resultEmail = await checkExistEmail(values.email);
-      if (resultEmail === true) {
-        setFieldError('email', 'Данная почта уже существует');
-        setSubmitting(false);
-        return;
-      }
-    }
-
-    if (values.nickname) {
-      const resultNickname = await checkExistNickname(values.nickname);
-      if (resultNickname === true) {
-        setFieldError('nickname', 'Данный ник уже существует');
-        setSubmitting(false);
-        return;
-      }
-    }
-
-    // фильтруем пустые соцсети
-    const profileData = {
-      ...values,
-      socialLinks: (values.socialLinks || []).filter((link) => link.url && link.url.trim() !== ''),
-    };
-    delete profileData.backgroundImage;
-    delete profileData.profileImage;
-
     try {
+      // проверка никнейма
+      if (values.nickname) {
+        const nicknameResult = await checkExistNickname(values.nickname);
+        if (!nicknameResult.success) throw new Error(nicknameResult.message);
+        if (nicknameResult.data?.exists) {
+          setFieldError('username', 'Данный ник уже используется');
+        }
+      }
+
+      // проверка email
+      if (values.email) {
+        const emailResult = await checkExistEmail(values.email);
+        if (!emailResult.success) throw new Error(emailResult.message);
+        if (emailResult.data?.exists) {
+          setFieldError('email', 'Данная почта уже существует');
+        }
+      }
+
+      // фильтруем пустые соцсети
+      const profileData = {
+        ...values,
+        socialLinks: (values.socialLinks || []).filter((link) => link.url && link.url.trim() !== ''),
+      };
+      delete profileData.backgroundImage;
+      delete profileData.profileImage;
+
       const result = await dispatch(changeProfileData(profileData));
       setMessage(result?.message || '');
-    } catch (error) {
-      setMessage('Ошибка отправки данных');
+      if (values.profileImage) {
+        console.log(values.profileImage);
+        dispatch(settingProfileImage(values.profileImage));
+      }
+      if (values.backgroundImage) {
+        dispatch(settingBackgroundImage(values.backgroundImage));
+      }
+    } catch (error: any) {
+      setMessage(error.message || 'Произошла ошибка');
+    } finally {
+      setSubmitting(false);
     }
-    if (values.profileImage) {
-      console.log(values.profileImage);
-      dispatch(settingProfileImage(values.profileImage));
-    }
-    if (values.backgroundImage) {
-      dispatch(settingBackgroundImage(values.backgroundImage));
-    }
-
-    setSubmitting(false);
   };
 
   return (

@@ -12,6 +12,7 @@ import { Providers } from './Providers';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';
 import './index.css';
+import ErrorBoundary from './ErrorBoundary';
 
 const store = setupStore();
 
@@ -19,13 +20,15 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <Provider store={store}>
     <BrowserRouter>
-      <React.StrictMode>
-        <ThemeProvider theme={theme}>
-          <Providers>
-            <App />
-          </Providers>
-        </ThemeProvider>
-      </React.StrictMode>
+      <ErrorBoundary>
+        <React.StrictMode>
+          <ThemeProvider theme={theme}>
+            <Providers>
+              <App />
+            </Providers>
+          </ThemeProvider>
+        </React.StrictMode>
+      </ErrorBoundary>
     </BrowserRouter>
   </Provider>
 );
