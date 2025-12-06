@@ -9,7 +9,7 @@ export const ErrorBlock = ({ error, onRetry }: { error: any; onRetry: () => void
   return (
     <Box sx={{ textAlign: 'center', padding: '20px' }}>
       <StyledTitleH3>{error}</StyledTitleH3>
-      <StyledFollowButton onClick={() => dispatch(onRetry)}>Повторить</StyledFollowButton>
+      {onRetry && <StyledFollowButton onClick={() => dispatch(onRetry)}>Повторить</StyledFollowButton>}
     </Box>
   );
 };

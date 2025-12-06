@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 // context
-import { useHeaderModal } from '../../../../context/HeaderModalContext';
+
 // components
 import { Socials } from '../../../../components/socials/Socials';
 import { BannerEffect } from '../../../../components/ui/bannerEffect/BannerEffect';
@@ -18,6 +18,7 @@ import {
   StyledProfileSection,
 } from '../../../../components/StylesComponents';
 import { ISubscriber } from '../../../../types/share';
+import { useHeaderModal } from '../../../../context/HeaderModalContext';
 
 export const UserBanner = ({ userData, isNotProfileData }: any) => {
   const { isAuth, data: currentUser } = useAppSelector((state) => state.user);
@@ -25,6 +26,7 @@ export const UserBanner = ({ userData, isNotProfileData }: any) => {
 
   const [subscribers, setSubscribers] = useState<ISubscriber[]>([]);
   const [isSubscriber, setIsSubscriber] = useState(false);
+  const { showAlert } = useHeaderModal();
 
   const fetchSubscribers = async () => {
     if (!userData) return;
@@ -51,7 +53,7 @@ export const UserBanner = ({ userData, isNotProfileData }: any) => {
 
   const handlerSubscribe = async () => {
     if (!isAuth) {
-      // setOpen(true);
+      showAlert('Сначала войдите в профиль', 'warning');
       return;
     }
 
@@ -74,7 +76,11 @@ export const UserBanner = ({ userData, isNotProfileData }: any) => {
     >
       <StyledInfo>
         <StyledBannerUserName>{userData?.nickname}</StyledBannerUserName>
-        <StyledBannerUserInfo>{subscribers.length} подписчиков</StyledBannerUserInfo>
+        <StyledBannerUserInfo>
+          {subscribers.length
+            ? subscribers.length === 1 && `${subscribers.length} подписчик`
+            : `${subscribers.length} подписчиков`}
+        </StyledBannerUserInfo>
 
         {/* Показывать кнопку можно только на чужом профиле */}
         {isNotProfileData &&

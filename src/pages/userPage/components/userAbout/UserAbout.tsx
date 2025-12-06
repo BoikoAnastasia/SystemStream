@@ -18,7 +18,7 @@ export const UserAbout = ({ userData }: { userData: IProfile | null }) => {
       <StyledAboutSection>
         <StyledTitleModal>ОБО МНЕ</StyledTitleModal>
         <StyledNameComponents sx={{ padding: '0 20px' }}>
-          {userData?.profileDescription || 'Тестовое описание '}
+          {userData?.profileDescription || 'Скоро информация обо мне появится здесь! '}
         </StyledNameComponents>
       </StyledAboutSection>
       <StyledVideoSection>

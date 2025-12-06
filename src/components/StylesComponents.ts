@@ -245,6 +245,7 @@ export const StyledTab = styled(Tab)(() => ({
     boxShadow: 'var(--boxShadowButton)',
   },
 }));
+
 // modal
 export const StyleModalContent = styled(Box)(() => ({
   position: 'absolute',
@@ -579,7 +580,6 @@ export const StyledSidebarList = styled(List)({
   display: 'flex',
   flexDirection: 'column',
   gap: '6px',
-
   overflowY: 'auto',
 });
 
@@ -588,7 +588,7 @@ export const StyledSidebarListItem = styled(ListItem)({
   borderRadius: '12px',
   transition: 'all 0.25s ease',
   '&:hover': {
-    background: 'rgba(19, 21, 44, 1)',
+    background: 'rgb(61 58 108)',
   },
 });
 
@@ -621,7 +621,7 @@ export const StyledDrawer = styled(Drawer)(() => ({
     height: '100%',
     minWidth: '250px',
     padding: '25px 16px 0',
-    background: 'var(--gradient-sidebar)',
+    background: 'var(--gradient-sidebar-open)',
     paddingBottom: '200px',
   },
   '@media (max-width: 768px)': {
@@ -690,7 +690,7 @@ export const StyledInfo = styled(Box)({
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   gap: '6px',
   maxWidth: '50%',
   padding: '20px',

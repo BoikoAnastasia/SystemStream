@@ -127,6 +127,7 @@ export interface IStream {
   startedAt: string | Date;
   isLive: boolean;
 }
+
 export interface IStreamHistoryData {
   page: number;
   pageSize: number;

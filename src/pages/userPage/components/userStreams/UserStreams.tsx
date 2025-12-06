@@ -1,17 +1,22 @@
-import React from 'react';
-import { PaginationComponent } from '../../../../components/ui/pagination/PaginationComponent';
-import { IStreamHistoryData } from '../../../../types/share';
+// store
 import { fecthStreamHistory } from '../../../../store/actions/StreamsActions';
+// components
+import { PaginationComponent } from '../../../../components/ui/pagination/PaginationComponent';
+// utils
+import { formatDate, getStreamDuration } from '../../../../utils/formatDate';
+//mui
+import { CardMedia } from '@mui/material';
+// styles, types
+import { IStreamHistoryData } from '../../../../types/share';
 import {
+  CardDrawerTypography,
   StyledVideoCard,
   StyledVideoCardInfo,
   StyledVideoCardLink,
   StyledVideoGrid,
 } from '../../../../components/StylesComponents';
-import { Box, CardMedia } from '@mui/material';
 
-export const UserStreams = ({ dataStreams }: { dataStreams: IStreamHistoryData | null }) => {
-  if (!dataStreams) return <Box>Нет данных</Box>;
+export const UserStreams = ({ dataStreams }: { dataStreams: IStreamHistoryData }) => {
   const pageCurrent = Math.ceil(dataStreams.pageSize / dataStreams.totalStreams);
   return (
     <>
@@ -21,16 +26,20 @@ export const UserStreams = ({ dataStreams }: { dataStreams: IStreamHistoryData |
             <StyledVideoCardLink to="/" />
             <CardMedia component="img" height="200" image={'./img/preview/preview-01.jpg'} alt="video preview" />
             <StyledVideoCardInfo>
-              {/* <CardDrawerTypography fs={'18px'} sx={{ fontWeight: 600 }} isEllipsis={false}>
-                {item.streamName}
+              <CardDrawerTypography fs={'14px'} sx={{ fontWeight: 600 }} isEllipsis={false}>
+                {formatDate(new Date(item.startedAt), 'date')}
               </CardDrawerTypography>
               <CardDrawerTypography fs={'14px'} c={'var(--hover-header-menu)'} isEllipsis={false}>
-                {item.streamersLeague}
-              </CardDrawerTypography> */}
+                Длительность: {getStreamDuration(item.startedAt, item.endedAt)}
+              </CardDrawerTypography>
+              <CardDrawerTypography fs={'14px'} c={'var(--hover-header-menu)'} isEllipsis={false}>
+                Категории: не выбрано
+              </CardDrawerTypography>
             </StyledVideoCardInfo>
           </StyledVideoCard>
         ))}
       </StyledVideoGrid>
+
       <PaginationComponent
         count={dataStreams.page}
         pageCurrent={pageCurrent}

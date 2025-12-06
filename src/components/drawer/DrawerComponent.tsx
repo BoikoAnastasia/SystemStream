@@ -9,18 +9,22 @@ import { CardDrawer } from '../cardDrawer/CardDrawer';
 // hooks
 import { useAppSelector } from '../../hooks/redux';
 // mui
-import { Box, SvgIconTypeMap } from '@mui/material';
+import { Box, SvgIconTypeMap, Typography } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import HistoryIcon from '@mui/icons-material/History';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 // styles
 import {
+  CardDrawerTypography,
+  StyledChatTextField,
   StyledDrawer,
+  StyledNameComponents,
   StyledSidebarLink,
   StyledSidebarList,
   StyledSidebarListItem,
   StyledSidebarName,
+  StyledSpanDark,
 } from '../StylesComponents';
 // types
 import { IStreamOnline, ISubscriber } from '../../types/share';
@@ -56,7 +60,7 @@ export const DrawerComponent = () => {
   const { data } = useAppSelector((state) => state.user);
   const streams = useAppSelector(selectStreams);
   const [subscribers, setSubscribers] = useState<ISubscriber[] | null>(null);
-
+  console.log(subscribers);
   useEffect(() => {
     if (!data) return;
     const fetchSubsribers = async () => {
@@ -91,21 +95,31 @@ export const DrawerComponent = () => {
           ))}
         </StyledSidebarList>
         <StyledSidebarName>Ваши подписки:</StyledSidebarName>
-        {subscribers && (
+        {subscribers === null ? (
+          <Typography sx={{ fontSize: '16px', color: 'var(--color-link)' }}>Загрузка...</Typography>
+        ) : subscribers.length === 0 ? (
+          <Typography sx={{ fontSize: '16px', color: 'var(--color-link)' }}>У вас нет подписок</Typography>
+        ) : (
           <StyledSidebarList sx={{ height: '100%', overflowX: 'hidden', flex: 1 }}>
             {subscribers.map((card) => (
-              <StyledSidebarListItem key={card.nickname}>
+              <StyledSidebarListItem sx={{ padding: '0 !important' }} key={card.nickname}>
                 <CardDrawer card={card} />
               </StyledSidebarListItem>
             ))}
           </StyledSidebarList>
         )}
         <StyledSidebarName>Сейчас в эфире:</StyledSidebarName>
-        {(streams ?? []).map((stream: IStreamOnline) => (
-          <StyledSidebarListItem key={stream.streamId}>
-            <CardDrawer card={stream} />
-          </StyledSidebarListItem>
-        ))}
+        {streams === null ? (
+          <Typography sx={{ fontSize: '16px', color: 'var(--color-link)' }}>Загрузка...</Typography>
+        ) : streams.length === 0 ? (
+          <Typography sx={{ fontSize: '16px', color: 'var(--color-link)' }}>Сейчас нет стримов</Typography>
+        ) : (
+          (streams ?? []).map((stream: IStreamOnline) => (
+            <StyledSidebarListItem key={stream.streamId}>
+              <CardDrawer card={stream} />
+            </StyledSidebarListItem>
+          ))
+        )}
       </Box>
     </StyledDrawer>
   );

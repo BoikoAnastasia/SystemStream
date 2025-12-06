@@ -75,6 +75,7 @@ export const StyledPaginationMenu = styled(Pagination)(() => ({
     border: '1px solid transparent',
     transition: 'all 0.2s ease',
   },
+
   '& .MuiPaginationItem-root:hover': {
     backgroundColor: 'var(--background-card)',
     borderColor: 'var(--background-tab)',
