@@ -3,6 +3,7 @@ import * as signalR from '@microsoft/signalr';
 import Hls from 'hls.js';
 import { createGuestKey } from '../../utils/createGuestKey';
 import { IStream } from '../../types/share';
+import { getCookie } from '../../utils/cookieFunctions';
 
 interface UseStreamHubProps {
   nickname: string | undefined;
@@ -43,7 +44,13 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
       return;
     }
 
-    const hub = new signalR.HubConnectionBuilder().withUrl(hubUrl).withAutomaticReconnect().build();
+    // const hub = new signalR.HubConnectionBuilder().withUrl(hubUrl).withAutomaticReconnect().build();
+    const hub = new signalR.HubConnectionBuilder()
+      .withUrl(hubUrl, {
+        accessTokenFactory: () => getCookie('tokenData') ?? '',
+      })
+      .withAutomaticReconnect()
+      .build();
 
     hubRef.current = hub;
 

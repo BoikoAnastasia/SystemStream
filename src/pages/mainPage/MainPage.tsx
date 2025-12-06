@@ -283,7 +283,7 @@ export const MainPage: FC = appLayout((): JSX.Element => {
       text={'Пока нет Live стримов'}
       onRetry={fetchUserOnlineStreams}
     >
-      <SectionListVideo list={streams} key="live" />,
+      <SectionListVideo list={streams} key="live" />
     </ContentWrapperSwitch>,
     <SectionListVideo list={testStreams} key="videos" />,
     <SectionListVideo list={testStreams} key="videos" />,
