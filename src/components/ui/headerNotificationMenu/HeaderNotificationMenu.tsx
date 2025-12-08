@@ -51,7 +51,8 @@ export const HeaderNotificationMenu = () => {
     setAnchorEl(null);
   };
 
-  const handleNotificationClick = (link: string) => {
+  const handleNotificationClick = (link: string, id: number) => {
+    handleMarkAsRead(id);
     navigate(link.startsWith('/') ? link : `/${link}`);
     handleClose();
   };
@@ -99,10 +100,12 @@ export const HeaderNotificationMenu = () => {
               sx={{
                 display: 'grid',
                 gridTemplateAreas: `'icon title time check' 'icon message message check'`,
+                gridTemplateColumns: 'auto 1fr auto auto',
                 gap: '5px 10px',
+                justifyContent: 'normal',
               }}
               key={notification.id}
-              onClick={() => handleNotificationClick(notification.link || '/')}
+              onClick={() => handleNotificationClick(notification.link || '/', notification.id)}
             >
               <notification.icon sx={{ gridArea: 'icon' }} />
               <Box sx={{ gridArea: 'title' }}>{notification.title}</Box>

@@ -736,7 +736,7 @@ export const StyledSocials = styled(Box)({
   gridAutoFlow: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: '20px',
+  gap: '5px',
   width: '100%',
   padding: '0',
   '@media (max-width: 768px)': {

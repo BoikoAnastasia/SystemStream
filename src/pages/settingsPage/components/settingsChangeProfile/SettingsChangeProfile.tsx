@@ -8,28 +8,27 @@ import {
   settingBackgroundImage,
   settingProfileImage,
 } from '../../../../store/actions/SettingsActions';
+// coomponents
+import { SocialLinksEditor } from '../socialLinksEditor/SocialLinksEditor';
 // formik
-import { Formik, Form, FieldArray, Field } from 'formik';
+import { Formik, Form, Field, FieldArray } from 'formik';
 // validation
 import { validationChangeProfile } from '../../../../validation/validation';
 //hooks, context
 import { useAppSelector } from '../../../../hooks/redux';
 import { useHeaderModal } from '../../../../context/HeaderModalContext';
 // mui, style, types
-import { Box, MenuItem } from '@mui/material';
+import { Box } from '@mui/material';
 import {
   StyledFilterButton,
   StyledFollowButton,
   StyledListSettings,
   StyledNameComponents,
-  StyledScheduleFormControl,
-  StyledScheduleInputLabel,
-  StyledScheduleSelect,
   StyledTextFieldModal,
   StyledTitleH3,
   StyleListItemSettings,
 } from '../../../../components/StylesComponents';
-import { IProfileChange, ISocialLink } from '../../../../types/share';
+import { IProfileChange } from '../../../../types/share';
 
 type ProfileField = keyof IProfileChange;
 
@@ -52,16 +51,8 @@ const ListSettingsProfile: { label?: string; type: string; value: ProfileField; 
     },
   ];
 
-const ListSettingsSocial: { label?: string; value: string }[] = [
-  { label: 'Instagram', value: 'instagram' },
-  { label: 'YouTube', value: 'youtube' },
-  { label: 'Facebook', value: 'facebook' },
-  { label: 'Twitter', value: 'twitter' },
-];
-
 export const SettingsChangeProfile = () => {
   const [message, setMessage] = useState('');
-  const [selectedPlatform, setSelectedPlatform] = useState('');
   const dispatch = useDispatch<AppDispatch>();
   const { data: userData } = useAppSelector((state) => state.user);
   const { showAlert } = useHeaderModal();
@@ -79,6 +70,24 @@ export const SettingsChangeProfile = () => {
 
   const checkChangeProfile = async (values: IProfileChange, { setFieldError, setSubmitting }: any) => {
     setMessage('');
+    console.log(values.socialLinks);
+
+    // проверка на все пустые поля
+    const hasAnyValue =
+      !!values.nickname?.trim() ||
+      !!values.email?.trim() ||
+      !!values.currentPassword?.trim() ||
+      !!values.newPassword?.trim() ||
+      !!values.profileDescription?.trim() ||
+      !!values.profileImage ||
+      !!values.backgroundImage ||
+      (values.socialLinks || []).some((link) => link.url?.trim() !== '');
+
+    if (!hasAnyValue) {
+      showAlert('Нельзя отправлять пустые данные.', 'warning');
+      return;
+    }
+
     setSubmitting(true);
     try {
       // проверка никнейма
@@ -137,8 +146,6 @@ export const SettingsChangeProfile = () => {
       enableReinitialize={true}
     >
       {({ values, handleChange, handleBlur, touched, errors, resetForm, setFieldValue }) => {
-        const socialLinks = values.socialLinks || [];
-
         return (
           <Form>
             <StyledTitleH3>Изменение данных профиля</StyledTitleH3>
@@ -182,106 +189,17 @@ export const SettingsChangeProfile = () => {
             </StyledListSettings>
 
             <StyledTitleH3>Социальные сети</StyledTitleH3>
-            <StyledListSettings>
-              <FieldArray name="socialLinks">
-                {({ push, remove }) => {
-                  const freePlatforms = ListSettingsSocial.filter(
-                    (p) => !socialLinks.some((s) => s.platform === p.value)
-                  );
-
-                  return (
-                    <Box>
-                      <StyledNameComponents sx={{ display: 'block', marginBottom: '10px' }}>
-                        Добавить соцсеть
-                      </StyledNameComponents>
-                      <Box sx={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-                        <StyledScheduleFormControl sx={{ width: '100%' }}>
-                          <StyledScheduleInputLabel id="demo-simple-select-label">
-                            Выберите социальную сеть
-                          </StyledScheduleInputLabel>
-                          <StyledScheduleSelect
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={selectedPlatform}
-                            onChange={(e) => {
-                              const platform = e.target.value;
-                              if (!platform) return;
-                              push({ platform, url: '' });
-                              setSelectedPlatform('');
-                            }}
-                          >
-                            {freePlatforms.map((p) => (
-                              <MenuItem key={p.value} value={p.value}>
-                                {p.label}
-                              </MenuItem>
-                            ))}
-                          </StyledScheduleSelect>
-                        </StyledScheduleFormControl>
-                      </Box>
-
-                      <Box sx={{ marginTop: '25px' }}>
-                        {socialLinks.map((item: ISocialLink, i: number) => {
-                          const platformInfo = ListSettingsSocial.find((p) => p.value === item.platform);
-                          const fieldName = `socialLinks[${i}].url`;
-
-                          return (
-                            <Box
-                              key={i}
-                              sx={{
-                                marginBottom: '20px',
-                                padding: '15px',
-                                border: '1px solid #ddd',
-                                borderRadius: '10px',
-                              }}
-                            >
-                              <StyledNameComponents sx={{ marginBottom: '10px' }}>
-                                {platformInfo?.label}
-                              </StyledNameComponents>
-
-                              <StyledTextFieldModal
-                                name={fieldName}
-                                type="url"
-                                value={item.url}
-                                onChange={(e) => setFieldValue(fieldName, e.target.value)}
-                                onBlur={(e) => handleBlur({ ...e, target: { ...e.target, name: fieldName } } as any)}
-                                error={Boolean(
-                                  (errors as any)?.socialLinks?.[i]?.url && (touched as any)?.socialLinks?.[i]?.url
-                                )}
-                                helperText={
-                                  (errors as any)?.socialLinks?.[i]?.url && (touched as any)?.socialLinks?.[i]?.url
-                                    ? (errors as any).socialLinks[i].url
-                                    : ''
-                                }
-                                fullWidth
-                              />
-
-                              <StyledFilterButton
-                                variant="outlined"
-                                color="error"
-                                onClick={() => remove(i)}
-                                sx={{ marginTop: '10px' }}
-                              >
-                                Удалить
-                              </StyledFilterButton>
-                            </Box>
-                          );
-                        })}
-                      </Box>
-                    </Box>
-                  );
-                }}
-              </FieldArray>
-
-              {message && <Box sx={{ fontSize: '22px', mt: 2 }}>{message}</Box>}
-            </StyledListSettings>
-
+            <FieldArray name="socialLinks">
+              {(arrayHelpers) => <SocialLinksEditor arrayHelpers={arrayHelpers} />}
+            </FieldArray>
+            {message && <Box sx={{ color: 'var(--error)', fontSize: '14px', marginTop: '-10px' }}>{message}</Box>}
             <Box
               sx={{
                 display: 'flex',
                 gap: '40px',
                 justifyContent: 'flex-end',
                 alignItems: 'flex-end',
-                marginBottom: '40px',
+                margin: '40px 0',
               }}
             >
               <StyledFilterButton type="button" onClick={() => resetForm()}>
