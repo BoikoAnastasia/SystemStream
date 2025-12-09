@@ -4,7 +4,10 @@ import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../../../../hooks/redux';
 import { AppDispatch } from '../../../../store/store';
 // store
-import { fetchStreamKey, postStreamKey } from '../../../../store/actions/StreamActions';
+import { fetchStatusCurrentStream, fetchStreamKey, postStreamKey } from '../../../../store/actions/StreamActions';
+// components
+import { useHeaderModal } from '../../../../context/HeaderModalContext';
+import { SettingUpdateStream } from './SettingUpdateStream';
 // mui
 import { Box, FormControl, InputAdornment } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
@@ -15,15 +18,19 @@ import {
   StyledIconButton,
   StyledInputLabel,
   StyledOutlinedInputModal,
+  StyledSpanDark,
   StyledTitleH3,
 } from '../../../../components/StylesComponents';
+import { ILiveStatusStream } from '../../../../types/share';
 
 export const SettingsKey = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { data, isError } = useAppSelector((state) => state.settings);
+  const { showAlert } = useHeaderModal();
 
   const [showKey, setShowKey] = useState(false);
   const [streamKey, setStreamKey] = useState('');
+  const [dataCurrentStream, setDataCurrentStream] = useState<ILiveStatusStream | null>(null);
 
   const handleClickShowKey = () => setShowKey((show) => !show);
   const handleMouseDownKey = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -41,6 +48,21 @@ export const SettingsKey = () => {
       setStreamKey('');
     }
   }, [data]);
+
+  useEffect(() => {
+    const fetchStatusStream = async () => {
+      try {
+        const response = await fetchStatusCurrentStream();
+        if (!response?.success) throw new Error(response?.message);
+        else if (response.success) {
+          setDataCurrentStream(response.data);
+        }
+      } catch (error) {
+        showAlert('Не удалось получить текущий стрим', 'error');
+      }
+    };
+    fetchStatusStream();
+  }, [showAlert]);
 
   const getStreamKey = useCallback(() => {
     if (data?.streamKey) return;
@@ -90,6 +112,14 @@ export const SettingsKey = () => {
           Получить код
         </StyledFollowButton>
         <StyledFilterButton onClick={changeKey}>Сбросить</StyledFilterButton>
+      </Box>
+      <StyledTitleH3 sx={{ marginTop: '20px' }}>Изменить текущий стрим:</StyledTitleH3>
+      <Box>
+        {dataCurrentStream?.streamInfo ? (
+          <SettingUpdateStream dataCurrentStream={dataCurrentStream} showAlert={showAlert} />
+        ) : (
+          <StyledSpanDark>Стрим еще не начат</StyledSpanDark>
+        )}
       </Box>
     </>
   );

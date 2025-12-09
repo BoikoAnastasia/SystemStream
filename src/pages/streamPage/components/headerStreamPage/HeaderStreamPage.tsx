@@ -13,6 +13,9 @@ import {
 import { IStream } from '../../../../types/share';
 export const HeaderStreamPage = ({ streamInfo, viewerCount }: { streamInfo: IStream | null; viewerCount: number }) => {
   // OFFLINE состояние
+
+  console.log(streamInfo?.previewUrl, `${process.env.REACT_APP_API_LOCAL}${streamInfo?.previewUrl}`);
+
   if (!streamInfo) {
     return (
       <StyledHeaderStreamPage>

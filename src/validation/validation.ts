@@ -87,3 +87,9 @@ export const validationChangeProfile = Yup.object({
     })
   ),
 });
+
+export const validationChangeCurrentStream = Yup.object({
+  streamName: Yup.string().notRequired(),
+  previewUrl: fileImage,
+  tags: Yup.array().of(Yup.string()).notRequired(),
+});

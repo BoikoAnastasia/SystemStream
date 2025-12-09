@@ -26,6 +26,9 @@ export const StreamPage = ({
   const { isMobile } = useDeviceDetect();
   const [isOpen, setIsOpen] = useState(true);
 
+  const videoContainerFlex = isOpen && !isMobile ? '0 1 70%' : '0 1 100%';
+  const chatFlex = isOpen ? '0 1 30%' : '0 1 5%';
+
   return (
     <>
       <Box
@@ -48,7 +51,7 @@ export const StreamPage = ({
             position: 'relative',
             display: 'flex',
             flexDirection: 'column',
-            flex: isOpen && !isMobile ? '0 1 70%' : '0 1 100%',
+            flex: videoContainerFlex,
             height: '100%',
             maxHeight: '830px',
             padding: '0 10px',
@@ -58,11 +61,7 @@ export const StreamPage = ({
             transition: 'all .3s ease',
           }}
         >
-          {streamInfo ? (
-            <HeaderStreamPage streamInfo={streamInfo} viewerCount={viewerCount} />
-          ) : (
-            <HeaderStreamPage streamInfo={null} viewerCount={viewerCount} /> /* или показать placeholder */
-          )}{' '}
+          <HeaderStreamPage streamInfo={streamInfo} viewerCount={viewerCount} />
           <video
             key={streamInfo?.hlsUrl ?? 'no-stream'}
             ref={videoRef}
@@ -80,7 +79,7 @@ export const StreamPage = ({
         <Box
           sx={{
             display: isMobile ? 'none' : 'block',
-            flex: isOpen ? '0 1 30%' : '0 1 5%',
+            flex: chatFlex,
             height: '100%',
             maxHeight: '636px',
             transition: 'all .3s ease',

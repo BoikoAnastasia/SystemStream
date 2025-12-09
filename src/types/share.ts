@@ -121,7 +121,7 @@ export interface IStream {
   streamerName: string;
   streamerId: number;
   tags: Array<string>;
-  previewUrl: string;
+  previewUrl: string | null;
   hlsUrl: string;
   totalViews: number;
   startedAt: string | Date;
@@ -141,6 +141,28 @@ export interface IStreamHistory {
   endedAt: string;
   hasRecord: boolean;
   recordPath: string;
+  streamName: string;
+  categoryName: string | null;
+  tags: Array<string>;
+}
+export interface IUpdateStream {
+  streamName?: string | null;
+  previewUrl?: string | null;
+  tags?: Array<string> | null;
+}
+
+type StreamInfo = {
+  [K in keyof IStream]: IStream[K];
+};
+
+export interface ILiveStatusStream {
+  isStreaming: boolean;
+  streamInfo:
+    | (StreamInfo & {
+        title: string;
+        endedAt: string | null;
+      })
+    | null;
 }
 
 export interface INotificationBase {

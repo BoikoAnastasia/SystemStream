@@ -32,7 +32,7 @@ import { IProfileChange } from '../../../../types/share';
 
 type ProfileField = keyof IProfileChange;
 
-const ListSettingsProfile: { label?: string; type: string; value: ProfileField; title: string; disabled?: boolean }[] =
+const listSettingsProfile: { label?: string; type: string; value: ProfileField; title: string; disabled?: boolean }[] =
   [
     { type: 'field', label: 'Введите ник', value: 'nickname', title: 'Изменить ник:' },
     { type: 'field', label: 'Введите почту', value: 'email', title: 'Изменить почту:' },
@@ -70,8 +70,6 @@ export const SettingsChangeProfile = () => {
 
   const checkChangeProfile = async (values: IProfileChange, { setFieldError, setSubmitting }: any) => {
     setMessage('');
-    console.log(values.socialLinks);
-
     // проверка на все пустые поля
     const hasAnyValue =
       !!values.nickname?.trim() ||
@@ -150,7 +148,7 @@ export const SettingsChangeProfile = () => {
           <Form>
             <StyledTitleH3>Изменение данных профиля</StyledTitleH3>
             <StyledListSettings>
-              {ListSettingsProfile.map((item) => (
+              {listSettingsProfile.map((item) => (
                 <StyleListItemSettings key={item.value}>
                   <StyledNameComponents sx={{ display: 'block', marginBottom: '10px' }}>
                     {item.title}

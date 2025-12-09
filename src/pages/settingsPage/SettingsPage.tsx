@@ -2,7 +2,7 @@ import { ComponentType, FC, JSX, useEffect, useState } from 'react';
 // components
 import { settingLayout } from '../../layout/SettingLayout';
 import { SettingsChangeProfile } from './components/settingsChangeProfile/SettingsChangeProfile';
-import { SettingsKey } from './components/settingsKey/SettingsKey';
+import { SettingsKey } from './components/settingsStream/SettingsStream';
 // hooks
 import { useDeviceDetect } from '../../hooks/useDeviceDetect';
 // mui
@@ -15,7 +15,7 @@ interface IListSettings {
 }
 const itemsList: IListSettings[] = [
   {
-    value: 'key',
+    value: 'profile',
     title: 'Настройки профиля',
     component: SettingsChangeProfile,
   },

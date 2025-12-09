@@ -17,7 +17,9 @@ import {
 } from '../../../../components/StylesComponents';
 
 export const UserStreams = ({ dataStreams }: { dataStreams: IStreamHistoryData }) => {
-  const pageCurrent = Math.ceil(dataStreams.pageSize / dataStreams.totalStreams);
+  const totalPages = Math.ceil(dataStreams.totalStreams / dataStreams.pageSize);
+  const pageCurrent = dataStreams.page;
+
   return (
     <>
       <StyledVideoGrid>
@@ -26,14 +28,17 @@ export const UserStreams = ({ dataStreams }: { dataStreams: IStreamHistoryData }
             <StyledVideoCardLink to="/" />
             <CardMedia component="img" height="200" image={'./img/preview/preview-01.jpg'} alt="video preview" />
             <StyledVideoCardInfo>
-              <CardDrawerTypography fs={'14px'} sx={{ fontWeight: 600 }} isEllipsis={false}>
+              <CardDrawerTypography fs={'16px'} sx={{ fontWeight: 500 }} isEllipsis={false}>
+                {item.streamName}
+              </CardDrawerTypography>
+              <CardDrawerTypography fs={'14px'} isEllipsis={false}>
                 {formatDate(new Date(item.startedAt), 'date')}
               </CardDrawerTypography>
               <CardDrawerTypography fs={'14px'} c={'var(--hover-header-menu)'} isEllipsis={false}>
                 Длительность: {getStreamDuration(item.startedAt, item.endedAt)}
               </CardDrawerTypography>
               <CardDrawerTypography fs={'14px'} c={'var(--hover-header-menu)'} isEllipsis={false}>
-                Категории: не выбрано
+                {item.categoryName && `Категория: ${item.categoryName}`}
               </CardDrawerTypography>
             </StyledVideoCardInfo>
           </StyledVideoCard>
@@ -41,7 +46,7 @@ export const UserStreams = ({ dataStreams }: { dataStreams: IStreamHistoryData }
       </StyledVideoGrid>
 
       <PaginationComponent
-        count={dataStreams.page}
+        count={totalPages}
         pageCurrent={pageCurrent}
         isSmall={false}
         functionDispatch={() => fecthStreamHistory('')}

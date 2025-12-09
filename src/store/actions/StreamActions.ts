@@ -4,6 +4,8 @@ import { SettingsSlice } from '../slices/SettingsSlice';
 import { StreamSlice } from '../slices/StreamSlice';
 // utils
 import { getCookie } from '../../utils/cookieFunctions';
+import { handleApiRequest } from '../../utils/handleApiRequest';
+import { IUpdateStream } from '../../types/share';
 
 const { SettingsSliceFetch, SettingsSliceError, SettingsSliceSuccess } = SettingsSlice.actions;
 const { StreamSliceError, StreamSliceFetch, StreamSliceSuccess } = StreamSlice.actions;
@@ -74,4 +76,31 @@ export const fetchStreamView = (nickname: string) => async (dispatch: AppDispatc
   } catch (error) {
     dispatch(StreamSliceError(error));
   }
+};
+
+// get stream status
+export const fetchStatusCurrentStream = async () => {
+  const token = getCookie('tokenData');
+  if (!token) return { success: false, message: 'Вы не авторизованы' };
+  return handleApiRequest(`${process.env.REACT_APP_API_STREAM}/status`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+// update stream info
+export const updateCurrentStream = async (values: IUpdateStream) => {
+  const token = getCookie('tokenData');
+  if (!token) return { success: false, message: 'Вы не авторизованы' };
+  return handleApiRequest(`${process.env.REACT_APP_API_STREAM}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ values }),
+  });
 };
