@@ -101,6 +101,6 @@ export const updateCurrentStream = async (values: IUpdateStream) => {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ values }),
+    body: JSON.stringify(values),
   });
 };

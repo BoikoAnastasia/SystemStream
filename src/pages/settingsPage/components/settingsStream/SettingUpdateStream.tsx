@@ -54,8 +54,9 @@ export const SettingUpdateStream = ({
   const initialValues: IUpdateStream = {
     streamName: streamInfo ? streamInfo.streamName : '',
     previewUrl: streamInfo ? streamInfo.previewUrl : null,
-    tags: streamInfo ? streamInfo.tags : [],
+    tags: chipData.map((chip) => chip.label),
   };
+  // TODO fix clear dubs tags
 
   const addNewChip = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' && newChip.trim() !== '') {
