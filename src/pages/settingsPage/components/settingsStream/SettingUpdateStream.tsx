@@ -64,10 +64,13 @@ export const SettingUpdateStream = ({
       const isDuplicate = chipData.some(
         (chip) => chip.label.toLocaleLowerCase() === newChip.trim().toLocaleLowerCase()
       );
+
       if (isDuplicate) {
         showAlert('Такой тег уже добавлен', 'warning');
+        setNewChip('');
         return;
       }
+
       const newChipObject = { key: Date.now().toString(), label: newChip.trim() };
       setChipData((prev) => [...prev, newChipObject]);
       setNewChip('');
@@ -88,7 +91,12 @@ export const SettingUpdateStream = ({
     setSubmitting(true);
 
     try {
-      const valuesToSubmit = { ...values, tags: chipData.map((chip) => chip.label) };
+      const valuesToSubmit = {
+        streamName: values.streamName,
+        category: values.category,
+        previewUrl: values.previewUrl,
+        tags: chipData.map((chip) => chip.label),
+      };
       console.log(valuesToSubmit);
       const changeStreamData = await updateCurrentStream(valuesToSubmit);
       if (!changeStreamData?.success) {
