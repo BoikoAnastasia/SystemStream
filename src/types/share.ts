@@ -121,7 +121,7 @@ export interface IStream {
   streamerName: string;
   streamerId: number;
   tags: Array<string>;
-  previewUrl: string | null;
+  previewUrl: File | null;
   hlsUrl: string;
   totalViews: number;
   startedAt: string | Date;
@@ -147,7 +147,8 @@ export interface IStreamHistory {
 }
 export interface IUpdateStream {
   streamName?: string | null;
-  previewUrl?: string | null;
+  category?: string | null;
+  previewUrl?: File | null | undefined;
   tags?: Array<string> | null;
 }
 
@@ -291,4 +292,10 @@ export interface IChatMessage {
   role: string;
   timestamp: string;
   offsetSeconds: number;
+}
+
+// Settings
+export interface IChip {
+  key: string;
+  label: string;
 }

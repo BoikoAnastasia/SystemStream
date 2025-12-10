@@ -3,7 +3,8 @@ import { Field, Form, Formik } from 'formik';
 // store
 import { updateCurrentStream } from '../../../../store/actions/StreamActions';
 // mui
-import { Box } from '@mui/material';
+import { Box, Chip, Paper, Stack } from '@mui/material';
+import TagFacesIcon from '@mui/icons-material/TagFaces';
 // validation
 import { validationChangeCurrentStream } from '../../../../validation/validation';
 // style, type
@@ -12,40 +13,69 @@ import {
   StyledFollowButton,
   StyledListSettings,
   StyledNameComponents,
+  StyledSpanDark,
   StyledTextFieldModal,
-  StyledTitleH3,
   StyleListItemSettings,
 } from '../../../../components/StylesComponents';
-import { AlertType, ILiveStatusStream, IUpdateStream } from '../../../../types/share';
+import { AlertType, IChip, ILiveStatusStream, IUpdateStream } from '../../../../types/share';
 
-// todo Tags = chip
+type StreamField = keyof IUpdateStream;
+
 export const SettingUpdateStream = ({
   dataCurrentStream,
   showAlert,
+  chipData,
+  setChipData,
+  newChip,
+  setNewChip,
 }: {
   dataCurrentStream: ILiveStatusStream;
   showAlert: (message: string, type?: AlertType) => void;
+  chipData: IChip[];
+  setChipData: React.Dispatch<React.SetStateAction<IChip[]>>;
+  newChip: string;
+  setNewChip: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   if (!dataCurrentStream.streamInfo) return <Box>Стрим еще не начат</Box>;
   const streamInfo = dataCurrentStream.streamInfo;
 
-  type ProfileField = keyof IUpdateStream;
-
-  const listSettingsStream: { label?: string; type: string; value: ProfileField; title: string; disabled?: boolean }[] =
+  const listSettingsStream: { label?: string; type: string; value: StreamField; title: string; disabled?: boolean }[] =
     [
       { type: 'field', label: 'Введите название стрима', value: 'streamName', title: 'Изменить название:' },
+      { type: 'field', label: 'Выберите категорию видео', value: 'category', title: 'Добавьте категорию' },
+      { type: 'chip', label: 'Добавьте тег', value: 'tags', title: 'Добавьте теги стрима' },
       {
         type: 'file',
         value: 'previewUrl',
         title: 'Загрузить превью стрима:',
       },
-      { type: 'field', label: 'Добавьте тег', value: 'tags', title: 'Добавьте теги стрима' },
     ];
 
   const initialValues: IUpdateStream = {
     streamName: streamInfo ? streamInfo.streamName : '',
-    previewUrl: streamInfo ? streamInfo.previewUrl : '',
+    previewUrl: streamInfo ? streamInfo.previewUrl : null,
     tags: streamInfo ? streamInfo.tags : [],
+  };
+
+  const addNewChip = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' && newChip.trim() !== '') {
+      e.preventDefault();
+
+      const isDuplicate = chipData.some(
+        (chip) => chip.label.toLocaleLowerCase() === newChip.trim().toLocaleLowerCase()
+      );
+      if (isDuplicate) {
+        showAlert('Такой тег уже добавлен', 'warning');
+        return;
+      }
+      const newChipObject = { key: Date.now().toString(), label: newChip.trim() };
+      setChipData((prev) => [...prev, newChipObject]);
+      setNewChip('');
+    }
+  };
+
+  const handleDelete = (chipToDelete: IChip) => () => {
+    setChipData((chips) => chips.filter((chip) => chip.key !== chipToDelete.key));
   };
 
   const checkChangeStream = async (values: IUpdateStream, { setFieldError, setSubmitting }: any) => {
@@ -58,7 +88,9 @@ export const SettingUpdateStream = ({
     setSubmitting(true);
 
     try {
-      const changeStreamData = await updateCurrentStream(values);
+      const valuesToSubmit = { ...values, tags: chipData.map((chip) => chip.label) };
+      console.log(valuesToSubmit);
+      const changeStreamData = await updateCurrentStream(valuesToSubmit);
       if (!changeStreamData?.success) {
         throw new Error(changeStreamData?.message);
       }
@@ -80,7 +112,6 @@ export const SettingUpdateStream = ({
       {({ values, handleChange, handleBlur, touched, errors, resetForm, setFieldValue }) => {
         return (
           <Form>
-            <StyledTitleH3>Изменение данных профиля</StyledTitleH3>
             <StyledListSettings>
               {listSettingsStream.map((item) => (
                 <StyleListItemSettings key={item.value}>
@@ -97,6 +128,41 @@ export const SettingUpdateStream = ({
                       helperText={touched[item.value] && errors[item.value]}
                       name={item.value}
                     />
+                  ) : item.type === 'chip' ? (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                      <StyledSpanDark>Вы можете добавить до 5 тегов, они будут отображаться на стриме.</StyledSpanDark>
+                      <StyledTextFieldModal
+                        label={item.label}
+                        onChange={(e) => setNewChip(e.target.value)}
+                        disabled={chipData.length >= 5}
+                        onKeyDown={(e) => addNewChip(e)}
+                        onBlur={handleBlur}
+                        value={newChip}
+                      />
+                      <Paper sx={{ display: 'flex', background: 'transparent' }} component="ul">
+                        {chipData &&
+                          chipData.map((data) => {
+                            let icon;
+                            if (data.label === 'React') {
+                              icon = <TagFacesIcon />;
+                            }
+                            return (
+                              <Stack direction="row" spacing={1}>
+                                <Chip
+                                  icon={icon}
+                                  label={data.label}
+                                  onDelete={data.label === 'React' ? undefined : handleDelete(data)}
+                                  variant="outlined"
+                                  sx={{
+                                    color: 'white',
+                                    '& .MuiChip-deleteIcon': { color: 'white', '&:hover': { color: 'grey' } },
+                                  }}
+                                />
+                              </Stack>
+                            );
+                          })}
+                      </Paper>
+                    </Box>
                   ) : (
                     <Field name={item.value}>
                       {({ form }: any) => (

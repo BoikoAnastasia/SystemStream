@@ -22,7 +22,7 @@ export const UserStreams = ({ dataStreams }: { dataStreams: IStreamHistoryData }
 
   return (
     <>
-      <StyledVideoGrid>
+      <StyledVideoGrid sx={{ marginBottom: '20px' }}>
         {(dataStreams.streams ?? []).map((item) => (
           <StyledVideoCard key={item.id}>
             <StyledVideoCardLink to="/" />
@@ -34,9 +34,11 @@ export const UserStreams = ({ dataStreams }: { dataStreams: IStreamHistoryData }
               <CardDrawerTypography fs={'14px'} isEllipsis={false}>
                 {formatDate(new Date(item.startedAt), 'date')}
               </CardDrawerTypography>
-              <CardDrawerTypography fs={'14px'} c={'var(--hover-header-menu)'} isEllipsis={false}>
-                Длительность: {getStreamDuration(item.startedAt, item.endedAt)}
-              </CardDrawerTypography>
+              {item?.endedAt && (
+                <CardDrawerTypography fs={'14px'} c={'var(--hover-header-menu)'} isEllipsis={false}>
+                  Длительность: {getStreamDuration(item.startedAt, item.endedAt)}
+                </CardDrawerTypography>
+              )}
               <CardDrawerTypography fs={'14px'} c={'var(--hover-header-menu)'} isEllipsis={false}>
                 {item.categoryName && `Категория: ${item.categoryName}`}
               </CardDrawerTypography>

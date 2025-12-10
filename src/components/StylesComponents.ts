@@ -270,7 +270,6 @@ export const StyledTextFieldModal = styled(TextField)(() => ({
   '& .MuiOutlinedInput-input': {
     color: 'var(--white) !important',
     caretColor: 'var(--white)',
-
     '&:-webkit-autofill': {
       WebkitBoxShadow: '0 0 0 100px var(--background) inset !important',
       WebkitTextFillColor: 'var(--white) !important',
@@ -298,6 +297,15 @@ export const StyledTextFieldModal = styled(TextField)(() => ({
     '&.Mui-focused': {
       color: 'var(--white)',
     },
+    '&.Mui-disabled': {
+      color: 'var(--background-line)',
+    },
+    '&.Mui-error': {
+      color: 'var(--error)',
+    },
+  },
+  '&:hover .MuiInputLabel-root': {
+    color: 'var(--white)',
   },
 
   '& .MuiOutlinedInput-notchedOutline': {
@@ -309,6 +317,9 @@ export const StyledTextFieldModal = styled(TextField)(() => ({
   },
   '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
     borderColor: 'var(--white)',
+  },
+  '& .MuiOutlinedInput-root.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+    borderColor: 'var(--background-line)',
   },
 }));
 

@@ -21,7 +21,7 @@ import {
   StyledSpanDark,
   StyledTitleH3,
 } from '../../../../components/StylesComponents';
-import { ILiveStatusStream } from '../../../../types/share';
+import { IChip, ILiveStatusStream } from '../../../../types/share';
 
 export const SettingsKey = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -30,7 +30,36 @@ export const SettingsKey = () => {
 
   const [showKey, setShowKey] = useState(false);
   const [streamKey, setStreamKey] = useState('');
+  const [chipData, setChipData] = useState<Array<IChip>>([]);
+  const [newChip, setNewChip] = useState('');
   const [dataCurrentStream, setDataCurrentStream] = useState<ILiveStatusStream | null>(null);
+  // {
+  //   isStreaming: true,
+  //   streamInfo: {
+  //     streamId: 1,
+  //     streamName: 'Разработка игр на Unity с нуля',
+  //     streamerName: 'GameDevPro',
+  //     streamerId: 101,
+  //     tags: ['fsdf', 'sdfsdfdf'],
+  //     previewUrl: null,
+  //     hlsUrl: 'https://example.com/hls/stream1.m3u8',
+  //     totalViews: 12800,
+  //     startedAt: '2024-01-15T18:30:00Z',
+  //     isLive: true,
+  //     title: 'Unity Game Development Tutorial - Part 1',
+  //     endedAt: null,
+  //   },
+  // }
+
+  useEffect(() => {
+    if (dataCurrentStream?.streamInfo?.tags) {
+      const mappedChips = dataCurrentStream?.streamInfo?.tags.map((tag, index) => ({
+        key: `${index}-${tag}`,
+        label: tag,
+      }));
+      setChipData(mappedChips);
+    }
+  }, [dataCurrentStream]);
 
   const handleClickShowKey = () => setShowKey((show) => !show);
   const handleMouseDownKey = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -113,10 +142,17 @@ export const SettingsKey = () => {
         </StyledFollowButton>
         <StyledFilterButton onClick={changeKey}>Сбросить</StyledFilterButton>
       </Box>
-      <StyledTitleH3 sx={{ marginTop: '20px' }}>Изменить текущий стрим:</StyledTitleH3>
+      <StyledTitleH3 sx={{ margin: '20px 0 10px' }}>Изменить текущий стрим:</StyledTitleH3>
       <Box>
         {dataCurrentStream?.streamInfo ? (
-          <SettingUpdateStream dataCurrentStream={dataCurrentStream} showAlert={showAlert} />
+          <SettingUpdateStream
+            chipData={chipData}
+            setChipData={setChipData}
+            newChip={newChip}
+            setNewChip={setNewChip}
+            dataCurrentStream={dataCurrentStream}
+            showAlert={showAlert}
+          />
         ) : (
           <StyledSpanDark>Стрим еще не начат</StyledSpanDark>
         )}
