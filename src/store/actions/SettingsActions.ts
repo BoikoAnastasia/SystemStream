@@ -14,7 +14,7 @@ export const changeProfileData = (data: FormData) => async (dispatch: AppDispatc
   return handleApiRequest(
     `${process.env.REACT_APP_API_SETTINGS}/profile`,
     {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -31,7 +31,7 @@ export const postStreamKey = () => async (dispatch: AppDispatch) => {
     const token = getCookie('tokenData');
     if (!token) return;
     const response = await fetch(`${process.env.REACT_APP_API_SETTINGS}/streamKey`, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -54,7 +54,7 @@ export const updateCurrentStream = async (values: FormData) => {
   const token = getCookie('tokenData');
   if (!token) return { success: false, message: 'Вы не авторизованы' };
   return handleApiRequest(`${process.env.REACT_APP_API_SETTINGS}`, {
-    method: 'POST',
+    method: 'PUT',
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -68,8 +68,8 @@ export const fetchCategory = async (search?: string) => {
   if (!token) return { success: false, message: 'Вы не авторизованы' };
 
   const url = search
-    ? `${process.env.REACT_APP_API_SETTINGS}/categories?search=${encodeURIComponent(search)}`
-    : `${process.env.REACT_APP_API_SETTINGS}/categories`;
+    ? `${process.env.REACT_APP_API_SETTINGS}/categories?search=${encodeURIComponent(search)}&page=1&pageSize=20`
+    : `${process.env.REACT_APP_API_SETTINGS}//categories?page=1&pageSize=20`;
 
   try {
     const response = await fetch(url, {
@@ -78,6 +78,8 @@ export const fetchCategory = async (search?: string) => {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    console.log('fetchCategory', response);
 
     if (!response.ok) {
       const text = await response.text(); // читаем HTML или текст ошибки
