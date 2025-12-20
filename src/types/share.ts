@@ -126,6 +126,7 @@ export interface IStream {
   totalViews: number;
   startedAt: string | Date;
   isLive: boolean;
+  categoryId?: number;
 }
 
 export interface IStreamHistoryData {
@@ -145,9 +146,10 @@ export interface IStreamHistory {
   categoryName: string | null;
   tags: Array<string>;
 }
+
 export interface IUpdateStream {
   streamName?: string | null;
-  category?: string | null;
+  category: number | null;
   previewUrl?: File | null | undefined;
   tags?: Array<string> | null;
 }
@@ -276,6 +278,9 @@ export interface StyledButtonSearchProps {
 export interface StyledAlertMessageProps {
   type?: string;
 }
+export interface StyledDragBoxProps {
+  dragActive?: boolean;
+}
 
 export interface IUser {
   id: string;
@@ -298,4 +303,10 @@ export interface IChatMessage {
 export interface IChip {
   key: string;
   label: string;
+}
+
+export interface ICategories {
+  id: number;
+  name: string;
+  bannerImageUrl: string | null;
 }

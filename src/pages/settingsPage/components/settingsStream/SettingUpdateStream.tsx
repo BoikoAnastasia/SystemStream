@@ -1,13 +1,16 @@
+// components
+import { ComboBox } from '../../../../components/ui/comboBox/ComboBox';
+import { FileInputField } from '../../../../components/ui/fileInputField/FileInputField';
 // formik
-import { Field, Form, Formik } from 'formik';
+import { Form, Formik } from 'formik';
 // store
-import { updateCurrentStream } from '../../../../store/actions/StreamActions';
+import { updateCurrentStream } from '../../../../store/actions/SettingsActions';
 // mui
 import { Box, Chip, Paper, Stack } from '@mui/material';
 import TagFacesIcon from '@mui/icons-material/TagFaces';
 // validation
 import { validationChangeCurrentStream } from '../../../../validation/validation';
-// style, type
+// styles, type
 import {
   StyledFilterButton,
   StyledFollowButton,
@@ -17,7 +20,8 @@ import {
   StyledTextFieldModal,
   StyleListItemSettings,
 } from '../../../../components/StylesComponents';
-import { AlertType, IChip, ILiveStatusStream, IUpdateStream } from '../../../../types/share';
+import { AlertType, ICategories, IChip, ILiveStatusStream, IUpdateStream } from '../../../../types/share';
+import { useId } from 'react';
 
 type StreamField = keyof IUpdateStream;
 
@@ -28,21 +32,23 @@ export const SettingUpdateStream = ({
   setChipData,
   newChip,
   setNewChip,
+  categoryData,
 }: {
-  dataCurrentStream: ILiveStatusStream;
+  dataCurrentStream: ILiveStatusStream | null;
   showAlert: (message: string, type?: AlertType) => void;
   chipData: IChip[];
   setChipData: React.Dispatch<React.SetStateAction<IChip[]>>;
   newChip: string;
   setNewChip: React.Dispatch<React.SetStateAction<string>>;
+  categoryData: ICategories[];
 }) => {
-  if (!dataCurrentStream.streamInfo) return <Box>Стрим еще не начат</Box>;
-  const streamInfo = dataCurrentStream.streamInfo;
+  const streamInfo = dataCurrentStream?.streamInfo || null;
+  const id = useId();
 
   const listSettingsStream: { label?: string; type: string; value: StreamField; title: string; disabled?: boolean }[] =
     [
       { type: 'field', label: 'Введите название стрима', value: 'streamName', title: 'Изменить название:' },
-      { type: 'field', label: 'Выберите категорию видео', value: 'category', title: 'Добавьте категорию' },
+      { type: 'combobox', label: 'Выберите категорию видео', value: 'category', title: 'Добавьте категорию' },
       { type: 'chip', label: 'Добавьте тег', value: 'tags', title: 'Добавьте теги стрима' },
       {
         type: 'file',
@@ -55,6 +61,7 @@ export const SettingUpdateStream = ({
     streamName: streamInfo ? streamInfo.streamName : '',
     previewUrl: streamInfo ? streamInfo.previewUrl : null,
     tags: chipData.map((chip) => chip.label),
+    category: streamInfo?.categoryId ?? null,
   };
   // TODO fix clear dubs tags
 
@@ -72,14 +79,16 @@ export const SettingUpdateStream = ({
         return;
       }
 
-      const newChipObject = { key: Date.now().toString(), label: newChip.trim() };
+      const newChipObject = { key: `${id}-${Date.now()}`, label: newChip.trim() };
       setChipData((prev) => [...prev, newChipObject]);
       setNewChip('');
     }
   };
 
   const handleDelete = (chipToDelete: IChip) => () => {
-    setChipData((chips) => chips.filter((chip) => chip.key !== chipToDelete.key));
+    setChipData((chips) =>
+      chips.filter((chip) => chip.label.trim().toLocaleLowerCase() !== chipToDelete.label.trim().toLocaleLowerCase())
+    );
   };
 
   const checkChangeStream = async (values: IUpdateStream, { setFieldError, setSubmitting }: any) => {
@@ -90,16 +99,18 @@ export const SettingUpdateStream = ({
       return;
     }
     setSubmitting(true);
-
+    const formData = new FormData();
     try {
-      const valuesToSubmit = {
-        streamName: values.streamName,
-        category: values.category,
-        previewUrl: values.previewUrl,
-        tags: chipData.map((chip) => chip.label),
-      };
-      console.log(valuesToSubmit);
-      const changeStreamData = await updateCurrentStream(valuesToSubmit);
+      if (values.streamName) formData.append('StreamName', values.streamName);
+      if (values.category) formData.append('СategoryId', values.category.toString());
+      if (values.previewUrl) formData.append('PreviewImage', values.previewUrl);
+      if (values.tags) {
+        const tags = chipData.map((chip) => chip.label);
+        formData.append('Tags', JSON.stringify(tags));
+      }
+      console.log('formData - settings', formData);
+
+      const changeStreamData = await updateCurrentStream(formData);
       if (!changeStreamData?.success) {
         throw new Error(changeStreamData?.message);
       }
@@ -137,8 +148,16 @@ export const SettingUpdateStream = ({
                       helperText={touched[item.value] && errors[item.value]}
                       name={item.value}
                     />
+                  ) : item.type === 'combobox' ? (
+                    <ComboBox
+                      key={values.category}
+                      options={categoryData}
+                      value={values.category}
+                      name="category"
+                      setFieldValue={setFieldValue}
+                    />
                   ) : item.type === 'chip' ? (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '15px', width: '100%' }}>
                       <StyledSpanDark>Вы можете добавить до 5 тегов, они будут отображаться на стриме.</StyledSpanDark>
                       <StyledTextFieldModal
                         label={item.label}
@@ -156,7 +175,7 @@ export const SettingUpdateStream = ({
                               icon = <TagFacesIcon />;
                             }
                             return (
-                              <Stack direction="row" spacing={1}>
+                              <Stack key={data.key} direction="row" spacing={1}>
                                 <Chip
                                   icon={icon}
                                   label={data.label}
@@ -173,23 +192,14 @@ export const SettingUpdateStream = ({
                       </Paper>
                     </Box>
                   ) : (
-                    <Field name={item.value}>
-                      {({ form }: any) => (
-                        <>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(event) => {
-                              form.setFieldValue(item.value, event.currentTarget.files?.[0] || null);
-                            }}
-                            disabled={item.disabled || false}
-                          />
-                          {form.touched[item.value] && form.errors[item.value] && (
-                            <div style={{ color: 'red', fontSize: '12px' }}>{form.errors[item.value]}</div>
-                          )}
-                        </>
-                      )}
-                    </Field>
+                    <FileInputField
+                      item={item}
+                      value={values[item.value] as File | null}
+                      setFieldValue={setFieldValue}
+                      touched={touched[item.value]}
+                      error={errors[item.value]}
+                      disabled={item.disabled}
+                    />
                   )}
                 </StyleListItemSettings>
               ))}

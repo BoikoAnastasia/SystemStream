@@ -106,7 +106,7 @@ export const SocialLinksEditor = ({ arrayHelpers }: SocialLinksEditorProps) => {
       </Box>
       {/* Список соцсетей */}
       <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <StyledSpanDark>Ваши добавленные ссылки:</StyledSpanDark>
+        {socialLinks.length > 0 && <StyledSpanDark>Ваши добавленные ссылки:</StyledSpanDark>}
         {socialLinks.map((link: ISocialLink, i: number) => {
           // Редактирование
           if (editingIndex === i) {

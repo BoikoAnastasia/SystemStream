@@ -3,15 +3,12 @@ import { useDispatch } from 'react-redux';
 // store
 import { AppDispatch } from '../../../../store/store';
 import { checkExistEmail, checkExistNickname } from '../../../../store/actions/UserActions';
-import {
-  changeProfileData,
-  settingBackgroundImage,
-  settingProfileImage,
-} from '../../../../store/actions/SettingsActions';
+import { changeProfileData } from '../../../../store/actions/SettingsActions';
 // coomponents
 import { SocialLinksEditor } from '../socialLinksEditor/SocialLinksEditor';
+import { FileInputField } from '../../../../components/ui/fileInputField/FileInputField';
 // formik
-import { Formik, Form, Field, FieldArray } from 'formik';
+import { Formik, Form, FieldArray } from 'formik';
 // validation
 import { validationChangeProfile } from '../../../../validation/validation';
 //hooks, context
@@ -87,6 +84,7 @@ export const SettingsChangeProfile = () => {
     }
 
     setSubmitting(true);
+    const formData = new FormData();
     try {
       // проверка никнейма
       if (values.nickname) {
@@ -108,26 +106,30 @@ export const SettingsChangeProfile = () => {
         }
       }
 
-      // фильтруем пустые соцсети
-      const profileData = {
-        ...values,
-        socialLinks: (values.socialLinks || []).filter((link) => link.url && link.url.trim() !== ''),
-      };
-      delete profileData.backgroundImage;
-      delete profileData.profileImage;
+      if (values.nickname) formData.append('Nickname', values.nickname);
+      if (values.email) formData.append('Email', values.email);
+      if (values.currentPassword) formData.append('CurrentPassword', values.currentPassword);
+      if (values.newPassword) formData.append('NewPassword', values.newPassword);
+      if (values.profileDescription) {
+        formData.append('ProfileDescription', values.profileDescription);
+      }
+      // файлы
+      if (values.profileImage) {
+        formData.append('ProfileImage', values.profileImage);
+      }
+      if (values.backgroundImage) {
+        formData.append('BackgroundImage', values.backgroundImage);
+      }
 
-      const changeProfileResult = await dispatch(changeProfileData(profileData));
+      const filteredSocialLinks = (values.socialLinks || []).filter((link) => link.url && link.url.trim() !== '');
+
+      formData.append('SocialLinks', JSON.stringify(filteredSocialLinks));
+      console.log('formData - profile', formData);
+      const changeProfileResult = await dispatch(changeProfileData(formData));
       if (!changeProfileResult.success) {
         throw new Error(changeProfileResult.message);
       }
 
-      if (values.profileImage) {
-        dispatch(settingProfileImage(values.profileImage));
-      }
-
-      if (values.backgroundImage) {
-        dispatch(settingBackgroundImage(values.backgroundImage));
-      }
       showAlert('Профиль обновлен.', 'success');
     } catch (error: any) {
       showAlert('Произошла ошибка.', 'error');
@@ -164,23 +166,14 @@ export const SettingsChangeProfile = () => {
                       name={item.value}
                     />
                   ) : (
-                    <Field name={item.value}>
-                      {({ form }: any) => (
-                        <>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(event) => {
-                              form.setFieldValue(item.value, event.currentTarget.files?.[0] || null);
-                            }}
-                            disabled={item.disabled || false}
-                          />
-                          {form.touched[item.value] && form.errors[item.value] && (
-                            <div style={{ color: 'red', fontSize: '12px' }}>{form.errors[item.value]}</div>
-                          )}
-                        </>
-                      )}
-                    </Field>
+                    <FileInputField
+                      item={item}
+                      value={values[item.value] as File | null}
+                      setFieldValue={setFieldValue}
+                      touched={touched[item.value]}
+                      error={errors[item.value]}
+                      disabled={item.disabled}
+                    />
                   )}
                 </StyleListItemSettings>
               ))}

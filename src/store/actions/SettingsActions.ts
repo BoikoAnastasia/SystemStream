@@ -3,66 +3,82 @@ import { AppDispatch } from '../store';
 import { userProfile } from './UserActions';
 import { getCookie } from '../../utils/cookieFunctions';
 // types
-import { IProfileChange } from '../../types/share';
 import { handleApiRequest } from '../../utils/handleApiRequest';
+import { SettingsSlice } from '../slices/SettingsSlice';
 
-export const changeProfileData = (data: IProfileChange) => async (dispatch: AppDispatch) => {
+const { SettingsSliceFetch, SettingsSliceError, SettingsSliceSuccess } = SettingsSlice.actions;
+
+export const changeProfileData = (data: FormData) => async (dispatch: AppDispatch) => {
   const token = getCookie('tokenData');
   if (!token) return { success: false, message: 'Вы не авторизованы' };
   return handleApiRequest(
-    `${process.env.REACT_APP_API_USER}/profile`,
+    `${process.env.REACT_APP_API_SETTINGS}/profile`,
     {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(data),
+      body: data,
     },
     dispatch,
     () => dispatch(userProfile())
   );
 };
 
-export const settingProfileImage = (image: File) => async (dispatch: AppDispatch) => {
-  const token = getCookie('tokenData');
-  if (!token) return { success: false, message: 'Вы не авторизованы' };
-  if (!image) return { success: false, message: 'Изображение не загружено' };
-
-  const formData = new FormData();
-  formData.append('file', image);
-
-  return handleApiRequest(
-    `${process.env.REACT_APP_API_USER}/upload/profile-image`,
-    {
+export const postStreamKey = () => async (dispatch: AppDispatch) => {
+  try {
+    dispatch(SettingsSliceFetch());
+    const token = getCookie('tokenData');
+    if (!token) return;
+    const response = await fetch(`${process.env.REACT_APP_API_SETTINGS}/streamKey`, {
+      method: 'PUT',
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      method: 'POST',
-      body: formData,
-    },
-    dispatch,
-    () => dispatch(userProfile())
-  );
+    });
+    console.log(response);
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Не удалось изменить ключ:', error.message || response.statusText);
+    }
+
+    const data = await response.json();
+    dispatch(SettingsSliceSuccess(data));
+  } catch (error: any) {
+    dispatch(SettingsSliceError(error.message || 'Не удалось поменять ключ'));
+  }
 };
 
-export const settingBackgroundImage = (image: File) => async (dispatch: AppDispatch) => {
+// update stream info
+export const updateCurrentStream = async (values: FormData) => {
   const token = getCookie('tokenData');
   if (!token) return { success: false, message: 'Вы не авторизованы' };
-  if (!image) return { success: false, message: 'Изображение не загружено' };
-
-  const formData = new FormData();
-  formData.append('file', image);
-  return handleApiRequest(
-    `${process.env.REACT_APP_API_USER}/upload/background-image`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      method: 'POST',
-      body: formData,
+  return handleApiRequest(`${process.env.REACT_APP_API_SETTINGS}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
-    dispatch,
-    () => dispatch(userProfile())
-  );
+    body: values,
+  });
 };
+
+// get category
+export const fetchCategory = async (search?: string) => {
+  const token = getCookie('tokenData');
+  if (!token) return { success: false, message: 'Вы не авторизованы' };
+  const api = search
+    ? `${process.env.REACT_APP_API_SETTINGS}/categories&search=${search}`
+    : `${process.env.REACT_APP_API_SETTINGS}/categories`;
+  return handleApiRequest(api, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+//  "page": 1,
+//   "pageSize": 20,
+//   "totalCategories": 0,
+//   "categories": [
+// "Name", "Type", "Description", "Slug", "BannerImageUrl"]

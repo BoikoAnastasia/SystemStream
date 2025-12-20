@@ -4,7 +4,8 @@ import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../../../../hooks/redux';
 import { AppDispatch } from '../../../../store/store';
 // store
-import { fetchStatusCurrentStream, fetchStreamKey, postStreamKey } from '../../../../store/actions/StreamActions';
+import { fetchStatusCurrentStream, fetchStreamKey } from '../../../../store/actions/StreamActions';
+import { fetchCategory, postStreamKey } from '../../../../store/actions/SettingsActions';
 // components
 import { useHeaderModal } from '../../../../context/HeaderModalContext';
 import { SettingUpdateStream } from './SettingUpdateStream';
@@ -18,10 +19,9 @@ import {
   StyledIconButton,
   StyledInputLabel,
   StyledOutlinedInputModal,
-  StyledSpanDark,
   StyledTitleH3,
 } from '../../../../components/StylesComponents';
-import { IChip, ILiveStatusStream } from '../../../../types/share';
+import { ICategories, IChip, ILiveStatusStream } from '../../../../types/share';
 
 export const SettingsKey = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -31,6 +31,23 @@ export const SettingsKey = () => {
   const [showKey, setShowKey] = useState(false);
   const [streamKey, setStreamKey] = useState('');
   const [chipData, setChipData] = useState<Array<IChip>>([]);
+  const [categoryData, setCategoryData] = useState<Array<ICategories>>([
+    // {
+    //   id: 5,
+    //   name: 'Chess',
+    //   bannerImageUrl: null,
+    // },
+    // {
+    //   id: 1,
+    //   name: 'Counter Strike',
+    //   bannerImageUrl: null,
+    // },
+    // {
+    //   id: 2,
+    //   name: 'Fortnite',
+    //   bannerImageUrl: null,
+    // },
+  ]);
   const [newChip, setNewChip] = useState('');
   const [dataCurrentStream, setDataCurrentStream] = useState<ILiveStatusStream | null>(null);
   // {
@@ -60,6 +77,21 @@ export const SettingsKey = () => {
       setChipData(mappedChips);
     }
   }, [dataCurrentStream]);
+
+  const getCategories = async () => {
+    const response = await fetchCategory();
+    console.log('getCategories', response);
+    if (!response.success) {
+      throw new Error(response?.message);
+    }
+    setCategoryData(response.data.categories);
+  };
+
+  useEffect(() => {
+    if (categoryData.length === 0) {
+      getCategories();
+    }
+  }, []);
 
   const handleClickShowKey = () => setShowKey((show) => !show);
   const handleMouseDownKey = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -114,10 +146,11 @@ export const SettingsKey = () => {
           <StyledInputLabel htmlFor="outlined-adornment-key">Ключ</StyledInputLabel>
           <StyledOutlinedInputModal
             label="Ключ"
-            name="key"
+            name="streamKey"
             type={showKey ? 'text' : 'password'}
             value={streamKey}
             aria-readonly
+            autoComplete="off"
             endAdornment={
               <InputAdornment position="end">
                 <StyledIconButton
@@ -144,18 +177,15 @@ export const SettingsKey = () => {
       </Box>
       <StyledTitleH3 sx={{ margin: '20px 0 10px' }}>Изменить текущий стрим:</StyledTitleH3>
       <Box>
-        {dataCurrentStream?.streamInfo ? (
-          <SettingUpdateStream
-            chipData={chipData}
-            setChipData={setChipData}
-            newChip={newChip}
-            setNewChip={setNewChip}
-            dataCurrentStream={dataCurrentStream}
-            showAlert={showAlert}
-          />
-        ) : (
-          <StyledSpanDark>Стрим еще не начат</StyledSpanDark>
-        )}
+        <SettingUpdateStream
+          chipData={chipData}
+          categoryData={categoryData}
+          setChipData={setChipData}
+          newChip={newChip}
+          setNewChip={setNewChip}
+          dataCurrentStream={dataCurrentStream || null}
+          showAlert={showAlert}
+        />
       </Box>
     </>
   );
