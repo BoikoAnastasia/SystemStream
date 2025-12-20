@@ -14,7 +14,7 @@ export const changeProfileData = (data: FormData) => async (dispatch: AppDispatc
   return handleApiRequest(
     `${process.env.REACT_APP_API_SETTINGS}/profile`,
     {
-      method: 'PUT',
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -31,7 +31,7 @@ export const postStreamKey = () => async (dispatch: AppDispatch) => {
     const token = getCookie('tokenData');
     if (!token) return;
     const response = await fetch(`${process.env.REACT_APP_API_SETTINGS}/streamKey`, {
-      method: 'PUT',
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -54,7 +54,7 @@ export const updateCurrentStream = async (values: FormData) => {
   const token = getCookie('tokenData');
   if (!token) return { success: false, message: 'Вы не авторизованы' };
   return handleApiRequest(`${process.env.REACT_APP_API_SETTINGS}`, {
-    method: 'PUT',
+    method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -66,15 +66,29 @@ export const updateCurrentStream = async (values: FormData) => {
 export const fetchCategory = async (search?: string) => {
   const token = getCookie('tokenData');
   if (!token) return { success: false, message: 'Вы не авторизованы' };
-  const api = search
-    ? `${process.env.REACT_APP_API_SETTINGS}/categories&search=${search}`
+
+  const url = search
+    ? `${process.env.REACT_APP_API_SETTINGS}/categories?search=${encodeURIComponent(search)}`
     : `${process.env.REACT_APP_API_SETTINGS}/categories`;
-  return handleApiRequest(api, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const text = await response.text(); // читаем HTML или текст ошибки
+      return { success: false, message: `Ошибка сервера ${response.status}: ${text}`, code: response.status };
+    }
+
+    const data = await response.json(); // безопасно читаем JSON
+    return { success: true, data, message: 'OK', code: response.status };
+  } catch (error: any) {
+    return { success: false, message: error.message || 'Неизвестная ошибка' };
+  }
 };
 
 //  "page": 1,

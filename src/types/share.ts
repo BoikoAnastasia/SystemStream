@@ -50,6 +50,13 @@ export type NotificationsType = 'NewFollower' | 'StreamStarted';
 
 export type AlertType = 'success' | 'error' | 'info' | 'warning';
 
+export interface IApiResponse<T = any> {
+  success: boolean;
+  data?: T;
+  message: string;
+  code?: number;
+}
+
 // data
 export interface IProfile {
   id: number;

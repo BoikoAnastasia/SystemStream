@@ -1,11 +1,5 @@
 import { AppDispatch } from '../store/store';
-
-interface IApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  message: string;
-  code?: number;
-}
+import { IApiResponse } from '../types/share';
 
 export const handleApiRequest = async <T = any>(
   url: string,

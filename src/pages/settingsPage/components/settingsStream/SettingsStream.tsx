@@ -81,9 +81,12 @@ export const SettingsKey = () => {
   const getCategories = async () => {
     const response = await fetchCategory();
     console.log('getCategories', response);
-    if (!response.success) {
-      throw new Error(response?.message);
+
+    if (!response.success || !response.data) {
+      showAlert(response.message, 'error');
+      return;
     }
+
     setCategoryData(response.data.categories);
   };
 
