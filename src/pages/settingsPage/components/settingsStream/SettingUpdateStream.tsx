@@ -21,7 +21,7 @@ import {
   StyleListItemSettings,
 } from '../../../../components/StylesComponents';
 import { AlertType, ICategories, IChip, ILiveStatusStream, IUpdateStream } from '../../../../types/share';
-import { useId } from 'react';
+import { useId, useMemo, useState } from 'react';
 
 type StreamField = keyof IUpdateStream;
 
@@ -44,6 +44,7 @@ export const SettingUpdateStream = ({
 }) => {
   const streamInfo = dataCurrentStream?.streamInfo || null;
   const id = useId();
+  const [newTag, setNewTag] = useState('');
 
   const listSettingsStream: { label?: string; type: string; value: StreamField; title: string; disabled?: boolean }[] =
     [
@@ -57,34 +58,32 @@ export const SettingUpdateStream = ({
       },
     ];
 
-  const initialValues: IUpdateStream = {
-    streamName: streamInfo ? streamInfo.streamName : '',
-    previewUrl: streamInfo ? streamInfo.previewUrl : null,
-    tags: chipData.map((chip) => chip.label),
-    category: streamInfo?.categoryId ?? null,
-  };
+  const initialValues: IUpdateStream = useMemo(
+    () => ({
+      streamName: streamInfo?.streamName ?? '',
+      category: streamInfo?.categoryId ?? null,
+      previewUrl: null,
+      tags: streamInfo?.tags ?? [],
+    }),
+    [streamInfo]
+  );
+
   // TODO fix clear dubs tags
 
-  const addNewChip = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Enter' && newChip.trim() !== '') {
+  const addNewChip = (e: React.KeyboardEvent, values: IUpdateStream, setFieldValue: any) => {
+    if (e.key === 'Enter' && newChip.trim()) {
       e.preventDefault();
 
-      const isDuplicate = chipData.some(
-        (chip) => chip.label.toLocaleLowerCase() === newChip.trim().toLocaleLowerCase()
-      );
-
-      if (isDuplicate) {
+      const tags = values.tags ?? [];
+      if (tags.includes(newChip.trim())) {
         showAlert('Такой тег уже добавлен', 'warning');
-        setNewChip('');
         return;
       }
 
-      const newChipObject = { key: `${id}-${Date.now()}`, label: newChip.trim() };
-      setChipData((prev) => [...prev, newChipObject]);
+      setFieldValue('tags', [...tags, newChip.trim()]);
       setNewChip('');
     }
   };
-
   const handleDelete = (chipToDelete: IChip) => () => {
     setChipData((chips) =>
       chips.filter((chip) => chip.label.trim().toLocaleLowerCase() !== chipToDelete.label.trim().toLocaleLowerCase())
@@ -104,10 +103,8 @@ export const SettingUpdateStream = ({
       if (values.streamName) formData.append('StreamName', values.streamName);
       if (values.category) formData.append('СategoryId', values.category.toString());
       if (values.previewUrl) formData.append('PreviewImage', values.previewUrl);
-      if (values.tags) {
-        const tags = chipData.map((chip) => chip.label);
-        formData.append('Tags', JSON.stringify(tags));
-      }
+      if (values.tags.length > 0) formData.append('Tags', JSON.stringify(values.tags));
+
       console.log('formData - settings', formData);
 
       const changeStreamData = await updateCurrentStream(formData);
@@ -161,34 +158,42 @@ export const SettingUpdateStream = ({
                       <StyledSpanDark>Вы можете добавить до 5 тегов, они будут отображаться на стриме.</StyledSpanDark>
                       <StyledTextFieldModal
                         label={item.label}
-                        onChange={(e) => setNewChip(e.target.value)}
                         disabled={chipData.length >= 5}
-                        onKeyDown={(e) => addNewChip(e)}
-                        onBlur={handleBlur}
-                        value={newChip}
-                      />
-                      <Paper sx={{ display: 'flex', background: 'transparent' }} component="ul">
-                        {chipData &&
-                          chipData.map((data) => {
-                            let icon;
-                            if (data.label === 'React') {
-                              icon = <TagFacesIcon />;
+                        onChange={(e) => setNewTag(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && newTag.trim()) {
+                            e.preventDefault();
+                            if (values.tags.includes(newTag.trim())) {
+                              showAlert('Такой тег уже добавлен', 'warning');
+                              return;
                             }
-                            return (
-                              <Stack key={data.key} direction="row" spacing={1}>
-                                <Chip
-                                  icon={icon}
-                                  label={data.label}
-                                  onDelete={data.label === 'React' ? undefined : handleDelete(data)}
-                                  variant="outlined"
-                                  sx={{
-                                    color: 'white',
-                                    '& .MuiChip-deleteIcon': { color: 'white', '&:hover': { color: 'grey' } },
-                                  }}
-                                />
-                              </Stack>
-                            );
-                          })}
+                            setFieldValue('tags', [...values.tags, newTag.trim()]);
+                            setNewTag('');
+                          }
+                        }}
+                        onBlur={handleBlur}
+                        value={newTag}
+                      />
+                      <Paper sx={{ display: 'flex', gap: '5px', background: 'transparent' }} component="ul">
+                        {values.tags.map((tag: string) => (
+                          <Stack key={tag} direction="row" spacing={1}>
+                            <Chip
+                              icon={tag === 'React' ? <TagFacesIcon /> : undefined}
+                              label={tag}
+                              onDelete={() =>
+                                setFieldValue(
+                                  'tags',
+                                  values.tags.filter((t: string) => t !== tag)
+                                )
+                              }
+                              variant="outlined"
+                              sx={{
+                                color: 'white',
+                                '& .MuiChip-deleteIcon': { color: 'white', '&:hover': { color: 'grey' } },
+                              }}
+                            />
+                          </Stack>
+                        ))}
                       </Paper>
                     </Box>
                   ) : (
@@ -197,7 +202,7 @@ export const SettingUpdateStream = ({
                       value={values[item.value] as File | null}
                       setFieldValue={setFieldValue}
                       touched={touched[item.value]}
-                      error={errors[item.value]}
+                      error={errors[item.value] as string}
                       disabled={item.disabled}
                     />
                   )}

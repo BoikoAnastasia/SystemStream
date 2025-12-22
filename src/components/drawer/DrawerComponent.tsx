@@ -35,6 +35,8 @@ interface IButtonInfo {
 
 export const DrawerComponent = () => {
   const { open, setOpen } = useDrawer();
+  const { isAuth } = useAppSelector((state) => state.user);
+
   const buttonInfo: IButtonInfo[] = [
     {
       icon: HomeIcon,
@@ -90,20 +92,25 @@ export const DrawerComponent = () => {
             </StyledSidebarListItem>
           ))}
         </StyledSidebarList>
-        <StyledSidebarName>Ваши подписки:</StyledSidebarName>
-        {subscribers === null ? (
-          <Typography sx={{ fontSize: '16px', color: 'var(--color-link)' }}>Загрузка...</Typography>
-        ) : subscribers.length === 0 ? (
-          <Typography sx={{ fontSize: '16px', color: 'var(--color-link)' }}>У вас нет подписок</Typography>
-        ) : (
-          <StyledSidebarList sx={{ height: '100%', overflowX: 'hidden', flex: 1 }}>
-            {subscribers.map((card) => (
-              <StyledSidebarListItem sx={{ padding: '0 !important' }} key={card.nickname}>
-                <CardDrawer card={card} />
-              </StyledSidebarListItem>
-            ))}
-          </StyledSidebarList>
+        {isAuth && (
+          <>
+            <StyledSidebarName>Ваши подписки:</StyledSidebarName>
+            {subscribers === null ? (
+              <Typography sx={{ fontSize: '16px', color: 'var(--color-link)' }}>Загрузка...</Typography>
+            ) : subscribers.length === 0 ? (
+              <Typography sx={{ fontSize: '16px', color: 'var(--color-link)' }}>У вас нет подписок</Typography>
+            ) : (
+              <StyledSidebarList sx={{ height: '100%', overflowX: 'hidden', flex: 1 }}>
+                {subscribers.map((card) => (
+                  <StyledSidebarListItem sx={{ padding: '0 !important' }} key={card.nickname}>
+                    <CardDrawer card={card} />
+                  </StyledSidebarListItem>
+                ))}
+              </StyledSidebarList>
+            )}
+          </>
         )}
+
         <StyledSidebarName>Сейчас в эфире:</StyledSidebarName>
         {streams === null ? (
           <Typography sx={{ fontSize: '16px', color: 'var(--color-link)' }}>Загрузка...</Typography>

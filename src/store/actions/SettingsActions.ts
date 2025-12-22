@@ -53,7 +53,7 @@ export const postStreamKey = () => async (dispatch: AppDispatch) => {
 export const updateCurrentStream = async (values: FormData) => {
   const token = getCookie('tokenData');
   if (!token) return { success: false, message: 'Вы не авторизованы' };
-  return handleApiRequest(`${process.env.REACT_APP_API_SETTINGS}`, {
+  return handleApiRequest(`${process.env.REACT_APP_API_SETTINGS}/stream`, {
     method: 'PUT',
     headers: {
       Authorization: `Bearer ${token}`,

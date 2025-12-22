@@ -83,7 +83,7 @@ export const SettingsKey = () => {
     console.log('getCategories', response);
 
     if (!response.success || !response.data) {
-      showAlert(response.message, 'error');
+      console.log(response.message, 'error');
       return;
     }
 

@@ -155,10 +155,10 @@ export interface IStreamHistory {
 }
 
 export interface IUpdateStream {
-  streamName?: string | null;
+  streamName: string;
   category: number | null;
-  previewUrl?: File | null | undefined;
-  tags?: Array<string> | null;
+  previewUrl: File | null;
+  tags: string[];
 }
 
 type StreamInfo = {

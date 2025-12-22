@@ -33,9 +33,10 @@ const fileImage = Yup.mixed<File>()
   .nullable()
   .notRequired()
   .test('fileFormat', 'Неверный формат изображения', (value) => {
-    if (!value) return true;
-    const type = (value as File).type.toLowerCase();
-    return type === 'image/jpeg' || type === 'image/jpg' || type === 'image/png' || type === 'image/gif';
+    if (!(value instanceof File)) return true;
+    const type = value.type?.toLowerCase();
+    if (!type) return false;
+    return ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'].includes(type);
   })
   .test('fileSize', 'Файл слишком большой (макс. 5MB)', (value) => {
     if (!value) return true;
@@ -89,8 +90,8 @@ export const validationChangeProfile = Yup.object({
 });
 
 export const validationChangeCurrentStream = Yup.object({
-  streamName: Yup.string().nullable().notRequired(),
-  category: Yup.string().nullable().notRequired(),
+  streamName: Yup.string().nullable(),
+  category: Yup.number().nullable(),
   previewUrl: fileImage,
-  tags: Yup.array().of(Yup.string()).notRequired(),
+  tags: Yup.array().of(Yup.string().defined()).default([]).required(),
 });

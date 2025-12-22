@@ -1,6 +1,8 @@
-import { Autocomplete } from '@mui/material';
+import { Autocomplete, Popper } from '@mui/material';
 import { StyledTextFieldModal } from '../../StylesComponents';
 import { ICategories } from '../../../types/share';
+import { forwardRef } from 'react';
+import { PopperProps } from '@mui/material/Popper/BasePopper.types';
 
 interface IPropsCombobox {
   options: ICategories[];
@@ -18,12 +20,20 @@ export const ComboBox = ({ options, value, setFieldValue, name }: IPropsCombobox
       id="combo-box-setting"
       options={options}
       value={selectedOption}
-      getOptionLabel={(option) => option.name}
+      getOptionLabel={(option) => option.name ?? ''}
       isOptionEqualToValue={(option, value) => option.id === value.id}
       onChange={(_, option) => {
         setFieldValue('category', option?.id);
       }}
       noOptionsText="Категории не найдены"
+      slotProps={{
+        paper: {
+          sx: {
+            background: 'var(--gradient-selected)',
+            color: 'var(--white)',
+          },
+        },
+      }}
       sx={{
         width: '100%',
         '& .MuiOutlinedInput-root': {
