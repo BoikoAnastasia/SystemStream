@@ -9,6 +9,7 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import { useDeviceDetect } from '../../hooks/useDeviceDetect';
 // types
 import { IChatMessage, IStream } from '../../types/share';
+import { VideoPlayer } from '../../components/videoPlayer/VideoPlayer';
 
 export const StreamPage = ({
   videoRef,
@@ -36,6 +37,7 @@ export const StreamPage = ({
           display: 'flex',
           position: 'relative',
           overflow: 'hidden',
+          minHeight: '500px',
           '&::before': {
             content: '""',
             position: 'absolute',
@@ -54,7 +56,6 @@ export const StreamPage = ({
             flex: videoContainerFlex,
             height: '100%',
             maxHeight: '830px',
-            padding: '0 10px',
             zIndex: 1,
             backgroundColor: 'rgba(255,255,255,0.05)',
             backdropFilter: 'blur(16px)',
@@ -62,19 +63,8 @@ export const StreamPage = ({
           }}
         >
           <HeaderStreamPage streamInfo={streamInfo} viewerCount={viewerCount} />
-          <video
-            key={streamInfo?.hlsUrl ?? 'no-stream'}
-            ref={videoRef}
-            autoPlay
-            playsInline
-            controls
-            style={{
-              borderRadius: '20px',
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-            }}
-          />
+          {/* <VideoPlayer src={'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8'} /> */}
+          <VideoPlayer src={streamInfo?.hlsUrl} />
         </Box>
         <Box
           sx={{

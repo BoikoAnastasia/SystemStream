@@ -21,7 +21,7 @@ import {
   StyledOutlinedInputModal,
   StyledTitleH3,
 } from '../../../../components/StylesComponents';
-import { ICategories, IChip, ILiveStatusStream } from '../../../../types/share';
+import { ICategories, ILiveStatusStream } from '../../../../types/share';
 
 export const SettingsKey = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -30,7 +30,6 @@ export const SettingsKey = () => {
 
   const [showKey, setShowKey] = useState(false);
   const [streamKey, setStreamKey] = useState('');
-  const [chipData, setChipData] = useState<Array<IChip>>([]);
   const [categoryData, setCategoryData] = useState<Array<ICategories>>([
     // {
     //   id: 5,
@@ -48,7 +47,6 @@ export const SettingsKey = () => {
     //   bannerImageUrl: null,
     // },
   ]);
-  const [newChip, setNewChip] = useState('');
   const [dataCurrentStream, setDataCurrentStream] = useState<ILiveStatusStream | null>(null);
   // {
   //   isStreaming: true,
@@ -67,16 +65,6 @@ export const SettingsKey = () => {
   //     endedAt: null,
   //   },
   // }
-
-  useEffect(() => {
-    if (dataCurrentStream?.streamInfo?.tags) {
-      const mappedChips = dataCurrentStream?.streamInfo?.tags.map((tag, index) => ({
-        key: `${index}-${tag}`,
-        label: tag,
-      }));
-      setChipData(mappedChips);
-    }
-  }, [dataCurrentStream]);
 
   const getCategories = async () => {
     const response = await fetchCategory();
@@ -181,11 +169,7 @@ export const SettingsKey = () => {
       <StyledTitleH3 sx={{ margin: '20px 0 10px' }}>Изменить текущий стрим:</StyledTitleH3>
       <Box>
         <SettingUpdateStream
-          chipData={chipData}
           categoryData={categoryData}
-          setChipData={setChipData}
-          newChip={newChip}
-          setNewChip={setNewChip}
           dataCurrentStream={dataCurrentStream || null}
           showAlert={showAlert}
         />

@@ -70,6 +70,13 @@ export const UserPage: FC = appLayout(() => {
         onRetry={() => {}}
         text={'Такого пользователя не существует'}
       >
+        {/* <StreamPage
+          videoRef={videoRef}
+          streamInfo={currentStream}
+          viewerCount={viewerCount}
+          messages={messages}
+          sendMessage={sendMessage}
+        /> */}
         {currentStream?.isLive && currentStream.hlsUrl && (
           <StreamPage
             videoRef={videoRef}

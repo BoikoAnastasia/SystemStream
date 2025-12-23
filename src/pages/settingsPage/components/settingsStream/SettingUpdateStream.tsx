@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 // components
 import { ComboBox } from '../../../../components/ui/comboBox/ComboBox';
 import { FileInputField } from '../../../../components/ui/fileInputField/FileInputField';
@@ -20,30 +21,20 @@ import {
   StyledTextFieldModal,
   StyleListItemSettings,
 } from '../../../../components/StylesComponents';
-import { AlertType, ICategories, IChip, ILiveStatusStream, IUpdateStream } from '../../../../types/share';
-import { useId, useMemo, useState } from 'react';
+import { AlertType, ICategories, ILiveStatusStream, IUpdateStream } from '../../../../types/share';
 
 type StreamField = keyof IUpdateStream;
 
 export const SettingUpdateStream = ({
   dataCurrentStream,
   showAlert,
-  chipData,
-  setChipData,
-  newChip,
-  setNewChip,
   categoryData,
 }: {
   dataCurrentStream: ILiveStatusStream | null;
   showAlert: (message: string, type?: AlertType) => void;
-  chipData: IChip[];
-  setChipData: React.Dispatch<React.SetStateAction<IChip[]>>;
-  newChip: string;
-  setNewChip: React.Dispatch<React.SetStateAction<string>>;
   categoryData: ICategories[];
 }) => {
   const streamInfo = dataCurrentStream?.streamInfo || null;
-  const id = useId();
   const [newTag, setNewTag] = useState('');
 
   const listSettingsStream: { label?: string; type: string; value: StreamField; title: string; disabled?: boolean }[] =
@@ -67,28 +58,6 @@ export const SettingUpdateStream = ({
     }),
     [streamInfo]
   );
-
-  // TODO fix clear dubs tags
-
-  const addNewChip = (e: React.KeyboardEvent, values: IUpdateStream, setFieldValue: any) => {
-    if (e.key === 'Enter' && newChip.trim()) {
-      e.preventDefault();
-
-      const tags = values.tags ?? [];
-      if (tags.includes(newChip.trim())) {
-        showAlert('Такой тег уже добавлен', 'warning');
-        return;
-      }
-
-      setFieldValue('tags', [...tags, newChip.trim()]);
-      setNewChip('');
-    }
-  };
-  const handleDelete = (chipToDelete: IChip) => () => {
-    setChipData((chips) =>
-      chips.filter((chip) => chip.label.trim().toLocaleLowerCase() !== chipToDelete.label.trim().toLocaleLowerCase())
-    );
-  };
 
   const checkChangeStream = async (values: IUpdateStream, { setFieldError, setSubmitting }: any) => {
     const hasAnyValue =
@@ -158,7 +127,7 @@ export const SettingUpdateStream = ({
                       <StyledSpanDark>Вы можете добавить до 5 тегов, они будут отображаться на стриме.</StyledSpanDark>
                       <StyledTextFieldModal
                         label={item.label}
-                        disabled={chipData.length >= 5}
+                        disabled={values.tags.length >= 5}
                         onChange={(e) => setNewTag(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && newTag.trim()) {

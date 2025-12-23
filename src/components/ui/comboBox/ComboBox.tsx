@@ -1,8 +1,6 @@
-import { Autocomplete, Popper } from '@mui/material';
+import { Autocomplete } from '@mui/material';
 import { StyledTextFieldModal } from '../../StylesComponents';
 import { ICategories } from '../../../types/share';
-import { forwardRef } from 'react';
-import { PopperProps } from '@mui/material/Popper/BasePopper.types';
 
 interface IPropsCombobox {
   options: ICategories[];

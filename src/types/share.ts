@@ -101,13 +101,13 @@ export interface ISubscriber {
 }
 
 export interface IStreamOnline {
-  nickname: string;
-  profileImage: string;
   isOnline: boolean;
-  streamersLeague: string;
+  nickname: string;
   previewUrl: string;
-  streamName: string;
+  profileImage: string;
   streamId: number | null;
+  streamName: string;
+  streamersLeague: string;
   totalCount?: number;
 }
 
