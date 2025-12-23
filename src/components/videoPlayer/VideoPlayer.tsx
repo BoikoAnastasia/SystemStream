@@ -45,9 +45,6 @@ export const VideoPlayer = ({ src }: { src?: string }) => {
     const video = videoRef.current;
     if (!video) return;
 
-    // Для теста: автоплей разрешён, когда muted = true
-    video.muted = true;
-
     let hls: Hls | null = null;
     const onCanPlay = () => {
       setIsLoading(false);
@@ -218,9 +215,9 @@ export const VideoPlayer = ({ src }: { src?: string }) => {
       {src && showControls && (
         <VideoPlayerStyledButtonPlay onClick={togglePlay}>
           {isPlaying ? (
-            <PauseIcon sx={{ color: 'white', fontSize: '2em' }} />
+            <PauseIcon sx={{ color: 'white', fontSize: '3em' }} />
           ) : (
-            <PlayArrowIcon sx={{ color: 'white', fontSize: '2em' }} />
+            <PlayArrowIcon sx={{ color: 'white', fontSize: '3em' }} />
           )}
         </VideoPlayerStyledButtonPlay>
       )}

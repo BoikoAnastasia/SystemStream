@@ -17,6 +17,7 @@ import { ContentWrapperSwitch } from '../../components/сontentWrapperSwitch/Con
 import { Box } from '@mui/material';
 // types
 import { IStreamOnline, IUser } from '../../types/share';
+import { VideoPlayer } from '../../components/videoPlayer/VideoPlayer';
 
 export const testStreams: IStreamOnline[] = [
   {
@@ -294,6 +295,7 @@ export const MainPage: FC = appLayout((): JSX.Element => {
     <>
       <Box sx={{ display: 'flex', width: '100%', height: '100%' }} className="page">
         <ContainerBox>
+          <VideoPlayer src={'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8'} />
           <TabsComponent propsChild={getTabsComponents()} propTabsTitle={['Live', 'Видео', 'Клипы', 'Пользователи']} />
           {streams.length > 0 && (
             <PaginationComponent
