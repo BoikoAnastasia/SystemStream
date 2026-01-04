@@ -1,51 +1,91 @@
-# Getting Started with Create React App
+# Система для просмотров стримов
 
-Для установки
-### `yarn` 
-или 
-### `npm i` 
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+![React](https://img.shields.io/badge/React-18-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-4.x-blue)
+![MUI](https://img.shields.io/badge/MUI-Material--UI-blue)
 
-## Available Scripts
+SystemStream — это веб-платформа для стриминга, разработанная с использованием React + TypeScript. Проект предоставляет интерфейс для просмотра и управления стримами, а также функции авторизации, регистрации и подписок. (Backend-часть проекта предполагается, но в данный репозиторий не входит).
 
-In the project directory, you can run:
+## Описание
 
-### `npm start`
-или
-### `yarn start`
+Система предназначена для организации и воспроизведения потокового видео в браузере. Клиентская часть реализована на React и позволяет:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- запуск приложения в режиме разработки;
+- просмотр стримов (UI);
+- взаимодействие с сервером стриминга через API;
+- адаптивный интерфейс;
+- авторизация и регистрация;
+- система подписок.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+💡 Этот репозиторий содержит только frontend-часть (React интерфейс).
 
-### `npm test`
+## Стек технологий
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Основные
 
-### `npm run build`
+- React (Create React App)
+- TypeScript
+- React Router
+- Redux Toolkit
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### UI / формы
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- MUI (Material-UI)
+- Formik
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Инструменты и конфигурации
 
-### `npm run eject`
+- Create React App — сборка и конфигурация окружения
+- CSS
+- Prettier / ESLint
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Плановые улучшения
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+В планах на следующие итерации:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+- Улучшение UI/UX дизайна
+- Внедрение тем (светлая / тёмная)
+- Локализация интерфейса
+- Поиск стримов и пользователей
+- Расписание будущих стримов
+- Доработки логики (UX-фичи, оптимизации)
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Быстрый старт
 
-## Learn More
+Перед началом убедись, что установлен Node.js (рекомендуемая версия 16+).
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. Клонировать репозиторий
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+git clone https://github.com/BoikoAnastasia/SystemStream.git
+cd SystemStream
+```
+
+2. Установить зависимости
+
+```bash
+yarn
+# или
+npm install
+```
+
+3. Запустить в режиме разработки
+
+```bash
+yarn start
+# или
+npm start
+```
+
+4. Открыть в браузере
+
+```bash
+http://localhost:3000
+```
+
+Страница будет автоматически перезагружаться при изменениях.
+
+## Лицензия
+
+Проект распространяется под лицензией MIT.
