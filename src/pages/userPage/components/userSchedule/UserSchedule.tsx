@@ -6,15 +6,15 @@ import { useDeviceDetect } from '../../../../hooks/useDeviceDetect';
 // mui
 import { Box, MenuItem } from '@mui/material';
 // styles
+import { StyledFilterButton } from '../../../../components/StylesComponents';
 import {
   ContainerProfileComponents,
-  StyledFilterButton,
   StyledFilters,
   StyledScheduleFormControl,
   StyledScheduleInputLabel,
   StyledScheduleSelect,
   StyledVideoGrid,
-} from '../../../../components/StylesComponents';
+} from '../../StyledUserPage';
 
 export const UserSchedule = () => {
   const filters = [

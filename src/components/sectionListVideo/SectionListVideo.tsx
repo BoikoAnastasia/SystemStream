@@ -1,7 +1,7 @@
 // components
 import { VideoView } from '../videoView/VideoView';
 // styles
-import { StyledVideoGrid } from '../StylesComponents';
+import { StyledVideoGrid } from '../../pages/userPage/StyledUserPage';
 // types
 import { IStreamOnline } from '../../types/share';
 

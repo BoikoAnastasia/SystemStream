@@ -1,5 +1,5 @@
 import { Autocomplete } from '@mui/material';
-import { StyledTextFieldModal } from '../../StylesComponents';
+import { StyledTextFieldRegular } from '../../StylesComponents';
 import { ICategories } from '../../../types/share';
 
 interface IPropsCombobox {
@@ -40,38 +40,7 @@ export const ComboBox = ({ options, value, setFieldValue, name }: IPropsCombobox
           },
         },
       }}
-      renderInput={(params) => <StyledTextFieldModal {...params} label="Категории" />}
+      renderInput={(params) => <StyledTextFieldRegular {...params} label="Категории" />}
     />
   );
 };
-
-// "page": 1,
-//   "pageSize": 20,
-//   "totalCategories": 5,
-//   "categories": [
-//     {
-//       "id": 5,
-//       "name": "Chess",
-//       "bannerImageUrl": null
-//     },
-//     {
-//       "id": 1,
-//       "name": "Counter Strike",
-//       "bannerImageUrl": null
-//     },
-//     {
-//       "id": 2,
-//       "name": "Fortnite",
-//       "bannerImageUrl": null
-//     },
-//     {
-//       "id": 3,
-//       "name": "Just Chatting",
-//       "bannerImageUrl": null
-//     },
-//     {
-//       "id": 4,
-//       "name": "Music",
-//       "bannerImageUrl": null
-//     }
-//   ]

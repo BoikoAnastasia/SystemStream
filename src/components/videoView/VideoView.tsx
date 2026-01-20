@@ -3,7 +3,7 @@ import { CardMedia } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 // styles
 import {
-  CardDrawerTypography,
+  CardTypography,
   StyledButtonLive,
   StyledVideoCard,
   StyledVideoCardInfo,
@@ -27,15 +27,15 @@ export const VideoView = ({ item }: { item: IStreamOnline }) => {
         <></>
       )}
       <StyledVideoCardInfo>
-        <CardDrawerTypography fs={'14px'} isEllipsis={false} sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+        <CardTypography fs={'14px'} isEllipsis={false} sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
           <VisibilityIcon fontSize="small" /> {item?.totalCount || 0}
-        </CardDrawerTypography>
-        <CardDrawerTypography fs={'18px'} sx={{ fontWeight: 600 }} isEllipsis={false}>
+        </CardTypography>
+        <CardTypography fs={'18px'} sx={{ fontWeight: 600 }} isEllipsis={false}>
           {item.streamName}
-        </CardDrawerTypography>
-        <CardDrawerTypography fs={'14px'} c={'var(--hover-header-menu)'} isEllipsis={false}>
+        </CardTypography>
+        <CardTypography fs={'14px'} c={'var(--hover-header-menu)'} isEllipsis={false}>
           {item.streamersLeague}
-        </CardDrawerTypography>
+        </CardTypography>
       </StyledVideoCardInfo>
     </StyledVideoCard>
   );

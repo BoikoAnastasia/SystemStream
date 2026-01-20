@@ -18,7 +18,7 @@ import {
   StyledFollowButton,
   StyledIconButton,
   StyledInputLabel,
-  StyledOutlinedInputModal,
+  StyledTextFieldOutlined,
   StyledTitleH3,
 } from '../../../../components/StylesComponents';
 import { ICategories, ILiveStatusStream } from '../../../../types/share';
@@ -135,7 +135,7 @@ export const SettingsKey = () => {
       <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
         <FormControl variant="outlined" sx={{ width: '100%' }}>
           <StyledInputLabel htmlFor="outlined-adornment-key">Ключ</StyledInputLabel>
-          <StyledOutlinedInputModal
+          <StyledTextFieldOutlined
             label="Ключ"
             name="streamKey"
             type={showKey ? 'text' : 'password'}

@@ -22,17 +22,8 @@ import { useAppSelector } from '../../hooks/redux';
 export const UserPage: FC = appLayout(() => {
   const dispatch = useDispatch<AppDispatch>();
   const { nickname: paramNickname } = useParams<{ nickname: string }>();
-  const {
-    userData,
-    isNotProfileData,
-    videoRef,
-    currentStream,
-    viewerCount,
-    isLoading,
-    isError,
-    messages,
-    sendMessage,
-  } = useUserPage(paramNickname);
+  const { userData, isNotProfileData, currentStream, viewerCount, isLoading, isError, messages, sendMessage } =
+    useUserPage(paramNickname);
   const {
     data: userHistoryStream,
     isLoading: loadHistory,
@@ -70,16 +61,8 @@ export const UserPage: FC = appLayout(() => {
         onRetry={() => {}}
         text={'Такого пользователя не существует'}
       >
-        {/* <StreamPage
-          videoRef={videoRef}
-          streamInfo={currentStream}
-          viewerCount={viewerCount}
-          messages={messages}
-          sendMessage={sendMessage}
-        /> */}
         {currentStream?.isLive && currentStream.hlsUrl && (
           <StreamPage
-            videoRef={videoRef}
             streamInfo={currentStream}
             viewerCount={viewerCount}
             messages={messages}

@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react';
-// context
-
 // components
 import { Socials } from '../../../../components/socials/Socials';
 import { BannerEffect } from '../../../../components/ui/bannerEffect/BannerEffect';
@@ -9,16 +7,16 @@ import { deleteSubscribe, streamerFolows, subscribeToUser } from '../../../../st
 // hooks
 import { useAppSelector } from '../../../../hooks/redux';
 // styles
-import {
-  StyledBannerAvatar,
-  StyledBannerUserInfo,
-  StyledBannerUserName,
-  StyledFollowButton,
-  StyledInfo,
-  StyledProfileSection,
-} from '../../../../components/StylesComponents';
+import { StyledFollowButton } from '../../../../components/StylesComponents';
 import { ISubscriber } from '../../../../types/share';
 import { useHeaderModal } from '../../../../context/HeaderModalContext';
+import {
+  StyledBannerAvatar,
+  StyledInfo,
+  StyledProfileSection,
+  StyledBannerUserInfo,
+  StyledBannerUserName,
+} from '../../StyledUserPage';
 
 export const UserBanner = ({ userData, isNotProfileData }: any) => {
   const { isAuth, data: currentUser } = useAppSelector((state) => state.user);

@@ -19,13 +19,12 @@ import { Box } from '@mui/material';
 import {
   StyledFilterButton,
   StyledFollowButton,
-  StyledListSettings,
   StyledNameComponents,
-  StyledTextFieldModal,
+  StyledTextFieldRegular,
   StyledTitleH3,
-  StyleListItemSettings,
 } from '../../../../components/StylesComponents';
 import { IProfileChange } from '../../../../types/share';
+import { StyledListSettings, StyleListItemSettings } from '../../StyledSettingsPage';
 
 type ProfileField = keyof IProfileChange;
 
@@ -156,7 +155,7 @@ export const SettingsChangeProfile = () => {
                     {item.title}
                   </StyledNameComponents>
                   {item.type === 'field' ? (
-                    <StyledTextFieldModal
+                    <StyledTextFieldRegular
                       label={item.label}
                       onChange={handleChange}
                       onBlur={handleBlur}

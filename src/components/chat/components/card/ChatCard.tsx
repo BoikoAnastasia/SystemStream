@@ -1,6 +1,6 @@
-import { StyledChatCard, StyledChatCardMessage, StyledChatCardNickname } from '../../StylesComponents';
+import { StyledChatCard, StyledChatCardMessage, StyledChatCardNickname } from '../../StyledChat';
 
-import { IChatMessage } from '../../../types/share';
+import { IChatMessage } from '../../../../types/share';
 
 export const ChatCard = ({ msg, customColor }: { msg: IChatMessage; customColor: string }) => {
   const { username, text } = msg;

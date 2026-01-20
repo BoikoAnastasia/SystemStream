@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react';
+// utils
+import { getVolumeStorage, setVolumeStorage } from '../../../utils/storage';
 // mui
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import { IconButton, Slider } from '@mui/material';
-import { getVolumeStorage, setVolumeStorage } from '../../../utils/storage';
 
 export const SliderVolume = ({ videoRef }: any) => {
   const [volume, setVolume] = useState(() => {
     const savedVolume = getVolumeStorage();
     return savedVolume !== undefined ? savedVolume : 80;
   });
+
+  const iconStyles = {
+    color: 'white',
+    fontSize: '1.5rem',
+  };
 
   useEffect(() => {
     const video = videoRef.current;
@@ -35,11 +41,11 @@ export const SliderVolume = ({ videoRef }: any) => {
     <>
       {volume === 0 ? (
         <IconButton onClick={() => handleClick(1)}>
-          <VolumeOffIcon sx={{ color: 'white', fontSize: '1.5em' }} />
+          <VolumeOffIcon sx={{ iconStyles }} />
         </IconButton>
       ) : (
         <IconButton onClick={() => handleClick(0)}>
-          <VolumeUpIcon sx={{ color: 'white', fontSize: '1.5em' }} />
+          <VolumeUpIcon sx={{ iconStyles }} />
         </IconButton>
       )}
       <Slider

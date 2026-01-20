@@ -1,7 +1,7 @@
 import { useState } from 'react';
 // components
 import { Chat } from '../../components/chat/Chat';
-import { HeaderStreamPage } from './components/headerStreamPage/HeaderStreamPage';
+import { VideoPlayer } from '../../components/videoPlayer/VideoPlayer';
 // mui
 import { Box, Button } from '@mui/material';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
@@ -9,16 +9,15 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import { useDeviceDetect } from '../../hooks/useDeviceDetect';
 // types
 import { IChatMessage, IStream } from '../../types/share';
-import { VideoPlayer } from '../../components/videoPlayer/VideoPlayer';
+import { StyledContainerStream, StyledStreamContainerChat, StyledStreamContainerVideoPlayer } from './StyledStreamPage';
+import { HeaderStreamPage } from './components/headerStreamPage/HeaderStreamPage';
 
 export const StreamPage = ({
-  videoRef,
   streamInfo,
   viewerCount,
   messages,
   sendMessage,
 }: {
-  videoRef: React.RefObject<HTMLVideoElement | null>;
   streamInfo: IStream | null;
   viewerCount: number;
   messages: IChatMessage[];
@@ -32,47 +31,16 @@ export const StreamPage = ({
 
   return (
     <>
-      <Box
-        sx={{
-          display: 'flex',
-          position: 'relative',
-          overflow: 'hidden',
-          minHeight: '500px',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            inset: 0,
-            background: 'radial-gradient(circle at center, rgba(88,101,242,0.35), transparent 70%)',
-            filter: 'blur(40px)',
-            zIndex: 0,
-          },
-        }}
-      >
-        <Box
-          sx={{
-            position: 'relative',
-            display: 'flex',
-            flexDirection: 'column',
-            flex: videoContainerFlex,
-            height: '100%',
-            maxHeight: '830px',
-            zIndex: 1,
-            backgroundColor: 'rgba(255,255,255,0.05)',
-            backdropFilter: 'blur(16px)',
-            transition: 'all .3s ease',
-          }}
-        >
+      <StyledContainerStream sx={{ flexDirection: isMobile ? 'column' : 'row' }}>
+        <StyledStreamContainerVideoPlayer sx={{ flex: videoContainerFlex }}>
           <HeaderStreamPage streamInfo={streamInfo} viewerCount={viewerCount} />
-          {/* <VideoPlayer src={'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8'} /> */}
           <VideoPlayer src={streamInfo?.hlsUrl} />
-        </Box>
-        <Box
+          {/* <VideoPlayer src={'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8'} /> */}
+        </StyledStreamContainerVideoPlayer>
+        <StyledStreamContainerChat
           sx={{
-            display: isMobile ? 'none' : 'block',
             flex: chatFlex,
-            height: '100%',
-            maxHeight: '636px',
-            transition: 'all .3s ease',
+            minHeight: isMobile ? 'auto' : '100%',
           }}
         >
           {isOpen ? (
@@ -87,8 +55,8 @@ export const StreamPage = ({
               </Button>
             </Box>
           )}
-        </Box>
-      </Box>
+        </StyledStreamContainerChat>
+      </StyledContainerStream>
     </>
   );
 };

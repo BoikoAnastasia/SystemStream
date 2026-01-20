@@ -1,16 +1,15 @@
 // components
 import { VideoCard } from '../../../../components/videoCard/VideoCard';
 // styles
+import { StyledNameComponents, StyledTitleModal } from '../../../../components/StylesComponents';
+// types
+import { IProfile } from '../../../../types/share';
 import {
   ContainerProfileComponents,
   StyledAboutSection,
-  StyledNameComponents,
-  StyledTitleModal,
   StyledVideoGrid,
   StyledVideoSection,
-} from '../../../../components/StylesComponents';
-// types
-import { IProfile } from '../../../../types/share';
+} from '../../StyledUserPage';
 
 export const UserAbout = ({ userData }: { userData: IProfile | null }) => {
   return (

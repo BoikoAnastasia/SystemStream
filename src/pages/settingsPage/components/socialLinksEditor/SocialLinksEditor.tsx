@@ -8,7 +8,7 @@ import {
   StyledFollowButton,
   StyledNameComponents,
   StyledSpanDark,
-  StyledTextFieldModal,
+  StyledTextFieldRegular,
 } from '../../../../components/StylesComponents';
 // mui
 import { Box, IconButton } from '@mui/material';
@@ -84,15 +84,15 @@ export const SocialLinksEditor = ({ arrayHelpers }: SocialLinksEditorProps) => {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'flex-start' }}>
         {/* Добавление новой ссылки */}
         <StyledSpanDark>Вы можете добавить до 5 соцсетей, они будут отображаться в вашем профиле.</StyledSpanDark>
-        <StyledTextFieldModal
+        <StyledTextFieldRegular
           label="Название ссылки (текст ссылки)"
           value={platformName}
-          onChange={(e) => setPlatformName(e.target.value)}
+          onChange={(e: any) => setPlatformName(e.target.value)}
         />
-        <StyledTextFieldModal
+        <StyledTextFieldRegular
           label="URL ссылки (куда ведет эта ссылка? Введите полный url, например https://stream.com)"
           value={platformUrl}
-          onChange={(e) => handleUrlChange(e.target.value)}
+          onChange={(e: any) => handleUrlChange(e.target.value)}
           helperText={urlError}
           error={!!urlError}
         />
@@ -122,15 +122,15 @@ export const SocialLinksEditor = ({ arrayHelpers }: SocialLinksEditorProps) => {
                   borderRadius: '10px',
                 }}
               >
-                <StyledTextFieldModal
+                <StyledTextFieldRegular
                   label="Название ссылки"
                   value={editingName}
-                  onChange={(e) => setEditingName(e.target.value)}
+                  onChange={(e: any) => setEditingName(e.target.value)}
                 />
-                <StyledTextFieldModal
+                <StyledTextFieldRegular
                   label="URL ссылки"
                   value={editingUrl}
-                  onChange={(e) => handleEditingUrlChange(e.target.value)}
+                  onChange={(e: any) => handleEditingUrlChange(e.target.value)}
                   helperText={editingUrlError}
                   error={!!editingUrlError}
                 />

@@ -1,4 +1,5 @@
 import { FC, JSX, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 // layout
 import { appLayout } from '../../layout/index';
 // redux
@@ -13,11 +14,13 @@ import { ContainerBox } from '../../components/StylesComponents';
 import { CatalogUsers } from '../../components/catalogUsers/CatalogUsers';
 import { PaginationComponent } from '../../components/ui/pagination/PaginationComponent';
 import { ContentWrapperSwitch } from '../../components/сontentWrapperSwitch/ContentWrapperSwitch';
+import { StreamPage } from '../streamPage/StreamPage';
+// hooks
+import { useUserPage } from '../../hooks/useUserPage';
 // mui
 import { Box } from '@mui/material';
 // types
 import { IStreamOnline, IUser } from '../../types/share';
-import { VideoPlayer } from '../../components/videoPlayer/VideoPlayer';
 
 export const testStreams: IStreamOnline[] = [
   {
@@ -270,6 +273,9 @@ export const MainPage: FC = appLayout((): JSX.Element => {
   const { page = 1, pageSize = 25, totalStreams = 0 } = data ?? {};
   const pageCount = Math.ceil(totalStreams / pageSize);
 
+  const { nickname: paramNickname } = useParams<{ nickname: string }>();
+  const { messages, sendMessage, currentStream, viewerCount } = useUserPage(paramNickname);
+
   useEffect(() => {
     if (!data && !isLoading) {
       dispatch(fetchUserOnlineStreams());
@@ -295,7 +301,12 @@ export const MainPage: FC = appLayout((): JSX.Element => {
     <>
       <Box sx={{ display: 'flex', width: '100%', height: '100%' }} className="page">
         <ContainerBox>
-          <VideoPlayer src={'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8'} />
+          <StreamPage
+            streamInfo={currentStream}
+            viewerCount={viewerCount}
+            messages={messages}
+            sendMessage={sendMessage}
+          />
           <TabsComponent propsChild={getTabsComponents()} propTabsTitle={['Live', 'Видео', 'Клипы', 'Пользователи']} />
           {streams.length > 0 && (
             <PaginationComponent

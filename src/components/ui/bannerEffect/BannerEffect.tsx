@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { StyledBoxEffect } from '../../StylesComponents';
+import { StyledBoxEffect } from './StyledBannerEffect';
 
 export const BannerEffect = () => {
   return (

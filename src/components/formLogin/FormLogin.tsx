@@ -16,8 +16,8 @@ import {
   StyledButtonForm,
   StyledIconButton,
   StyledInputLabel,
-  StyledOutlinedInputModal,
-  StyledTextFieldModal,
+  StyledTextFieldOutlined,
+  StyledTextFieldRegular,
   StyledFollowButton,
 } from '../StylesComponents';
 // types
@@ -73,7 +73,7 @@ export const FormLogin = ({
         <Form
           style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '20px', width: '100%' }}
         >
-          <StyledTextFieldModal
+          <StyledTextFieldRegular
             label="Логин или электронная почта"
             onChange={handleChange}
             onBlur={handleBlur}
@@ -85,7 +85,7 @@ export const FormLogin = ({
           />
           <FormControl variant="outlined" sx={{ width: '100%' }}>
             <StyledInputLabel htmlFor="outlined-adornment-password">Пароль</StyledInputLabel>
-            <StyledOutlinedInputModal
+            <StyledTextFieldOutlined
               onChange={handleChange}
               onBlur={handleBlur}
               value={values.password}

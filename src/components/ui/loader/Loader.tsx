@@ -1,10 +1,9 @@
-import { Box } from '@mui/material';
-import { Styledloading } from '../../StylesComponents';
+import { StyledContainerLoader, Styledloading } from './StyledLoader';
 
 export const Loader = () => {
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', margin: '0 auto' }}>
+    <StyledContainerLoader>
       <Styledloading>Load&nbsp;ng</Styledloading>
-    </Box>
+    </StyledContainerLoader>
   );
 };

@@ -4,7 +4,7 @@ import { useHeaderModal } from '../../../context/HeaderModalContext';
 // mui
 import { Box } from '@mui/material';
 // styles
-import { StyleUploadButton, StyleUploadDrag } from '../../StylesComponents';
+import { StyleUploadButton, StyleUploadDrag } from './StyledFileInputField';
 
 interface IFileInputFieldProps {
   item: any;

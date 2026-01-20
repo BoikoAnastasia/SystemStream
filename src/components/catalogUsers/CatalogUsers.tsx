@@ -3,14 +3,14 @@ import { Avatar, Grid } from '@mui/material';
 // hooks
 import { useDeviceDetect } from '../../hooks/useDeviceDetect';
 // styled
+import { StyledButtonLive } from '../StylesComponents';
 import {
   StyledAvatarWrap,
-  StyledButtonLive,
   StyledSubscribeButton,
   StyledUserCard,
   StyledUserName,
   StyledUsersGrid,
-} from '../StylesComponents';
+} from './StyledCatalogUsers';
 // types
 import { IUser } from '../../types/share';
 

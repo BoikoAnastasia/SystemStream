@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { AppDispatch } from '../../../store/store';
 import { useDispatch } from 'react-redux';
 import { logoutUser } from '../../../store/actions/UserActions';
+// hooks
 import { useAppSelector } from '../../../hooks/redux';
 // components
 import { StyledMenu } from '../../../layout/StyledLayout';
@@ -48,6 +49,9 @@ export const HeaderMenuAvatar = () => {
       value: 'Баланс: 0 руб',
     },
   ];
+  const styledItem = {
+    '&.MuiMenuItem-root': { color: 'var(--white)', display: 'flex', gap: '4px' },
+  };
 
   const open = Boolean(anchorEl);
 
@@ -94,29 +98,18 @@ export const HeaderMenuAvatar = () => {
         {menuData
           .filter((item) => (item.authOnly ? isAuth : true))
           .map((item, index) => (
-            <MenuItem
-              sx={{ '&.MuiMenuItem-root': { color: 'var(--white)', display: 'flex', gap: '4px' } }}
-              key={index}
-              component={Link}
-              to={item.href}
-            >
+            <MenuItem sx={{ styledItem }} key={index} component={Link} to={item.href}>
               {item.icon && <item.icon />}
               {item.value}
             </MenuItem>
           ))}
         {isAuth ? (
-          <MenuItem
-            sx={{ '&.MuiMenuItem-root': { color: 'var(--white)', display: 'flex', gap: '4px' } }}
-            onClick={logout}
-          >
+          <MenuItem sx={{ styledItem }} onClick={logout}>
             <LogoutIcon />
             Выйти
           </MenuItem>
         ) : (
-          <MenuItem
-            sx={{ '&.MuiMenuItem-root': { color: 'var(--white)', display: 'flex', gap: '4px' } }}
-            onClick={handleOpenModal}
-          >
+          <MenuItem sx={{ styledItem }} onClick={handleOpenModal}>
             <LoginIcon />
             Войти
           </MenuItem>

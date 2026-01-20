@@ -7,6 +7,7 @@ import { SettingsKey } from './components/settingsStream/SettingsStream';
 import { useDeviceDetect } from '../../hooks/useDeviceDetect';
 // mui
 import { Box, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
+import { StyledSettingsContainer, StyledSettingsLisContainer } from './StyledSettingsPage';
 
 interface IListSettings {
   value: string;
@@ -48,8 +49,8 @@ export const SettingsPage: FC = settingLayout((): JSX.Element => {
   };
 
   return (
-    <Box sx={{ display: 'flex', width: '100%', flexDirection: isMobile ? 'column' : 'row' }} className="container">
-      <Box sx={{ position: 'relative', width: '100%', maxWidth: 360, height: '100%' }}>
+    <StyledSettingsContainer sx={{ flexDirection: isMobile ? 'column' : 'row' }} className="container">
+      <StyledSettingsLisContainer>
         <List sx={{ position: 'sticky', top: 0 }}>
           {itemsList &&
             itemsList.map((item: IListSettings) => (
@@ -60,8 +61,8 @@ export const SettingsPage: FC = settingLayout((): JSX.Element => {
               </ListItem>
             ))}
         </List>
-      </Box>
+      </StyledSettingsLisContainer>
       <Box sx={{ width: '100%' }}>{selectedItem?.component && <selectedItem.component />}</Box>
-    </Box>
+    </StyledSettingsContainer>
   );
 });

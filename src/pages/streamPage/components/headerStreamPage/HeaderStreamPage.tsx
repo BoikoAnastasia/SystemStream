@@ -2,13 +2,8 @@
 import { Box } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 // styles
-import {
-  StyledHeaderStreamPage,
-  StyledButtonLive,
-  StyledButtonWathers,
-  StyledTitle,
-  StyledSpanDark,
-} from '../../../../components/StylesComponents';
+import { StyledButtonLive, StyledTitle, StyledSpanDark } from '../../../../components/StylesComponents';
+import { StyledButtonWathers, StyledHeaderStreamPage } from '../../StyledStreamPage';
 // types
 import { IStream } from '../../../../types/share';
 export const HeaderStreamPage = ({ streamInfo, viewerCount }: { streamInfo: IStream | null; viewerCount: number }) => {

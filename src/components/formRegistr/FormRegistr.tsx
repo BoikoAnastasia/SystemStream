@@ -13,8 +13,8 @@ import {
   StyledButtonsForm,
   StyledIconButton,
   StyledInputLabel,
-  StyledOutlinedInputModal,
-  StyledTextFieldModal,
+  StyledTextFieldOutlined,
+  StyledTextFieldRegular,
   StyledFollowButton,
 } from '../StylesComponents';
 // types
@@ -82,7 +82,7 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
         <Form
           style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '20px', width: '100%' }}
         >
-          <StyledTextFieldModal
+          <StyledTextFieldRegular
             onChange={handleChange}
             onBlur={handleBlur}
             value={values.username}
@@ -95,7 +95,7 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
               autoComplete: 'username',
             }}
           />
-          <StyledTextFieldModal
+          <StyledTextFieldRegular
             onChange={handleChange}
             onBlur={handleBlur}
             value={values.email}
@@ -110,7 +110,7 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
           />
           <FormControl variant="outlined" sx={{ width: '100%' }}>
             <StyledInputLabel htmlFor="outlined-adornment-password">Пароль</StyledInputLabel>
-            <StyledOutlinedInputModal
+            <StyledTextFieldOutlined
               name="password"
               onChange={handleChange}
               onBlur={handleBlur}

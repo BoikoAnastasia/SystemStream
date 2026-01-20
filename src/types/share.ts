@@ -206,11 +206,6 @@ export interface IStyledButtonForm {
   c?: string;
 }
 
-export interface IStyledButtonDark {
-  h?: string;
-  br?: string;
-}
-
 export interface ITabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -221,27 +216,6 @@ export interface ITabsComponentProps {
   propsChild: (ReactNode | (() => ReactNode))[];
   propTabsTitle: string[];
 }
-
-export interface IVideoItem {
-  id: string;
-  video: string;
-  href: string;
-  name: string;
-  users: string;
-  type: string;
-  isLive: boolean;
-}
-
-export interface IUserItem {
-  id: string;
-  img: string;
-  href: string;
-  name: string;
-  users: string;
-}
-
-export type IListVideo = IVideoItem[];
-export type IListUsers = IUserItem[];
 
 export interface IModalRegistForm {
   password: string;
@@ -263,16 +237,7 @@ export type ModalContextType = {
   showAlert: (message: string, type?: AlertType) => void;
 };
 
-export type CardDrawerType = {
-  avatar: string;
-  views: string;
-  title: string;
-  author: string;
-  category: string;
-  href?: string;
-};
-
-export interface ICardDrawerTypography {
+export interface ICardTypography {
   c?: string;
   fs?: string;
   isEllipsis: boolean;

@@ -21,17 +21,15 @@ export const ButtonCustome = ({
       onClick={onClick}
       variant={variant === 'contained' ? 'contained' : 'text'}
       size={size === 'medium' ? 'medium' : 'small'}
-      sx={[
-        (theme) => ({
-          textTransform: 'none',
-          padding: '0 16px',
-          height: '40px',
-          borderRadius: '20px',
-          fontWeight: 'bold',
-          color: 'var(--background-block)',
-          backgroundColor: bg ? bg : 'var(--primary)',
-        }),
-      ]}
+      sx={{
+        textTransform: 'none',
+        padding: '0 16px',
+        height: '40px',
+        borderRadius: '20px',
+        fontWeight: 'bold',
+        color: 'var(--background-block)',
+        backgroundColor: bg ? bg : 'var(--primary)',
+      }}
     >
       {Icon && <Icon sx={{ fill: 'var(--white)' }} />}
       {text}

@@ -1,17 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useAppSelector } from '../../hooks/redux';
 // components
-import { ChatCard } from './components/ChatCard';
+import { ChatCard } from './components/card/ChatCard';
 // utils
 import { getRandomColor } from '../../utils/getRandomColor';
 //mui
 import { Box, Button } from '@mui/material';
-// styles
-import { StyledChatList, StyledChatTextField } from '../StylesComponents';
-import FirstPageIcon from '@mui/icons-material/FirstPage';
 import SendIcon from '@mui/icons-material/Send';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+// styles
+import {
+  StyledChatContainer,
+  StyledChatContainerMessages,
+  StyledChatHeader,
+  StyledChatList,
+  StyledChatTextField,
+} from './StyledChat';
 // types
 import { IChatMessage } from '../../types/share';
+import { useDeviceDetect } from '../../hooks/useDeviceDetect';
 
 export const Chat = ({
   isOpen,
@@ -24,6 +31,8 @@ export const Chat = ({
   messages: IChatMessage[];
   sendMessage: (text: string) => void;
 }) => {
+  const { isMobile } = useDeviceDetect();
+
   const listRef = useRef<HTMLDivElement | null>(null);
   const [text, setText] = useState('');
   const colorMap = useRef<{ [key: string]: string }>({});
@@ -49,24 +58,20 @@ export const Chat = ({
   };
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        height: '100%',
-        minWidth: '250px',
-      }}
-    >
-      <Box sx={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid var(--sidebar)' }}>
-        <Button onClick={() => setIsOpen(!isOpen)}>
-          <FirstPageIcon
-            fontSize="large"
-            sx={{ color: 'var(--white)', minWidth: 'auto', transform: 'rotate(-180deg)', transition: 'all .3s ease' }}
-          />
-        </Button>
-        <Box sx={{ fontSize: '20px' }}>Чат стрима</Box>
-      </Box>
+    <StyledChatContainer>
+      <StyledChatHeader>
+        {!isMobile ? (
+          <Button onClick={() => setIsOpen(!isOpen)}>
+            <FirstPageIcon
+              fontSize="large"
+              sx={{ color: 'var(--white)', minWidth: 'auto', transform: 'rotate(-180deg)', transition: 'all .3s ease' }}
+            />
+          </Button>
+        ) : (
+          <></>
+        )}
+        <Box sx={{ fontSize: '20px', padding: isMobile ? '10px' : '' }}>Чат стрима</Box>
+      </StyledChatHeader>
       {/* Chat */}
       <StyledChatList ref={listRef}>
         {messages.length > 0 &&
@@ -75,10 +80,11 @@ export const Chat = ({
           ))}
       </StyledChatList>
       {/* Message box */}
-      <Box sx={{ position: 'relative', display: 'flex', gap: '12px', alignItems: 'center', marginTop: '20px' }}>
+      <StyledChatContainerMessages>
         <StyledChatTextField
           placeholder={isAuth ? 'Введите сообщение' : 'Только для авторизованных'}
           autoComplete="false"
+          disabled={!isAuth}
           value={text}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setText(e.target.value)}
           onKeyDown={(e: React.KeyboardEvent) => e.key === 'Enter' && handleSend()}
@@ -90,7 +96,7 @@ export const Chat = ({
         >
           <SendIcon sx={{ color: 'var(--white)' }} />
         </Button>
-      </Box>
-    </Box>
+      </StyledChatContainerMessages>
+    </StyledChatContainer>
   );
 };

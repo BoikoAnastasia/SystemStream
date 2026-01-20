@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 // mui
 import { Box } from '@mui/material';
 // styles
-import { StyledTab, StyledTabs } from '../../StylesComponents';
+import { StyledTab, StyledTabs } from './StyledTabsComponent';
 // types
 import { ITabPanelProps, ITabsComponentProps } from '../../../types/share';
 

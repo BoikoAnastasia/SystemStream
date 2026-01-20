@@ -9,21 +9,16 @@ import { CardDrawer } from '../cardDrawer/CardDrawer';
 // hooks
 import { useAppSelector } from '../../hooks/redux';
 // mui
-import { Box, SvgIconTypeMap, Typography } from '@mui/material';
+import { SvgIconTypeMap } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import HistoryIcon from '@mui/icons-material/History';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 // styles
-import {
-  StyledDrawer,
-  StyledSidebarLink,
-  StyledSidebarList,
-  StyledSidebarListItem,
-  StyledSidebarName,
-} from '../StylesComponents';
+import { StyledSidebarLink, StyledSidebarList, StyledSidebarListItem, StyledSidebarName } from '../StylesComponents';
 // types
 import { IStreamOnline, ISubscriber } from '../../types/share';
+import { DrawerContainer, DrawerContainerHeader, DrawerTypography, StyledDrawer } from './StyledDrawerComponent';
 
 interface IButtonInfo {
   icon: OverridableComponent<SvgIconTypeMap<{}, 'svg'>> & {
@@ -70,18 +65,10 @@ export const DrawerComponent = () => {
 
   return (
     <StyledDrawer open={open} onClose={() => setOpen(false)}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginLeft: '20px',
-            marginBottom: '45px',
-          }}
-        >
+      <DrawerContainer>
+        <DrawerContainerHeader>
           <Logo />
-        </Box>
+        </DrawerContainerHeader>
         <StyledSidebarName>Для вас</StyledSidebarName>
         <StyledSidebarList>
           {buttonInfo.map((btn: IButtonInfo, i) => (
@@ -96,9 +83,9 @@ export const DrawerComponent = () => {
           <>
             <StyledSidebarName>Ваши подписки:</StyledSidebarName>
             {subscribers === null ? (
-              <Typography sx={{ fontSize: '16px', color: 'var(--color-link)' }}>Загрузка...</Typography>
+              <DrawerTypography>Загрузка...</DrawerTypography>
             ) : subscribers.length === 0 ? (
-              <Typography sx={{ fontSize: '16px', color: 'var(--color-link)' }}>У вас нет подписок</Typography>
+              <DrawerTypography>У вас нет подписок</DrawerTypography>
             ) : (
               <StyledSidebarList sx={{ height: '100%', overflowX: 'hidden', flex: 1 }}>
                 {subscribers.map((card) => (
@@ -113,9 +100,9 @@ export const DrawerComponent = () => {
 
         <StyledSidebarName>Сейчас в эфире:</StyledSidebarName>
         {streams === null ? (
-          <Typography sx={{ fontSize: '16px', color: 'var(--color-link)' }}>Загрузка...</Typography>
+          <DrawerTypography>Загрузка...</DrawerTypography>
         ) : streams.length === 0 ? (
-          <Typography sx={{ fontSize: '16px', color: 'var(--color-link)' }}>Сейчас нет стримов</Typography>
+          <DrawerTypography>Сейчас нет стримов</DrawerTypography>
         ) : (
           (streams ?? []).map((stream: IStreamOnline) => (
             <StyledSidebarListItem key={stream.streamId}>
@@ -123,7 +110,7 @@ export const DrawerComponent = () => {
             </StyledSidebarListItem>
           ))
         )}
-      </Box>
+      </DrawerContainer>
     </StyledDrawer>
   );
 };

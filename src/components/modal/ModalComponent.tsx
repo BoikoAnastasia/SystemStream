@@ -1,6 +1,6 @@
 import { memo, useState, useEffect } from 'react';
 // context
-import { useHeaderModal } from '../../context/HeaderModalContext';
+// import { useHeaderModal } from '../../context/HeaderModalContext';
 // components
 import { FormLogin } from '../formLogin/FormLogin';
 import { FormAuth } from '../formRegistr/FormRegistr';
@@ -8,7 +8,8 @@ import { TabsComponent } from '../ui/tabs/TabsComponent';
 // mui
 import Modal from '@mui/material/Modal';
 // style
-import { StyledTitleModal, StyleModalContent } from '../StylesComponents';
+import { StyledTitleModal } from '../StylesComponents';
+import { StyleModalContent } from './StyledModal';
 
 export const ModalComponent = memo(
   ({ title, open, setOpen }: { title: string; open: boolean; setOpen: (open: boolean) => void }) => {

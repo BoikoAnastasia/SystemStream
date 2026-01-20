@@ -15,13 +15,12 @@ import { validationChangeCurrentStream } from '../../../../validation/validation
 import {
   StyledFilterButton,
   StyledFollowButton,
-  StyledListSettings,
   StyledNameComponents,
   StyledSpanDark,
-  StyledTextFieldModal,
-  StyleListItemSettings,
+  StyledTextFieldRegular,
 } from '../../../../components/StylesComponents';
 import { AlertType, ICategories, ILiveStatusStream, IUpdateStream } from '../../../../types/share';
+import { StyledListSettings, StyleListItemSettings } from '../../StyledSettingsPage';
 
 type StreamField = keyof IUpdateStream;
 
@@ -105,7 +104,7 @@ export const SettingUpdateStream = ({
                     {item.title}
                   </StyledNameComponents>
                   {item.type === 'field' ? (
-                    <StyledTextFieldModal
+                    <StyledTextFieldRegular
                       label={item.label}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -125,7 +124,7 @@ export const SettingUpdateStream = ({
                   ) : item.type === 'chip' ? (
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '15px', width: '100%' }}>
                       <StyledSpanDark>Вы можете добавить до 5 тегов, они будут отображаться на стриме.</StyledSpanDark>
-                      <StyledTextFieldModal
+                      <StyledTextFieldRegular
                         label={item.label}
                         disabled={values.tags.length >= 5}
                         onChange={(e) => setNewTag(e.target.value)}

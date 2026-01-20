@@ -1,82 +1,18 @@
 import { Link } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import {
-  Avatar,
   Box,
   Button,
   Card,
-  Drawer,
-  FormControl,
-  Grid,
   IconButton,
   InputLabel,
   List,
   ListItem,
   OutlinedInput,
-  Select,
-  Tab,
-  Tabs,
   TextField,
   Typography,
 } from '@mui/material';
-import { keyframes } from '@emotion/react';
-import {
-  ICardDrawerTypography,
-  IStyledButtonDark,
-  IStyledButtonForm,
-  StyledAlertMessageProps,
-  StyledButtonSearchProps,
-  StyledDragBoxProps,
-} from '../types/share';
-
-const animloader = keyframes`
-  0% {
-    transform: translateY(8px) scaleY(1) scaleX(1.25);
-  }
-  25%, 75% {
-    transform: translateY(-5px) scaleY(1.2) scaleX(1);
-  }
-  50% {
-    transform: translateY(-10px) scaleY(1) scaleX(1);
-  }
-  100% {
-    transform: translateY(8px) scaleY(0.8) scaleX(0.8);
-  }
-`;
-export const Styledloading = styled('span')(() => ({
-  position: 'relative',
-  display: 'inline-block',
-  fontSize: '2.5rem',
-  fontFamily: 'Arial, Helvetica, sans-serif',
-  color: '#FFF',
-  margin: '0 auto',
-  letterSpacing: '2px',
-  boxSizing: 'border-box',
-
-  '&::before': {
-    content: '""',
-    boxSizing: 'border-box',
-    position: 'absolute',
-    right: '54px',
-    bottom: '9.5px',
-    height: '24px',
-    width: '5.15px',
-    background: 'currentColor',
-  },
-
-  '&::after': {
-    content: '""',
-    width: '8px',
-    height: '8px',
-    position: 'absolute',
-    left: '99px',
-    top: '-5px',
-    borderRadius: '50%',
-    background: 'red',
-    boxSizing: 'border-box',
-    animation: `${animloader} 1s ease-in infinite`,
-  },
-}));
+import { ICardTypography, IStyledButtonForm } from '../types/share';
 
 export const ContainerBox = styled(Box)(() => ({
   display: 'flex',
@@ -88,24 +24,7 @@ export const ContainerBox = styled(Box)(() => ({
   padding: '10px 15px',
 }));
 
-export const StyledBannerUserName = styled('h1')(() => ({
-  fontSize: '40px',
-  fontWeight: 'bold',
-  color: 'var(--white)',
-  '@media (max-width: 1024px)': {
-    fontSize: '40px',
-  },
-}));
-
-export const StyledBannerUserInfo = styled('h1')(() => ({
-  fontSize: '28px',
-  fontWeight: 400,
-  color: '#bbb',
-  '@media (max-width: 1024px)': {
-    fontSize: '24px',
-  },
-}));
-
+// Typography
 export const StyledTitle = styled('h2')(() => ({
   fontSize: '28px',
   fontWeight: 'bold',
@@ -130,13 +49,14 @@ export const StyledNameComponents = styled('h4')(() => ({
   color: 'var(--white)',
 }));
 
-export const StyledAlertText = styled('span', {
-  shouldForwardProp: (prop) => prop !== 'type',
-})<StyledAlertMessageProps>(({ type }) => ({
-  fontSize: '16px',
-  fontWeight: 500,
-  lineHeight: 1.2,
-  color: type,
+export const CardTypography = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== 'c' && prop !== 'fs' && prop !== 'isEllipsis',
+})<ICardTypography>(({ c, fs, isEllipsis }) => ({
+  fontSize: fs ? fs : '1rem',
+  color: c ? c : 'var(--white)',
+  whiteSpace: 'nowrap',
+  overflow: isEllipsis ? 'hidden' : 'visible',
+  textOverflow: isEllipsis ? 'ellipsis' : 'clip',
 }));
 
 export const StyledSpanDark = styled('span')(() => ({
@@ -146,127 +66,16 @@ export const StyledSpanDark = styled('span')(() => ({
   color: 'var(--background-line)',
 }));
 
-export const StyledButtonsForm = styled(Box)(() => ({
-  width: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  gap: '12px',
-  '& > button': {
-    width: '100%',
-    borderRadius: '50px',
-  },
-}));
-
-export const StyledButtonLogIn = styled(Button)(() => ({
-  minWidth: '40px',
-  height: '40px',
-  color: 'var(--white)',
-  padding: '0',
-  borderRadius: '50%',
-  backgroundColor: 'var(--button-dark)',
-}));
-
-export const StyledButtonSearch = styled(TextField, {
-  shouldForwardProp: (prop) => prop !== 'h',
-})<StyledButtonSearchProps>(({ h }) => ({
-  width: '100%',
-  height: h || '40px',
-  maxWidth: '100%',
-  backgroundColor: 'var(--button-dark)',
-  borderRadius: '20px',
-  '& .MuiInputBase-root': {
-    minWidth: '200px',
-    height: '100%',
-    borderRadius: '20px',
-    color: 'var(--white)',
-    padding: '8px 0 8px 35px',
-  },
-}));
-
-// Tabs
-export const StyledTabs = styled(Tabs)(() => ({
-  display: 'inline-flex',
-  justifyContent: 'center',
-  width: '100%',
-  margin: '0 auto',
-  padding: '4px',
-  borderBottom: 'none',
-  borderRadius: '12px',
-  background: 'var(--background-tabs)',
-  scrollbarWidth: 'thin',
-  '& .MuiTabs-list': {
-    overflowX: 'auto',
-    whiteSpace: 'nowrap',
-  },
-  '& ::-webkit-scrollbar': {
-    height: '5px',
-    background: 'var(--background-scrollb)',
-    borderRadius: '5px',
-  },
-  '&.MuiTabs-root': {
-    width: 'auto',
-  },
-  '& .MuiTabs-indicator': {
-    display: 'none',
-  },
-
-  '& .MuiTabs-flexContainer': {
-    gap: '10px',
-  },
-  '@media (max-width: 768px)': {
-    width: '100% !important',
-    overflowX: 'auto',
-    '& .MuiTabs-scroller': {
-      overflowX: 'auto !important',
-      '&::-webkit-scrollbar': { display: 'none' },
-    },
-  },
-}));
-
-export const StyledTab = styled(Tab)(() => ({
-  textTransform: 'none',
-  fontSize: '0.95rem',
-  fontWeight: 500,
-  color: 'var(--color-link)',
-  minHeight: 36,
-  minWidth: 90,
-  borderRadius: '10px',
-  transition: 'all 0.25s ease',
-  background: 'transparent',
-  '&:hover': {
-    background: 'var(--background-tab)',
+// label
+export const StyledInputLabel = styled(InputLabel)(() => ({
+  color: 'var(--input-border)',
+  '&.Mui-focused': {
     color: 'var(--white)',
   },
-
-  '&.Mui-selected': {
-    color: 'var(--white)',
-    background: 'var(--gradient-selected)',
-    boxShadow: 'var(--boxShadowButton)',
-  },
 }));
 
-// modal
-export const StyleModalContent = styled(Box)(() => ({
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  maxWidth: '100%',
-  minWidth: '360px',
-  backgroundColor: 'var(--background)',
-  border: 'none',
-  padding: '20px 16px',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  gap: '20px',
-  fontSize: '28px',
-  borderRadius: '12px',
-}));
-
-export const StyledTextFieldModal = styled(TextField)(() => ({
+// input
+export const StyledTextFieldRegular = styled(TextField)(() => ({
   width: '100%',
   '& .MuiOutlinedInput-input': {
     color: 'var(--white) !important',
@@ -324,7 +133,7 @@ export const StyledTextFieldModal = styled(TextField)(() => ({
   },
 }));
 
-export const StyledOutlinedInputModal = styled(OutlinedInput)(() => ({
+export const StyledTextFieldOutlined = styled(OutlinedInput)(() => ({
   // Change label color
   '& .MuiInputLabel-root': {
     color: 'var(--input-border)',
@@ -380,23 +189,22 @@ export const StyledOutlinedInputModal = styled(OutlinedInput)(() => ({
   },
 }));
 
-export const StyledInputLabel = styled(InputLabel)(() => ({
-  color: 'var(--input-border)',
-  '&.Mui-focused': {
-    color: 'var(--white)',
+// Continer buttons
+
+export const StyledButtonsForm = styled(Box)(() => ({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  gap: '12px',
+  '& > button': {
+    width: '100%',
+    borderRadius: '50px',
   },
 }));
 
-export const StyledSocialButton = styled(IconButton)(() => ({
-  color: 'var(--input-border)',
-  borderRadius: 0,
-  backgroundColor: '#0000006e',
-  // background: 'var(--background-tabs)',
-  '&:hover': {
-    color: 'var(--white)',
-    backgroundColor: '#00000086',
-  },
-}));
+// IconButton
 
 export const StyledIconButton = styled(IconButton)(() => ({
   color: 'var(--input-border)',
@@ -407,6 +215,7 @@ export const StyledIconButton = styled(IconButton)(() => ({
   },
 }));
 
+// Form login
 export const StyledButtonForm = styled(Button, {
   shouldForwardProp: (prop) => prop !== 'bgcolor' && prop !== 'hoverbgcolor' && prop !== 'c' && prop !== 'hovercolor',
 })<IStyledButtonForm>(({ bgcolor, hovercolor, hoverbgcolor, c }) => ({
@@ -421,145 +230,40 @@ export const StyledButtonForm = styled(Button, {
   },
 }));
 
-export const StyledButtonLight = styled(Button)(() => ({
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '10px',
-  minWidth: '40px',
-  height: '40px',
-  fontWeight: 'bold',
-  color: 'var(--background-block)',
-  padding: '10px 20px',
-  borderRadius: '20px',
-  textTransform: 'none',
-  backgroundColor: 'var(--button-light)',
-}));
+// Video card
+export const StyledVideoCard = styled(Card)({
+  position: 'relative',
+  background: 'var(--background-tabs)',
+  borderRadius: '16px',
+  overflow: 'hidden',
+  cursor: 'pointer',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'translateY(-4px)',
+    background: 'var(--background-card)',
+  },
+});
 
-export const StyledButtonDark = styled(Button, {
-  shouldForwardProp: (prop) => prop !== 'br' && prop !== 'h',
-})<IStyledButtonDark>(({ br, h }) => ({
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '10px',
-  minWidth: h || '40px',
-  height: h || '40px',
-  fontWeight: 'bold',
-  color: 'var(--white)',
-  padding: '10px 20px',
-  borderRadius: br || '20px',
-  textTransform: 'none',
-  backgroundColor: 'var(--button-dark)',
-}));
-
-// Chat
-export const StyledChatList = styled(Box)(() => ({
+export const StyledVideoCardInfo = styled(Box)({
+  position: 'absolute',
+  bottom: '0',
   display: 'flex',
   flexDirection: 'column',
-  gap: '5px',
-  flex: 1,
-  padding: '20px 16px',
-  overflowY: 'auto',
-  justifyContent: 'flex-end',
-  '&::-webkit-scrollbar': {
-    width: '5px',
-  },
-  '&::-webkit-scrollbar-track': {
-    background: 'var(--background-block)', // фон трека
-    borderRadius: '5px',
-  },
-  '&::-webkit-scrollbar-thumb': {
-    background: 'var(--button-dark-hover)', // цвет ползунка
-    borderRadius: '5px',
-    border: 'none', // отступ вокруг ползунка
-  },
-  '&::-webkit-scrollbar-thumb:hover': {
-    background: 'var(--black)', // при наведении
-  },
-  // // Для Firefox
-  scrollbarWidth: 'thin',
-  scrollbarColor: 'var(--button-dark-hover) var(--background-block)',
-}));
-
-export const StyledChatCard = styled(Box)(() => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '5px',
-}));
-
-export const StyledChatCardNickname = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'customColor',
-})(({ customColor }: { customColor: string }) => ({
-  fontSize: '16px',
-  color: customColor || 'white',
-}));
-
-export const StyledChatCardMessage = styled(Box)(() => ({
-  fontSize: '14px',
-  wordBreak: 'break-word',
-}));
-
-export const StyledChatTextField = styled(TextField)(() => ({
-  flex: '0 0 auto',
   width: '100%',
-  borderRadius: '12px',
-  background: 'var(--button-dark)',
-  // Input text color
-  '& .MuiOutlinedInput-input': {
-    color: 'var(--white)',
-    paddingRight: '40px',
-  },
-  '& .MuiFormControl-root': {
-    borderColor: 'var(--white)',
-  },
-  // Label color
-  '& .MuiInputLabel-root': {
-    color: 'var(--input-border)',
-    '&.Mui-focused': {
-      color: 'var(--white)',
-    },
-  },
-  // Border color (default, hover, focused)
-  '& .MuiOutlinedInput-notchedOutline': {
-    borderRadius: '12px',
-  },
-}));
+  padding: '10px',
+  overflow: 'hidden',
+  background:
+    'linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgb(139 139 139 / 30%) 50%, rgb(151 151 151 / 80%) 100%)',
+  backdropFilter: 'blur(6px)',
+  pointerEvents: 'none',
+});
 
-export const StyledHeaderStreamPage = styled(Box)(() => ({
-  display: 'flex',
-  alignItems: 'flex-start',
-  justifyContent: 'space-between',
-  padding: '20px',
-  '@media (max-width: 768px)': {
-    flexDirection: 'column',
-    gap: '20px',
-  },
-}));
-
-export const StyledButtonLive = styled(Box)(() => ({
-  display: 'flex',
-  fontSize: '14px',
-  height: 'min-content',
-  whiteSpace: 'nowrap',
-  padding: '5px 10px',
-  borderRadius: '5px',
-  color: 'var(--white)',
-  background: 'var(--live-btn)',
-}));
-
-export const StyledButtonWathers = styled(Button)(() => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '5px',
-  fontSize: '10px',
-  height: 'min-content',
-  minWidth: 'min-content',
-  whiteSpace: 'nowrap',
-  padding: '5px',
-  color: 'var(--white)',
-  background: 'var(--modal-background)',
-}));
+export const StyledVideoCardLink = styled(Link)({
+  position: 'absolute',
+  width: '100%',
+  height: '100%',
+  zIndex: 1,
+});
 
 // StyledSidebar
 export const StyledSidebar = styled(Box)(() => ({
@@ -578,7 +282,7 @@ export const StyledSidebar = styled(Box)(() => ({
   },
 }));
 
-export const StyledSidebarName = styled('div')({
+export const StyledSidebarName = styled(Box)({
   fontSize: '14px',
   fontWeight: 600,
   textTransform: 'uppercase',
@@ -626,215 +330,7 @@ export const StyledSidebarLink = styled(Link)({
   },
 });
 
-// Drawer
-export const StyledDrawer = styled(Drawer)(() => ({
-  '& .MuiDrawer-paper': {
-    width: '250px',
-    height: '100%',
-    minWidth: '250px',
-    padding: '25px 16px 0',
-    background: 'var(--gradient-sidebar-open)',
-    paddingBottom: '200px',
-  },
-  '@media (max-width: 768px)': {
-    '& .MuiDrawer-paper': {
-      width: '40%',
-    },
-  },
-  '& ::-webkit-scrollbar': {
-    width: '5px',
-    background: 'var(--button-dark-hover)',
-    borderRadius: '5px',
-  },
-  scrollbarWidth: 'thin',
-}));
-
-// CardDrawer
-export const CardDrawerBoxWatch = styled(Box)(() => ({
-  position: 'absolute',
-  bottom: 0,
-  fontSize: '8px',
-  width: '100%',
-  padding: '2px',
-  textAlign: 'center',
-  borderRadius: '5px',
-  color: 'var(--white)',
-  backgroundColor: 'var(--live-btn)',
-}));
-
-export const CardDrawerTypography = styled(Typography, {
-  shouldForwardProp: (prop) => prop !== 'c' && prop !== 'fs' && prop !== 'isEllipsis',
-})<ICardDrawerTypography>(({ c, fs, isEllipsis }) => ({
-  fontSize: fs ? fs : '1rem',
-  color: c ? c : 'var(--white)',
-  whiteSpace: 'nowrap',
-  overflow: isEllipsis ? 'hidden' : 'visible',
-  textOverflow: isEllipsis ? 'ellipsis' : 'clip',
-}));
-
-// userProfile
-
-export const ContainerProfileComponents = styled(Box)(() => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '30px',
-  paddingBottom: '40px',
-}));
-
-export const StyledProfileSection = styled(Box)({
-  position: 'relative',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '20px',
-  height: '330px',
-  padding: '20px 60px 40px',
-  borderRadius: '20px',
-  overflow: 'hidden',
-  '@media (max-width: 768px)': {
-    flexDirection: 'column',
-    height: 'auto',
-    padding: '20px',
-  },
-});
-
-export const StyledInfo = styled(Box)({
-  position: 'relative',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  gap: '6px',
-  maxWidth: '50%',
-  padding: '20px',
-  borderRadius: '8px',
-  backgroundColor: '#0000001c',
-  zIndex: 2,
-  '@media (max-width: 768px)': {
-    maxWidth: '100%',
-    alignItems: 'center',
-  },
-});
-
-export const StyledBannerAvatar = styled(Avatar)(() => ({
-  height: '150px',
-  width: '150px',
-}));
-
-export const StyledFollowButton = styled(Button)({
-  fontSize: '0.95rem',
-  fontWeight: 600,
-  marginTop: '10px',
-  padding: '8px 28px',
-  color: 'var(--white)',
-  borderRadius: '10px',
-  background: 'var(--gradient-selected)',
-  textTransform: 'none',
-  '&:hover': { background: 'var(--gradient-selected-hover)' },
-});
-
-export const StyledAboutSection = styled(Box)({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '10px',
-  lineHeight: 1.6,
-});
-
-export const StyledSocials = styled(Box)({
-  position: 'absolute',
-  left: 0,
-  bottom: 0,
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-  gridAutoFlow: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '5px',
-  width: '100%',
-  padding: '0',
-  '@media (max-width: 768px)': {
-    position: 'relative',
-    gridTemplateColumns: 'repeat(2, minmax(150px, 1fr))',
-    gridAutoFlow: 'row',
-  },
-});
-
-export const StyledVideoSection = styled(Box)({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
-export const StyledVideoGrid = styled(Box)({
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-  gap: '20px',
-  padding: '0 20px',
-});
-
-export const StyledBoxEffect = styled(Box)(() => ({
-  position: 'absolute',
-  display: 'block',
-  listStyle: 'none',
-  animation: `${effect} 3s ease-in-out infinite alternate`,
-  backgroundImage: 'linear-gradient(-20deg, #2c2573ff 50%, #0000 50%)',
-  bottom: 0,
-  top: 0,
-  left: '-50%',
-  right: '-50%',
-  opacity: 0.2,
-  zIndex: -1,
-}));
-
-const effect = keyframes`
-  from {
-    transform: translateX(-25%);
-  }
-  to {
-    transform: translateX(25%);
-  }
-}`;
-
-export const StyledVideoCard = styled(Card)({
-  position: 'relative',
-  background: 'var(--background-tabs)',
-  borderRadius: '16px',
-  overflow: 'hidden',
-  cursor: 'pointer',
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    transform: 'translateY(-4px)',
-    background: 'var(--background-card)',
-  },
-});
-
-export const StyledVideoCardInfo = styled(Box)({
-  position: 'absolute',
-  bottom: '0',
-  display: 'flex',
-  flexDirection: 'column',
-  width: '100%',
-  padding: '10px',
-  overflow: 'hidden',
-  background:
-    'linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgb(139 139 139 / 30%) 50%, rgb(151 151 151 / 80%) 100%)',
-  backdropFilter: 'blur(6px)',
-  pointerEvents: 'none',
-});
-
-export const StyledVideoCardLink = styled(Link)({
-  position: 'absolute',
-  width: '100%',
-  height: '100%',
-  zIndex: 1,
-});
-
-// UserSchedule
-
-export const StyledFilters = styled(Box)({
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: '10px',
-});
-
+// buttons
 export const StyledFilterButton = styled(Button)({
   padding: '4px 12px',
   background: 'var(--background-tabs)',
@@ -857,245 +353,25 @@ export const StyledFilterButton = styled(Button)({
   },
 });
 
-export const StyledScheduleFormControl = styled(FormControl)({
-  color: 'var(--color-link)',
-  borderRadius: '10px',
-  background: 'var(--background-tabs)',
-  width: '25%',
-  height: 45,
-  '@media (max-width: 768px)': {
-    width: '100%',
-  },
-});
-
-export const StyledScheduleInputLabel = styled(InputLabel)({
-  width: '100%',
-  color: 'var(--color-link)',
-  '&.Mui-focused': {
-    color: 'var(--color-link)',
-  },
-  '& MuiOutlinedInput-input': {
-    borderColor: 'var(--color-link)',
-  },
-});
-
-export const StyledScheduleSelect = styled(Select)(() => ({
-  width: '100%',
-  color: 'var(--color-link)',
-  height: 45,
-  // // Border color (default, hover, focused)
-  '& .MuiOutlinedInput-notchedOutline': {
-    borderRadius: '12px',
-    borderColor: 'var(--color-link) !important',
-  },
-  '& .MuiSelect-icon': {
-    color: 'var(--color-link)',
-  },
-}));
-
-export const StyledScheduleCard = styled(Card)({
-  position: 'relative',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '10px',
-  padding: '20px',
-  borderRadius: '12px',
-  overflow: 'hidden',
-  background: 'var(--background-tabs)',
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    background: 'var(--background-card)',
-  },
-});
-
-export const StyledButtonReminder = styled(Button)({
-  display: 'inline-flex',
-  gap: '8px',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  fontSize: '1.125rem',
-  color: 'var(--white)',
-  borderRadius: '5px',
-  padding: '5px 15px',
-  background: 'rgba(255, 255, 255, 0.03)',
-  textTransform: 'none',
-});
-
-export const StyledScheduleCardText = styled(Typography)({
-  fontSize: '1rem',
-  color: '#cccfd8ff',
-});
-
-// CatalogUsers
-export const StyledUsersGrid = styled(Grid)({
-  justifyContent: 'center',
-  '@media (max-width: 768px)': {
-    justifyContent: 'flex-start',
-  },
-});
-
-export const StyledUserCard = styled(Box)({
-  position: 'relative',
-  borderRadius: 12,
-  padding: '20px',
-  background: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))',
-  boxShadow: '0 8px 30px var(--background-scrollbar)',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  textAlign: 'center',
-  transition: 'transform 220ms ease, box-shadow 220ms ease',
-  '&:hover': {
-    transform: 'translateY(-8px)',
-    boxShadow: '0 18px 50px var(--background-header-menu)',
-  },
-});
-
-export const StyledUserName = styled(Link)({
-  marginTop: 12,
+export const StyledFollowButton = styled(Button)({
+  fontSize: '0.95rem',
   fontWeight: 600,
+  marginTop: '10px',
+  padding: '8px 28px',
   color: 'var(--white)',
-  fontSize: 18,
-  '@media (max-width: 768px)': {
-    fontSize: 14,
-  },
-});
-
-export const StyledSubscribeButton = styled(Button)({
-  marginTop: 16,
-  width: '100%',
-  textTransform: 'none',
+  borderRadius: '10px',
   background: 'var(--gradient-selected)',
-  color: 'var(--white)',
-  borderRadius: 10,
-  padding: '10px 14px',
-  boxShadow: 'var(--boxShadowButton)',
-  '&:hover': {
-    background: 'var(--gradient-selected-hover)',
-  },
-});
-
-// avatar wrapper with soft glow
-export const StyledAvatarWrap = styled('div')({
-  width: 96,
-  height: 96,
-  borderRadius: '50%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-});
-
-// SettingsChangeProfile
-export const StyledListSettings = styled(List)({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '20px',
-  marginBottom: '30px',
-});
-
-export const StyleListItemSettings = styled(ListItem)({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'flex-start',
-  padding: 0,
-});
-
-export const StyleUploadButton = styled('label')({
   textTransform: 'none',
-  background: 'var(--gradient-selected)',
-  color: 'var(--white)',
-  borderRadius: 10,
-  padding: '10px 14px',
-  boxShadow: 'var(--boxShadowButton)',
-  cursor: 'pointer',
-  '&:hover': {
-    background: 'var(--gradient-selected-hover)',
-  },
+  '&:hover': { background: 'var(--gradient-selected-hover)' },
 });
-export const StyleUploadDrag = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'dragActive',
-})<StyledDragBoxProps>(({ dragActive }) => ({
+
+export const StyledButtonLive = styled(Box)(() => ({
   display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '20px',
-  width: '100%',
-  height: '150px',
-  borderRadius: '12px',
-  border: dragActive ? '2px solid var(--input-border)' : '1px solid var(--input-border)',
-  background: dragActive ? '#ffffff74' : '#ffffff1c',
+  fontSize: '14px',
+  height: 'min-content',
+  whiteSpace: 'nowrap',
+  padding: '5px 10px',
+  borderRadius: '5px',
+  color: 'var(--white)',
+  background: 'var(--live-btn)',
 }));
-
-// VideoPlayer
-export const VideoPlayerStyledBox = styled(Box)({
-  position: 'relative',
-  width: '100%',
-  height: '100%',
-  borderRadius: '20px',
-  cursor: 'pointer',
-  background: 'var(--black)',
-});
-
-export const VideoFrame = styled(Box)({
-  position: 'relative',
-  width: '100%',
-  height: '100%',
-  background: 'black',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  aspectRatio: '16 / 9',
-});
-
-export const StyledVideo = styled('video')({
-  maxWidth: '100%',
-  maxHeight: '100%',
-  width: '100%',
-  height: '100%',
-  objectFit: 'contain',
-  backgroundColor: 'black',
-});
-
-export const VideoPlayerStyledButtonPlay = styled(Button)({
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: '70px',
-  height: '70px',
-  padding: 0,
-  color: 'var(--white)',
-  border: '1px solid',
-  borderRadius: '50%',
-  boxShadow: '-1px 0px 20px 0 #000000c2',
-  transform: 'translate(-50%, -50%)',
-});
-
-export const VideoPlayerStyledBottom = styled(Box)({
-  position: 'absolute',
-  bottom: 0,
-  left: 0,
-  display: 'flex',
-  justifyContent: 'space-between',
-  width: '100%',
-  padding: 10,
-  backgroundColor: '#00000080',
-});
-
-export const VideoPlayerStyledButtons = styled(Box)({
-  display: 'flex',
-  gap: 10,
-  alignItems: 'center',
-});
-
-export const CircularProgressBox = styled(Box)({
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  zIndex: 10,
-  pointerEvents: 'none',
-});

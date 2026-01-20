@@ -16,17 +16,6 @@ import { StyledSidebar, StyledSidebarList, StyledSidebarListItem } from '../Styl
 export const Sidebar = () => {
   const { setOpen } = useDrawer();
   const streams = useAppSelector(selectStreams);
-  // const { data } = useAppSelector((state) => state.user);
-  // const [subscribers, setSubscribers] = useState<ISubscriber[] | null>(null);
-
-  // useEffect(() => {
-  //   if (!data) return;
-  //   const fetchSubsribers = async () => {
-  //     const users = await fetchtSubsribtionsMy();
-  //     setSubscribers(users);
-  //   };
-  //   fetchSubsribers();
-  // }, [data]);
 
   return (
     <StyledSidebar style={{ width: 'auto', padding: '9px 5px 0' }}>
@@ -45,16 +34,6 @@ export const Sidebar = () => {
           </StyledSidebarListItem>
         ))}
       </StyledSidebarList>
-
-      {/* {subscribers && (
-        <StyledSidebarList sx={{ height: '100%', overflowX: 'hidden', flex: 1 }}>
-          {subscribers.map((card) => (
-            <StyledSidebarListItem key={card.nickname}>
-              <CardDrawer card={card} variant="compact" />
-            </StyledSidebarListItem>
-          ))}
-        </StyledSidebarList>
-      )} */}
     </StyledSidebar>
   );
 };

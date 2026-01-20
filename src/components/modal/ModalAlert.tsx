@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { Modal } from '@mui/material';
-import { StyledAlertText, StyledFollowButton, StyleModalContent } from '../StylesComponents';
+import { StyledFollowButton } from '../StylesComponents';
 import { AlertType } from '../../types/share';
+import { StyledAlertText, StyleModalContent } from './StyledModal';
 
 interface IMessageProps {
   type?: AlertType;

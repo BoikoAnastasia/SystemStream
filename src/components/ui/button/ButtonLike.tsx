@@ -3,7 +3,7 @@ import { useState } from 'react';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 // styles
-import { StyledButtonLight } from '../../StylesComponents';
+import { Button, styled } from '@mui/material';
 
 export const ButtonLike = () => {
   const [isLike, setIsLike] = useState(false);
@@ -15,3 +15,18 @@ export const ButtonLike = () => {
     </StyledButtonLight>
   );
 };
+
+export const StyledButtonLight = styled(Button)(() => ({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '10px',
+  minWidth: '40px',
+  height: '40px',
+  fontWeight: 'bold',
+  color: 'var(--background-block)',
+  padding: '10px 20px',
+  borderRadius: '20px',
+  textTransform: 'none',
+  backgroundColor: 'var(--button-light)',
+}));

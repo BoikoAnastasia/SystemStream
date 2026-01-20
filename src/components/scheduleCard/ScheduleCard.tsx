@@ -5,13 +5,8 @@ import { useCheckedImage } from '../../hooks/checkImgFunctions';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { Box, CardMedia } from '@mui/material';
 // styles
-import {
-  StyledButtonLive,
-  StyledButtonReminder,
-  StyledNameComponents,
-  StyledScheduleCard,
-  StyledScheduleCardText,
-} from '../StylesComponents';
+import { StyledButtonLive, StyledNameComponents } from '../StylesComponents';
+import { StyledButtonReminder, StyledScheduleCard, StyledScheduleCardText } from './StyledScheduleCard';
 
 export const ScheduleCard = ({ live }: { live: boolean }) => {
   const [activeReminder, setActiveReminder] = useState(false);

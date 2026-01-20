@@ -20,7 +20,7 @@ import {
   VideoPlayerStyledBox,
   VideoPlayerStyledButtonPlay,
   VideoPlayerStyledButtons,
-} from '../StylesComponents';
+} from './StyledVideoPlayer';
 
 export const VideoPlayer = ({ src }: { src?: string }) => {
   const hlsRef = useRef<Hls | null>(null);
@@ -38,7 +38,7 @@ export const VideoPlayer = ({ src }: { src?: string }) => {
 
   const iconStyles = {
     color: 'white',
-    fontSize: '1.5em',
+    fontSize: '1.5rem',
   };
 
   const bigIconStyles = {
