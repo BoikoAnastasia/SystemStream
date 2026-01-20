@@ -14,6 +14,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 // styles
 import {
   CircularProgressBox,
+  StyledVideo,
+  VideoFrame,
   VideoPlayerStyledBottom,
   VideoPlayerStyledBox,
   VideoPlayerStyledButtonPlay,
@@ -28,10 +30,21 @@ export const VideoPlayer = ({ src }: { src?: string }) => {
 
   const [showControls, setShowControls] = useState(true);
   const [levels, setLevels] = useState<any[]>([]);
+  const [currentLevelIndex, setСurrentLevelIndex] = useState<number>(-1);
   const [open, setOpen] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const iconStyles = {
+    color: 'white',
+    fontSize: '1.5em',
+  };
+
+  const bigIconStyles = {
+    color: 'white',
+    fontSize: '3em',
+  };
 
   useEffect(() => {
     const handleFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
@@ -49,15 +62,25 @@ export const VideoPlayer = ({ src }: { src?: string }) => {
     const onCanPlay = () => {
       setIsLoading(false);
     };
+
     const onWaiting = () => {
-      setIsLoading(true);
+      if (!video.paused) {
+        setIsLoading(true);
+      }
     };
+
+    const onPause = () => {
+      setIsLoading(false);
+    };
+
     const onPlaying = () => {
       setIsLoading(false);
     };
+
     video.addEventListener('canplay', onCanPlay);
     video.addEventListener('waiting', onWaiting);
     video.addEventListener('playing', onPlaying);
+    video.addEventListener('pause', onPause);
 
     if (Hls.isSupported()) {
       if (hlsRef.current) {
@@ -95,6 +118,7 @@ export const VideoPlayer = ({ src }: { src?: string }) => {
       video.removeEventListener('canplay', onCanPlay);
       video.removeEventListener('waiting', onWaiting);
       video.removeEventListener('playing', onPlaying);
+      video.removeEventListener('pause', onPause);
 
       if (hls) {
         hls.off(Hls.Events.MANIFEST_PARSED);
@@ -165,6 +189,7 @@ export const VideoPlayer = ({ src }: { src?: string }) => {
     };
     hls.on(Hls.Events.FRAG_BUFFERED, onFragBuffered);
     hls.currentLevel = index;
+    setСurrentLevelIndex(index);
     setOpen(false);
   };
 
@@ -178,47 +203,58 @@ export const VideoPlayer = ({ src }: { src?: string }) => {
   const resetHideTimer = () => {
     setShowControls(true);
     if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-    hideTimerRef.current = setTimeout(() => setShowControls(false), 5000);
+    hideTimerRef.current = setTimeout(() => setShowControls(false), isFullscreen ? 3000 : 5000);
   };
+
+  useEffect(() => {
+    if (isFullscreen) {
+      resetHideTimer();
+    } else {
+      setShowControls(true);
+    }
+  }, [isFullscreen]);
+
   const handleMouseMove = () => resetHideTimer();
-  const handleMouseLeave = () => setShowControls(false);
+  const handleMouseLeave = () => {
+    if (isPlaying) {
+      setShowControls(false);
+    }
+  };
+
+  const handlePlayerClick = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('button')) return;
+    togglePlay();
+  };
 
   return (
     <VideoPlayerStyledBox
       ref={playerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={!showControls ? 'hideCursor' : ''}
+      onClick={handlePlayerClick}
+      className={!showControls && isPlaying ? 'hideCursor' : ''}
     >
-      {/* Видео всегда монтируем */}
-      <video
-        ref={videoRef}
-        controls={false}
-        onDoubleClick={toggleFullscreen}
-        controlsList="nodownload noplaybackrate"
-        disablePictureInPicture
-        style={{
-          width: isFullscreen ? '100%' : '80%',
-          margin: isFullscreen ? '0' : '0 auto',
-          display: 'block',
-          height: '100%',
-        }}
-      />
+      <VideoFrame>
+        {/* Видео всегда монтируем */}
+        <StyledVideo
+          ref={videoRef}
+          controls={false}
+          onDoubleClick={toggleFullscreen}
+          controlsList="nodownload noplaybackrate"
+          disablePictureInPicture
+        />
+      </VideoFrame>
 
       {/* Loader — оверлей поверх видео */}
-      {isLoading && (
+      {isLoading && isPlaying && (
         <CircularProgressBox>
-          <CircularProgress sx={{ color: 'white' }} />{' '}
+          <CircularProgress sx={{ color: 'white' }} />
         </CircularProgressBox>
       )}
 
       {src && showControls && (
         <VideoPlayerStyledButtonPlay onClick={togglePlay}>
-          {isPlaying ? (
-            <PauseIcon sx={{ color: 'white', fontSize: '3em' }} />
-          ) : (
-            <PlayArrowIcon sx={{ color: 'white', fontSize: '3em' }} />
-          )}
+          {isPlaying ? <PauseIcon sx={bigIconStyles} /> : <PlayArrowIcon sx={bigIconStyles} />}
         </VideoPlayerStyledButtonPlay>
       )}
 
@@ -226,21 +262,17 @@ export const VideoPlayer = ({ src }: { src?: string }) => {
         <VideoPlayerStyledBottom>
           <VideoPlayerStyledButtons>
             <IconButton onClick={togglePlay}>
-              {isPlaying ? (
-                <PauseIcon sx={{ color: 'white', fontSize: '1.5em' }} />
-              ) : (
-                <PlayArrowIcon sx={{ color: 'white', fontSize: '1.5em' }} />
-              )}
+              {isPlaying ? <PauseIcon sx={iconStyles} /> : <PlayArrowIcon sx={iconStyles} />}
             </IconButton>
             <SliderVolume videoRef={videoRef} />
           </VideoPlayerStyledButtons>
           <VideoPlayerStyledButtons>
-            {open && <ListSettings levels={levels} onClick={setQuality} />}
+            {open && <ListSettings levels={levels} onClick={setQuality} currentIndex={currentLevelIndex} />}
             <IconButton onClick={() => setOpen(!open)}>
-              <SettingsIcon sx={{ color: 'white', fontSize: '1.5em' }} />
+              <SettingsIcon sx={iconStyles} />
             </IconButton>
             <IconButton onClick={toggleFullscreen}>
-              <CropFreeIcon sx={{ color: 'white', fontSize: '1.5em' }} />
+              <CropFreeIcon sx={iconStyles} />
             </IconButton>
           </VideoPlayerStyledButtons>
         </VideoPlayerStyledBottom>

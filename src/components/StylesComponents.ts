@@ -1037,6 +1037,26 @@ export const VideoPlayerStyledBox = styled(Box)({
   background: 'var(--black)',
 });
 
+export const VideoFrame = styled(Box)({
+  position: 'relative',
+  width: '100%',
+  height: '100%',
+  background: 'black',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  aspectRatio: '16 / 9',
+});
+
+export const StyledVideo = styled('video')({
+  maxWidth: '100%',
+  maxHeight: '100%',
+  width: '100%',
+  height: '100%',
+  objectFit: 'contain',
+  backgroundColor: 'black',
+});
+
 export const VideoPlayerStyledButtonPlay = styled(Button)({
   position: 'absolute',
   top: '50%',
@@ -1050,6 +1070,7 @@ export const VideoPlayerStyledButtonPlay = styled(Button)({
   color: 'var(--white)',
   border: '1px solid',
   borderRadius: '50%',
+  boxShadow: '-1px 0px 20px 0 #000000c2',
   transform: 'translate(-50%, -50%)',
 });
 
