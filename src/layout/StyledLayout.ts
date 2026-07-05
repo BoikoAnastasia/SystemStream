@@ -11,7 +11,7 @@ export const StyleHeader = styled(Box)(() => ({
 export const StyleHeaderContainer = styled(Box)(() => ({
   display: 'flex',
   alignItems: 'center',
-  padding: '10px 15px',
+  padding: '10px var(--layout-padding-x)',
 }));
 
 export const StyleHeaderBlock = styled(Box)(() => ({

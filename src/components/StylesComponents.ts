@@ -19,9 +19,12 @@ export const ContainerBox = styled(Box)(() => ({
   flexDirection: 'column',
   gap: '32px',
   width: '100%',
-  maxWidth: '1440px',
+  maxWidth: 'var(--layout-max-width)',
   margin: '0 auto',
-  padding: '10px 15px',
+  padding: `10px var(--layout-padding-x)`,
+  '@media (max-width: 768px)': {
+    gap: '24px',
+  },
 }));
 
 // Typography

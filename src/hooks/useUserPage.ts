@@ -48,7 +48,23 @@ export const useUserPage = (paramNickname?: string) => {
     nickname: nickname || paramNickname,
     userData,
   });
-  const { messages, sendMessage } = useChat(connection, nickname || paramNickname);
+
+  const {
+    messages,
+    sendMessage,
+    deleteMessage,
+    timeoutUser,
+    banUser,
+    unbanUser,
+    chatError,
+    clearChatError,
+    slowModeSeconds,
+    setSlowMode,
+    canManageChat,
+    bannedUserIds,
+    inputRestore,
+    consumeInputRestore,
+  } = useChat(connection, nickname || paramNickname, profile);
 
   return {
     userData,
@@ -61,5 +77,17 @@ export const useUserPage = (paramNickname?: string) => {
     isError,
     messages,
     sendMessage,
+    deleteMessage,
+    timeoutUser,
+    banUser,
+    unbanUser,
+    chatError,
+    clearChatError,
+    slowModeSeconds,
+    setSlowMode,
+    canManageChat,
+    bannedUserIds,
+    inputRestore,
+    consumeInputRestore,
   };
 };

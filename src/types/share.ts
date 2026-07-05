@@ -263,12 +263,15 @@ export interface IUser {
 
 // Chat
 export interface IChatMessage {
+  id: string;
   userId: number;
   username: string;
   text: string;
   role: string;
   timestamp: string;
   offsetSeconds: number;
+  isDeleted?: boolean;
+  deletedText?: string;
 }
 
 // Settings

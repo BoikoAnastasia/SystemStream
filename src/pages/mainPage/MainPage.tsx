@@ -274,7 +274,25 @@ export const MainPage: FC = appLayout((): JSX.Element => {
   const pageCount = Math.ceil(totalStreams / pageSize);
 
   const { nickname: paramNickname } = useParams<{ nickname: string }>();
-  const { messages, sendMessage, currentStream, viewerCount } = useUserPage(paramNickname);
+  const {
+    messages,
+    sendMessage,
+    deleteMessage,
+    timeoutUser,
+    banUser,
+    unbanUser,
+    chatError,
+    clearChatError,
+    slowModeSeconds,
+    setSlowMode,
+    canManageChat,
+    bannedUserIds,
+    inputRestore,
+    consumeInputRestore,
+    currentStream,
+    viewerCount,
+    userData,
+  } = useUserPage(paramNickname);
 
   useEffect(() => {
     if (!data && !isLoading) {
@@ -306,6 +324,26 @@ export const MainPage: FC = appLayout((): JSX.Element => {
             viewerCount={viewerCount}
             messages={messages}
             sendMessage={sendMessage}
+            deleteMessage={deleteMessage}
+            timeoutUser={timeoutUser}
+            banUser={banUser}
+            unbanUser={unbanUser}
+            bannedUserIds={bannedUserIds}
+            chatError={chatError}
+            clearChatError={clearChatError}
+            inputRestore={inputRestore}
+            consumeInputRestore={consumeInputRestore}
+            slowModeSeconds={slowModeSeconds}
+            setSlowMode={setSlowMode}
+            canManageChat={canManageChat}
+            streamer={
+              currentStream
+                ? {
+                    nickname: userData?.nickname ?? currentStream.streamerName,
+                    avatarUrl: userData?.profileImage,
+                  }
+                : undefined
+            }
           />
           <TabsComponent propsChild={getTabsComponents()} propTabsTitle={['Live', 'Видео', 'Клипы', 'Пользователи']} />
           {streams.length > 0 && (

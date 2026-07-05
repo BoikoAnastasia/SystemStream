@@ -4,7 +4,13 @@ export const StyledContainerStream = styled(Box)(() => ({
   display: 'flex',
   position: 'relative',
   overflow: 'hidden',
-  minHeight: '500px',
+  height: 'auto',
+  maxHeight: 'none',
+  minHeight: 0,
+  transition: 'min-height 0.35s ease, max-height 0.35s ease, height 0.35s ease',
+  '@media (max-width: 768px)': {
+    minHeight: 'auto',
+  },
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -30,19 +36,32 @@ export const StyledStreamContainerVideoPlayer = styled(Box)(() => ({
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
-  // flex: videoContainerFlex,
-  height: '100%',
-  maxHeight: '830px',
+  minHeight: 0,
+  height: 'auto',
   zIndex: 1,
   backgroundColor: 'rgba(255,255,255,0.05)',
   backdropFilter: 'blur(16px)',
-  transition: 'all .3s ease',
+  transition: 'flex 0.35s ease',
+  '@media (max-width: 768px)': {
+    height: 'auto',
+    flex: '0 0 auto',
+  },
 }));
 
 export const StyledStreamContainerChat = styled(Box)(() => ({
-  height: '100%',
-  maxHeight: '636px',
-  transition: 'all .3s ease',
+  display: 'flex',
+  flexDirection: 'column',
+  minHeight: 0,
+  minWidth: 0,
+  overflow: 'hidden',
+  transition: 'flex 0.35s ease',
+  borderRadius: '4px',
+  '@media (max-width: 768px)': {
+    height: 'min(50vh, 420px)',
+    maxHeight: 'min(50vh, 420px)',
+    minHeight: '280px',
+    flex: '0 0 auto',
+  },
 }));
 
 export const StyledButtonWathers = styled(Button)(() => ({

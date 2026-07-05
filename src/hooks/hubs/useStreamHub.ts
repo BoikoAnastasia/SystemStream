@@ -21,6 +21,7 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
 
   const [currentStream, setCurrentStream] = useState<IStream | null>(null);
   const [viewerCount, setViewerCount] = useState<number>(0);
+  const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
 
   const hubUrl = `${process.env.REACT_APP_API_LOCAL}/hubs/streamHub`;
 
@@ -41,6 +42,7 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
 
     // Уже есть подключение → не создаём новое
     if (hubRef.current && hubRef.current.state !== signalR.HubConnectionState.Disconnected) {
+      setConnection(hubRef.current);
       return;
     }
 
@@ -108,6 +110,7 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
     hub
       .start()
       .then(() => {
+        setConnection(hub);
         hub.invoke('JoinStream', nickname, userTokenRef.current).catch(console.error);
 
         // Статус обновляем раз в 15 сек
@@ -123,6 +126,7 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
 
     // Автовосстановление
     hub.onreconnected(() => {
+      setConnection(hub);
       hub.invoke('JoinStream', nickname, userTokenRef.current).catch(console.error);
     });
 
@@ -139,6 +143,7 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
 
       hub.stop().catch(() => {});
       hubRef.current = null;
+      setConnection(null);
     };
   }, [nickname, userData?.id, hubUrl]);
 
@@ -202,6 +207,6 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
     videoRef,
     currentStream,
     viewerCount,
-    connection: hubRef.current,
+    connection,
   };
 };

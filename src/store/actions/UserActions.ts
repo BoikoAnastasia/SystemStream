@@ -28,7 +28,7 @@ export const loginUser = async ({ loginOrEmail, password }: { loginOrEmail: stri
       console.error('Токен не получен');
       return false;
     }
-    setCookie('tokenData', data.token, 30);
+    setCookie('tokenData', data.token, 1);
     return true;
   } catch (error: any) {
     console.error(error.message);
@@ -59,9 +59,14 @@ export const registrationUser = async (username: string, email: string, password
 
 // profile
 export const userProfile = () => async (dispatch: AppDispatch) => {
+  const token = getCookie('tokenData');
+  if (!token) {
+    dispatch(UserLogout());
+    return { ok: false, unauthorized: true };
+  }
+
   try {
     dispatch(UserFetch());
-    const token = getCookie('tokenData');
     const response = await fetch(`${process.env.REACT_APP_API_USER}/profile`, {
       method: 'GET',
       headers: {
@@ -69,11 +74,26 @@ export const userProfile = () => async (dispatch: AppDispatch) => {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    if (response.status === 401 || response.status === 403) {
+      removeCookie('tokenData');
+      dispatch(UserLogout());
+      return { ok: false, unauthorized: true };
+    }
+
+    if (!response.ok) {
+      const message = await response.text().catch(() => response.statusText);
+      dispatch(UserFetchError(message || `Ошибка сервера (${response.status})`));
+      return { ok: false, unauthorized: false };
+    }
+
     const data = await response.json();
     dispatch(UserFetchSuccess(data));
-    return { payload: data };
+    return { ok: true, payload: data };
   } catch (error) {
-    dispatch(UserFetchError(error));
+    const message = error instanceof Error ? error.message : 'Сеть недоступна';
+    dispatch(UserFetchError(message));
+    return { ok: false, unauthorized: false };
   }
 };
 

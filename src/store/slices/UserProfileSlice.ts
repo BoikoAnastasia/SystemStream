@@ -31,7 +31,6 @@ export const UserProfileSlice = createSlice({
     UserFetchError: (state, action) => {
       state.isError = action.payload;
       state.isLoading = false;
-      state.isAuth = false;
     },
     SetAuth: (state, action: PayloadAction<boolean>) => {
       state.isAuth = action.payload;

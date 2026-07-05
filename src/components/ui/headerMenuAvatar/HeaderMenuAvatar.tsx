@@ -14,6 +14,7 @@ import { IconButton, MenuItem } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import SavingsIcon from '@mui/icons-material/Savings';
 import SettingsIcon from '@mui/icons-material/Settings';
+import DashboardCustomizeOutlinedIcon from '@mui/icons-material/DashboardCustomizeOutlined';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -35,6 +36,12 @@ export const HeaderMenuAvatar = () => {
       href: `/${profile?.nickname}`,
       icon: PermIdentityIcon,
       value: 'Профиль',
+    },
+    {
+      authOnly: true,
+      href: '/dashboard',
+      icon: DashboardCustomizeOutlinedIcon,
+      value: 'Панель стрима',
     },
     {
       authOnly: true,

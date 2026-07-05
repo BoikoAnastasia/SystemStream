@@ -22,8 +22,28 @@ import { useAppSelector } from '../../hooks/redux';
 export const UserPage: FC = appLayout(() => {
   const dispatch = useDispatch<AppDispatch>();
   const { nickname: paramNickname } = useParams<{ nickname: string }>();
-  const { userData, isNotProfileData, currentStream, viewerCount, isLoading, isError, messages, sendMessage } =
-    useUserPage(paramNickname);
+  const {
+    userData,
+    isNotProfileData,
+    currentStream,
+    viewerCount,
+    isLoading,
+    isError,
+    messages,
+    sendMessage,
+    deleteMessage,
+    timeoutUser,
+    banUser,
+    unbanUser,
+    chatError,
+    clearChatError,
+    slowModeSeconds,
+    setSlowMode,
+    canManageChat,
+    bannedUserIds,
+    inputRestore,
+    consumeInputRestore,
+  } = useUserPage(paramNickname);
   const {
     data: userHistoryStream,
     isLoading: loadHistory,
@@ -67,6 +87,23 @@ export const UserPage: FC = appLayout(() => {
             viewerCount={viewerCount}
             messages={messages}
             sendMessage={sendMessage}
+            deleteMessage={deleteMessage}
+            timeoutUser={timeoutUser}
+            banUser={banUser}
+            unbanUser={unbanUser}
+            bannedUserIds={bannedUserIds}
+            chatError={chatError}
+            clearChatError={clearChatError}
+            inputRestore={inputRestore}
+            consumeInputRestore={consumeInputRestore}
+            slowModeSeconds={slowModeSeconds}
+            setSlowMode={setSlowMode}
+            canManageChat={canManageChat}
+            streamer={
+              userData
+                ? { nickname: userData.nickname, avatarUrl: userData.profileImage }
+                : { nickname: currentStream.streamerName }
+            }
           />
         )}
         <UserBanner userData={userData} isNotProfileData={isNotProfileData} />

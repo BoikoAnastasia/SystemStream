@@ -26,16 +26,8 @@ export const useAuthRestore = () => {
     }
 
     dispatch(SetAuth(true));
-    // получение профиля
-    dispatch(userProfile())
-      .then(() => console.log('Профиль получен'))
-      .catch(() => {
-        dispatch(UserLogout()); // токен невалидный
-      })
-      .finally(() => setIsLoading(false));
-    // получение уведомлений
+    dispatch(userProfile()).finally(() => setIsLoading(false));
     dispatch(notificationWithPagination())
-      .then(() => console.log('Уведомления получены'))
       .catch((error) => {
         dispatch(NotificationFetchError(error));
       })

@@ -26,6 +26,25 @@ const SettingsPage = lazy(() =>
   }))
 );
 
+const DashboardPage = lazy(() =>
+  import('../pages/dashboardPage/DashboardPage').then(({ DashboardPage }) => ({
+    default: DashboardPage,
+  }))
+);
+
+const ChannelManagePage = lazy(() =>
+  import('../pages/dashboardPage/ChannelManagePage').then(({ ChannelManagePage }) => ({
+    default: ChannelManagePage,
+  }))
+);
+
+// TEMP: demo-плеер — удалить вместе с pages/playerDemo/
+const PlayerDemoPage = lazy(() =>
+  import('../pages/playerDemo/PlayerDemoPage').then(({ PlayerDemoPage }) => ({
+    default: PlayerDemoPage,
+  }))
+);
+
 export const PrivateRoute = () => {
   const { isAuth } = useAppSelector((state) => state.user);
 
@@ -34,8 +53,16 @@ export const PrivateRoute = () => {
 
 export const routers = [
   { path: '/', Element: MainPage },
+  // TEMP: demo-плеер — удалить строку + pages/playerDemo/ (должен быть ВЫШЕ /:nickname)
+  { path: '/player-demo', Element: PlayerDemoPage },
   { path: '/:nickname', Element: UserPage },
   // { path: '/stream', Element: StreamPage },
 ];
 
-export const privateRouters = [{ path: '/settings', Element: SettingsPage }];
+export const privateRouters = [
+  { path: '/settings', Element: SettingsPage },
+  { path: '/dashboard', Element: DashboardPage },
+  { path: '/dashboard/:section', Element: DashboardPage },
+  { path: '/:nickname/manage', Element: ChannelManagePage },
+  { path: '/:nickname/manage/:section', Element: ChannelManagePage },
+];
