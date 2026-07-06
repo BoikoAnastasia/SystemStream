@@ -1,24 +1,126 @@
-import { Avatar, Box, Button, CircularProgress, Typography } from '@mui/material';
+import { Avatar, Box, Button, Chip, CircularProgress, Switch, TextField, Typography } from '@mui/material';
 import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
+import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
+import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
+import RuleOutlinedIcon from '@mui/icons-material/RuleOutlined';
+import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
+import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
+import CardGiftcardOutlinedIcon from '@mui/icons-material/CardGiftcardOutlined';
+import { FormEvent, useState } from 'react';
 import { DashboardMode } from '../dashboard.constants';
 import { useStreamBans } from '../../../hooks/useStreamBans';
+import { useStreamChatSettings } from '../../../hooks/useStreamChatSettings';
+import { SlowModePresets } from '../../../components/chat/SlowModePresets';
+import { DashboardSaveNotice } from '../components/DashboardSaveNotice';
+import { DashboardBlock, dashboardChatGridSx } from '../components/DashboardBlock';
 import { StyledDashboardSectionHint, StyledDashboardSectionTitle } from '../StyledDashboardPage';
 
-const formatBannedAt = (value: string) => {
+const SCROLL_BOX_SX = {
+  flex: 1,
+  minHeight: 180,
+  maxHeight: 220,
+  overflowY: 'auto' as const,
+  pr: 0.5,
+  '&::-webkit-scrollbar': { width: 6 },
+  '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255,255,255,0.15)', borderRadius: 3 },
+};
+
+const fieldSx = {
+  '& .MuiOutlinedInput-root': {
+    color: '#fff',
+    bgcolor: 'rgba(255,255,255,0.04)',
+    fontSize: 13,
+    '& fieldset': { borderColor: 'rgba(255,255,255,0.12)' },
+  },
+};
+
+const formatDate = (value: string) => {
   if (!value) return '';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleString('ru-RU', {
     day: 'numeric',
     month: 'short',
-    year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
   });
 };
 
+const ACTION_LABELS: Record<string, string> = {
+  Delete: 'Удалил сообщение',
+  Timeout: 'Таймаут',
+  Ban: 'Бан',
+  Unban: 'Разбан',
+  SlowMode: 'Slow mode',
+  RulesUpdate: 'Правила чата',
+};
+
+const formatLogLine = (entry: {
+  action: string;
+  actorUsername: string;
+  targetUsername?: string | null;
+  details?: string | null;
+}) => {
+  const action = ACTION_LABELS[entry.action] ?? entry.action;
+  const target = entry.targetUsername ? ` → ${entry.targetUsername}` : '';
+  const details = entry.details ? ` (${entry.details})` : '';
+  return `${entry.actorUsername}: ${action}${target}${details}`;
+};
+
+const NOTIFICATION_PLACEHOLDERS = [
+  { id: 'follow', icon: <PersonAddOutlinedIcon sx={{ fontSize: 16 }} />, label: 'Новый подписчик' },
+  { id: 'gift', icon: <CardGiftcardOutlinedIcon sx={{ fontSize: 16 }} />, label: 'Подарочная подписка' },
+];
+
 export const DashboardChatSection = ({ channelNickname, mode }: { channelNickname: string; mode: DashboardMode }) => {
-  const { bans, canManageChat, isLoading, error, actionError, unban } = useStreamBans(channelNickname, mode);
+  const {
+    settings,
+    modLog,
+    canManageChat,
+    isLoading: settingsLoading,
+    error: settingsError,
+    actionError: settingsActionError,
+    isSaving,
+    saveSettings,
+    reloadModLog,
+  } = useStreamChatSettings(channelNickname, mode);
+
+  const {
+    bans,
+    isLoading: bansLoading,
+    error: bansError,
+    actionError: bansActionError,
+    unban,
+  } = useStreamBans(channelNickname, mode);
+
+  const [chatRulesDraft, setChatRulesDraft] = useState<string | null>(null);
+  const [saveNotice, setSaveNotice] = useState<string | null>(null);
+  const rulesValue = chatRulesDraft ?? settings.chatRules;
+
+  const isLoading = settingsLoading || bansLoading;
+  const error = settingsError || bansError;
+  const actionError = settingsActionError || bansActionError;
+
+  const handleRulesSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setSaveNotice(null);
+    const ok = await saveSettings({ chatRules: rulesValue });
+    if (ok) {
+      setChatRulesDraft(null);
+      setSaveNotice('Правила чата сохранены');
+    }
+  };
+
+  const handleSlowModeChange = async (seconds: number) => {
+    setSaveNotice(null);
+    const ok = await saveSettings({ slowModeSeconds: seconds });
+    if (ok) setSaveNotice(seconds === 0 ? 'Slow mode выключен' : `Slow mode: ${seconds} сек`);
+  };
+
+  const handleUnban = async (userId: number) => {
+    const ok = await unban(userId);
+    if (ok) reloadModLog();
+  };
 
   if (isLoading) {
     return (
@@ -47,79 +149,192 @@ export const DashboardChatSection = ({ channelNickname, mode }: { channelNicknam
   }
 
   return (
-    <Box>
-      <StyledDashboardSectionTitle>Настройки чата</StyledDashboardSectionTitle>
-      <StyledDashboardSectionHint>
-        {mode === 'own'
-          ? 'Забаненные пользователи не могут писать в чат. Их сообщения скрываются.'
-          : `Модерация чата канала ${channelNickname}.`}
-      </StyledDashboardSectionHint>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'flex-start', width: '100%' }}>
+      <Box>
+        <StyledDashboardSectionTitle sx={{ mb: 0.5 }}>Настройки чата</StyledDashboardSectionTitle>
+        <StyledDashboardSectionHint sx={{ mb: 0 }}>
+          {mode === 'own'
+            ? 'Компактные блоки: уведомления, правила и модерация.'
+            : `Модерация чата канала ${channelNickname}.`}
+        </StyledDashboardSectionHint>
+      </Box>
 
-      <Box sx={{ mt: 2 }}>
-        <Typography
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            fontSize: 15,
-            fontWeight: 700,
-            color: '#fff',
-            mb: 1.5,
-          }}
+      <DashboardSaveNotice message={saveNotice} onClose={() => setSaveNotice(null)} />
+      {actionError && !saveNotice && <DashboardSaveNotice message={actionError} severity="error" />}
+
+      <Box sx={dashboardChatGridSx}>
+        <DashboardBlock
+          icon={<NotificationsOutlinedIcon sx={{ fontSize: 18, color: '#ffb86c' }} />}
+          title="Уведомления стримера"
+          hint="Скоро — оповещения о подписках и донатах"
         >
-          <BlockOutlinedIcon sx={{ fontSize: 18, color: '#ff8a8a' }} />
-          Забаненные
-        </Typography>
-
-        {actionError && <Typography sx={{ color: '#ff8a8a', fontSize: 13, mb: 2 }}>{actionError}</Typography>}
-
-        {bans.length === 0 ? (
-          <Typography sx={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }}>Список банов пуст.</Typography>
-        ) : (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            {bans.map((ban) => (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, flex: 1 }}>
+            {NOTIFICATION_PLACEHOLDERS.map((item) => (
               <Box
-                key={ban.userId}
+                key={item.id}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 1.5,
-                  p: 1.5,
-                  borderRadius: 2,
+                  justifyContent: 'space-between',
+                  gap: 1,
+                  py: 0.5,
+                  px: 0.75,
+                  borderRadius: 1,
                   bgcolor: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.08)',
                 }}
               >
-                <Avatar
-                  src={ban.profileImage ? `${process.env.REACT_APP_API_LOCAL}${ban.profileImage}` : undefined}
-                  sx={{ width: 36, height: 36 }}
-                />
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>{ban.username}</Typography>
-                  <Typography sx={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', mt: 0.25 }}>
-                    {formatBannedAt(ban.bannedAt)}
-                  </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+                  <Box sx={{ color: 'rgba(255,255,255,0.45)' }}>{item.icon}</Box>
+                  <Typography sx={{ fontSize: 12, color: 'rgba(255,255,255,0.75)' }}>{item.label}</Typography>
                 </Box>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  onClick={() => unban(ban.userId)}
-                  sx={{
-                    textTransform: 'none',
-                    color: '#6fff79',
-                    borderColor: 'rgba(111,255,121,0.35)',
-                    '&:hover': {
-                      borderColor: 'rgba(111,255,121,0.6)',
-                      bgcolor: 'rgba(111,255,121,0.08)',
-                    },
-                  }}
-                >
-                  Разбанить
-                </Button>
+                <Switch size="small" disabled sx={{ opacity: 0.45 }} />
               </Box>
             ))}
+            <Box sx={{ mt: 'auto', pt: 0.5 }}>
+              <Chip
+                label="Скоро"
+                size="small"
+                sx={{
+                  height: 22,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  bgcolor: 'rgba(255,184,108,0.12)',
+                  color: '#ffb86c',
+                  border: '1px solid rgba(255,184,108,0.25)',
+                }}
+              />
+            </Box>
           </Box>
-        )}
+        </DashboardBlock>
+
+        <DashboardBlock
+          icon={<TimerOutlinedIcon sx={{ fontSize: 18, color: '#56cb27' }} />}
+          title="Slow mode"
+          hint="Задержка между сообщениями зрителей"
+        >
+          <SlowModePresets
+            value={settings.slowModeSeconds}
+            disabled={isSaving}
+            compact
+            onChange={handleSlowModeChange}
+          />
+        </DashboardBlock>
+
+        <DashboardBlock
+          icon={<RuleOutlinedIcon sx={{ fontSize: 18, color: '#8e7bff' }} />}
+          title="Правила чата"
+          hint="Блок «Правила чата» над сообщениями в чате"
+          sx={{ gridColumn: { xs: '1', sm: '1 / -1', lg: 'auto' } }}
+        >
+          <Box
+            component="form"
+            onSubmit={handleRulesSubmit}
+            sx={{ display: 'flex', flexDirection: 'column', gap: 1, flex: 1, justifyContent: 'space-between' }}
+          >
+            <TextField
+              multiline
+              minRows={3}
+              maxRows={4}
+              fullWidth
+              size="small"
+              value={rulesValue}
+              onChange={(e) => setChatRulesDraft(e.target.value.slice(0, 500))}
+              placeholder="Будьте вежливы, без спама..."
+              sx={fieldSx}
+            />
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography sx={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>{rulesValue.length} / 500</Typography>
+              <Button
+                type="submit"
+                size="small"
+                variant="contained"
+                disabled={isSaving || rulesValue === settings.chatRules}
+                sx={{ textTransform: 'none', bgcolor: '#6d5dfb', '&:hover': { bgcolor: '#8e7bff' } }}
+              >
+                Сохранить
+              </Button>
+            </Box>
+          </Box>
+        </DashboardBlock>
+
+        <DashboardBlock
+          icon={<BlockOutlinedIcon sx={{ fontSize: 18, color: '#ff8a8a' }} />}
+          title="Модерация и баны"
+          hint={`Забанено: ${bans.length}`}
+        >
+          {bans.length === 0 ? (
+            <Typography sx={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>Список банов пуст.</Typography>
+          ) : (
+            <Box sx={{ ...SCROLL_BOX_SX, display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+              {bans.map((ban) => (
+                <Box
+                  key={ban.userId}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    py: 0.5,
+                    borderBottom: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                >
+                  <Avatar
+                    src={ban.profileImage ? `${process.env.REACT_APP_API_LOCAL}${ban.profileImage}` : undefined}
+                    sx={{ width: 28, height: 28 }}
+                  />
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography sx={{ color: '#fff', fontWeight: 600, fontSize: 13, lineHeight: 1.2 }}>
+                      {ban.username}
+                    </Typography>
+                    <Typography sx={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>
+                      {formatDate(ban.bannedAt)}
+                    </Typography>
+                  </Box>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => handleUnban(ban.userId)}
+                    sx={{
+                      minWidth: 0,
+                      px: 1,
+                      py: 0.25,
+                      fontSize: 11,
+                      textTransform: 'none',
+                      color: '#6fff79',
+                      borderColor: 'rgba(111,255,121,0.35)',
+                      '&:hover': { borderColor: 'rgba(111,255,121,0.6)', bgcolor: 'rgba(111,255,121,0.08)' },
+                    }}
+                  >
+                    Разбан
+                  </Button>
+                </Box>
+              ))}
+            </Box>
+          )}
+        </DashboardBlock>
+
+        <DashboardBlock
+          icon={<HistoryOutlinedIcon sx={{ fontSize: 18, color: '#8e7bff' }} />}
+          title="Лог модерации"
+          hint={`Последние ${Math.min(modLog.length, 30)} записей`}
+          sx={{ gridColumn: { sm: 'auto', lg: 'span 2' } }}
+        >
+          {modLog.length === 0 ? (
+            <Typography sx={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>Пока пусто.</Typography>
+          ) : (
+            <Box sx={{ ...SCROLL_BOX_SX, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+              {modLog.map((entry) => (
+                <Box key={entry.id} sx={{ py: 0.5, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <Typography sx={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', mb: 0.25 }}>
+                    {formatDate(entry.createdAt)}
+                  </Typography>
+                  <Typography sx={{ fontSize: 12, color: 'rgba(255,255,255,0.82)', lineHeight: 1.4 }}>
+                    {formatLogLine(entry)}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          )}
+        </DashboardBlock>
       </Box>
     </Box>
   );

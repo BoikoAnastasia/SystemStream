@@ -11,6 +11,7 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
   const [isReady, setIsReady] = useState(false);
   const [chatError, setChatError] = useState<string | null>(null);
   const [slowModeSeconds, setSlowModeSeconds] = useState(0);
+  const [chatRules, setChatRules] = useState('');
   const [canManageChat, setCanManageChat] = useState(false);
   const [bannedUserIds, setBannedUserIds] = useState<number[]>([]);
   const [inputRestore, setInputRestore] = useState<string | null>(null);
@@ -110,6 +111,11 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
       const seconds = data?.slowModeSeconds ?? data?.SlowModeSeconds;
       if (typeof seconds === 'number') {
         setSlowModeSeconds(Math.max(0, seconds));
+      }
+
+      const rules = data?.chatRules ?? data?.ChatRules;
+      if (typeof rules === 'string') {
+        setChatRules(rules);
       }
 
       const manage = data?.canManageChat ?? data?.CanManageChat;
@@ -358,6 +364,7 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
     clearChatError,
     slowModeSeconds,
     setSlowMode,
+    chatRules,
     canManageChat,
     bannedUserIds,
     inputRestore,

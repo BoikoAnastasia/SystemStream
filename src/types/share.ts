@@ -134,6 +134,9 @@ export interface IStream {
   startedAt: string | Date;
   isLive: boolean;
   categoryId?: number;
+  categoryName?: string | null;
+  categoryBannerImageUrl?: string | null;
+  streamLanguage?: string;
 }
 
 export interface IStreamHistoryData {

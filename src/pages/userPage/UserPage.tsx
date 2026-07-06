@@ -39,6 +39,7 @@ export const UserPage: FC = appLayout(() => {
     clearChatError,
     slowModeSeconds,
     setSlowMode,
+    chatRules,
     canManageChat,
     bannedUserIds,
     inputRestore,
@@ -98,6 +99,7 @@ export const UserPage: FC = appLayout(() => {
             consumeInputRestore={consumeInputRestore}
             slowModeSeconds={slowModeSeconds}
             setSlowMode={setSlowMode}
+            chatRules={chatRules}
             canManageChat={canManageChat}
             streamer={
               userData

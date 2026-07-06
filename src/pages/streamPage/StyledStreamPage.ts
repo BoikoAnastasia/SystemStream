@@ -64,6 +64,16 @@ export const StyledStreamContainerChat = styled(Box)(() => ({
   },
 }));
 
+export const StyledStreamMetaBar = styled(Box)(() => ({
+  position: 'relative',
+  zIndex: 1,
+  width: '100%',
+  backgroundColor: 'rgba(255,255,255,0.05)',
+  backdropFilter: 'blur(16px)',
+  borderRadius: '4px',
+  borderTop: '1px solid rgba(255,255,255,0.08)',
+}));
+
 export const StyledButtonWathers = styled(Button)(() => ({
   display: 'flex',
   alignItems: 'center',

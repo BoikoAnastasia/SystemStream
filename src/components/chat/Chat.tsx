@@ -49,6 +49,7 @@ export const Chat = ({
   consumeInputRestore,
   slowModeSeconds = 0,
   setSlowMode,
+  chatRules = '',
   canManageChat = false,
   streamerId,
   layout = 'default',
@@ -67,6 +68,7 @@ export const Chat = ({
   consumeInputRestore?: () => void;
   slowModeSeconds?: number;
   setSlowMode?: (seconds: number) => void;
+  chatRules?: string;
   canManageChat?: boolean;
   streamerId?: number;
   layout?: 'default' | 'fullscreen';
@@ -217,6 +219,28 @@ export const Chat = ({
           )}
         </Box>
       </StyledChatHeader>
+
+      {chatRules.trim() && (
+        <Box
+          sx={{
+            px: 1.5,
+            py: 1,
+            mx: 1,
+            mt: 0.5,
+            borderRadius: 1.5,
+            bgcolor: 'rgba(142,123,255,0.1)',
+            border: '1px solid rgba(142,123,255,0.2)',
+            flexShrink: 0,
+          }}
+        >
+          <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#b8adff', mb: 0.5, letterSpacing: '0.04em' }}>
+            ПРАВИЛА ЧАТА
+          </Typography>
+          <Typography sx={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', lineHeight: 1.45, whiteSpace: 'pre-wrap' }}>
+            {chatRules.trim()}
+          </Typography>
+        </Box>
+      )}
 
       <Box sx={{ position: 'relative', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         {messages.length === 0 ? (

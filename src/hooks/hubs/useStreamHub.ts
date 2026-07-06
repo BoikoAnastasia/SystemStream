@@ -67,14 +67,18 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
           ? prev
           : {
               streamId,
-              streamName: streamInfo.streamName,
-              streamerId: streamInfo.streamerId,
-              streamerName: streamInfo.streamerName,
-              tags: streamInfo.tags ?? [],
-              previewUrl: streamInfo.previewUrl ?? null,
+              streamName: streamInfo.streamName ?? streamInfo.StreamName ?? '',
+              streamerId: streamInfo.streamerId ?? streamInfo.StreamerId ?? 0,
+              streamerName: streamInfo.streamerName ?? streamInfo.StreamerName ?? '',
+              tags: streamInfo.tags ?? streamInfo.Tags ?? [],
+              categoryId: streamInfo.categoryId ?? streamInfo.CategoryId,
+              categoryName: streamInfo.categoryName ?? streamInfo.CategoryName ?? null,
+              categoryBannerImageUrl: streamInfo.categoryBannerImageUrl ?? streamInfo.CategoryBannerImageUrl ?? null,
+              streamLanguage: streamInfo.streamLanguage ?? streamInfo.StreamLanguage ?? 'ru',
+              previewUrl: streamInfo.previewUrl ?? streamInfo.PreviewUrl ?? null,
               hlsUrl: streamInfo.hlsUrl ?? streamInfo.HlsUrl ?? '',
-              totalViews: streamInfo.totalViews ?? 0,
-              startedAt: streamInfo.startedAt ?? new Date().toISOString(),
+              totalViews: streamInfo.totalViews ?? streamInfo.TotalViews ?? 0,
+              startedAt: streamInfo.startedAt ?? streamInfo.StartedAt ?? new Date().toISOString(),
               isLive: true,
             }
       );

@@ -1,14 +1,10 @@
-// mui
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-// styles
 import { StyledButtonLive, StyledTitle, StyledSpanDark } from '../../../../components/StylesComponents';
 import { StyledButtonWathers, StyledHeaderStreamPage } from '../../StyledStreamPage';
-// types
 import { IStream } from '../../../../types/share';
-export const HeaderStreamPage = ({ streamInfo, viewerCount }: { streamInfo: IStream | null; viewerCount: number }) => {
-  // OFFLINE состояние
 
+export const HeaderStreamPage = ({ streamInfo, viewerCount }: { streamInfo: IStream | null; viewerCount: number }) => {
   if (!streamInfo) {
     return (
       <StyledHeaderStreamPage>
@@ -22,26 +18,16 @@ export const HeaderStreamPage = ({ streamInfo, viewerCount }: { streamInfo: IStr
     );
   }
 
-  // LIVE состояние
   return (
     <StyledHeaderStreamPage>
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateAreas: `'avatar streamInfo' 'avatar nameStream'`,
-          gap: '0px 6px',
-          justifyItems: 'start',
-          alignItems: 'center',
-        }}
-      >
-        <Box sx={{ gridArea: 'streamInfo', display: 'flex', alignItems: 'center' }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
           <StyledButtonLive>В эфире</StyledButtonLive>
           <StyledButtonWathers>
             <VisibilityIcon sx={{ width: '10px', height: '10px' }} /> {String(viewerCount)}
           </StyledButtonWathers>
         </Box>
-
-        <StyledSpanDark style={{ gridArea: 'nameStream' }}>Сейчас в эфире: {streamInfo.streamName}</StyledSpanDark>
+        <StyledSpanDark>Сейчас в эфире: {streamInfo.streamName}</StyledSpanDark>
       </Box>
     </StyledHeaderStreamPage>
   );
