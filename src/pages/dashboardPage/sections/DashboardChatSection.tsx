@@ -3,6 +3,7 @@ import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
 import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import RuleOutlinedIcon from '@mui/icons-material/RuleOutlined';
+import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import CardGiftcardOutlinedIcon from '@mui/icons-material/CardGiftcardOutlined';
@@ -11,6 +12,8 @@ import { DashboardMode } from '../dashboard.constants';
 import { useStreamBans } from '../../../hooks/useStreamBans';
 import { useStreamChatSettings } from '../../../hooks/useStreamChatSettings';
 import { SlowModePresets } from '../../../components/chat/SlowModePresets';
+import { CHAT_MODE_OPTIONS, ChatMode } from '../../../components/chat/chat.constants';
+import { getChatModeLabel } from '../../../components/chat/chat.utils';
 import { DashboardSaveNotice } from '../components/DashboardSaveNotice';
 import { DashboardBlock, dashboardChatGridSx } from '../components/DashboardBlock';
 import { StyledDashboardSectionHint, StyledDashboardSectionTitle } from '../StyledDashboardPage';
@@ -53,6 +56,7 @@ const ACTION_LABELS: Record<string, string> = {
   Unban: 'Разбан',
   SlowMode: 'Slow mode',
   RulesUpdate: 'Правила чата',
+  ChatMode: 'Режим чата',
 };
 
 const formatLogLine = (entry: {
@@ -115,6 +119,13 @@ export const DashboardChatSection = ({ channelNickname, mode }: { channelNicknam
     setSaveNotice(null);
     const ok = await saveSettings({ slowModeSeconds: seconds });
     if (ok) setSaveNotice(seconds === 0 ? 'Slow mode выключен' : `Slow mode: ${seconds} сек`);
+  };
+
+  const handleChatModeChange = async (chatMode: ChatMode) => {
+    if (chatMode === settings.chatMode) return;
+    setSaveNotice(null);
+    const ok = await saveSettings({ chatMode });
+    if (ok) setSaveNotice(`Режим чата: ${getChatModeLabel(chatMode)}`);
   };
 
   const handleUnban = async (userId: number) => {
@@ -204,6 +215,57 @@ export const DashboardChatSection = ({ channelNickname, mode }: { channelNicknam
                 }}
               />
             </Box>
+          </Box>
+        </DashboardBlock>
+
+        <DashboardBlock
+          icon={<ChatOutlinedIcon sx={{ fontSize: 18, color: '#8e7bff' }} />}
+          title="Режим чата"
+          hint="Кто и что может писать в чате"
+        >
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+            {CHAT_MODE_OPTIONS.map((option) => {
+              const selected = settings.chatMode === option.value;
+              return (
+                <Box
+                  key={option.value}
+                  component="button"
+                  type="button"
+                  disabled={isSaving}
+                  onClick={() => handleChatModeChange(option.value)}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    gap: 0.25,
+                    width: '100%',
+                    p: 1,
+                    borderRadius: 1.5,
+                    border: selected ? '1px solid rgba(142,123,255,0.55)' : '1px solid rgba(255,255,255,0.1)',
+                    bgcolor: selected ? 'rgba(142,123,255,0.12)' : 'rgba(255,255,255,0.03)',
+                    color: '#fff',
+                    cursor: isSaving ? 'default' : 'pointer',
+                    textAlign: 'left',
+                    transition: 'border-color 0.15s, background-color 0.15s',
+                    '&:hover': isSaving
+                      ? undefined
+                      : {
+                          borderColor: selected ? 'rgba(142,123,255,0.7)' : 'rgba(255,255,255,0.18)',
+                          bgcolor: selected ? 'rgba(142,123,255,0.16)' : 'rgba(255,255,255,0.05)',
+                        },
+                  }}
+                >
+                  <Typography
+                    sx={{ fontSize: 13, fontWeight: 700, color: selected ? '#d8d0ff' : 'rgba(255,255,255,0.9)' }}
+                  >
+                    {option.label}
+                  </Typography>
+                  <Typography sx={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.35 }}>
+                    {option.hint}
+                  </Typography>
+                </Box>
+              );
+            })}
           </Box>
         </DashboardBlock>
 

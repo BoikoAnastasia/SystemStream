@@ -2,7 +2,8 @@ import * as signalR from '@microsoft/signalr';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { IChatMessage, IProfile } from '../../types/share';
 import { CHAT_MAX_MESSAGE_LENGTH } from '../../components/chat/chat.constants';
-import { mapChatError, normalizeChatMessage } from '../../components/chat/chat.utils';
+import { mapChatError, normalizeChatMessage, normalizeChatMode } from '../../components/chat/chat.utils';
+import type { ChatMode } from '../../components/chat/chat.constants';
 
 type LocalChatMessage = IChatMessage & { clientId?: string };
 
@@ -12,12 +13,16 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
   const [chatError, setChatError] = useState<string | null>(null);
   const [slowModeSeconds, setSlowModeSeconds] = useState(0);
   const [chatRules, setChatRules] = useState('');
+  const [chatMode, setChatMode] = useState<ChatMode>('normal');
+  const [canSendChat, setCanSendChat] = useState(true);
   const [canManageChat, setCanManageChat] = useState(false);
   const [bannedUserIds, setBannedUserIds] = useState<number[]>([]);
   const [inputRestore, setInputRestore] = useState<string | null>(null);
   const lastSuccessfulSentAtRef = useRef(0);
   const slowModeSecondsRef = useRef(0);
   const canManageChatRef = useRef(false);
+  const chatModeRef = useRef<ChatMode>('normal');
+  const sendRejectedRef = useRef(false);
 
   const clearChatError = useCallback(() => setChatError(null), []);
 
@@ -46,9 +51,15 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
   }, []);
 
   useEffect(() => {
+    chatModeRef.current = chatMode;
+  }, [chatMode]);
+
+  useEffect(() => {
     if (!hub) {
       setIsReady(false);
       setCanManageChat(false);
+      setCanSendChat(true);
+      setChatMode('normal');
       setBannedUserIds([]);
       canManageChatRef.current = false;
       return;
@@ -97,6 +108,7 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
         if (!profile) return prev;
         for (let i = prev.length - 1; i >= 0; i--) {
           if (prev[i].clientId && prev[i].userId === profile.id) {
+            sendRejectedRef.current = true;
             if (prev[i].text) {
               setInputRestore(prev[i].text);
             }
@@ -116,6 +128,18 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
       const rules = data?.chatRules ?? data?.ChatRules;
       if (typeof rules === 'string') {
         setChatRules(rules);
+      }
+
+      const mode = data?.chatMode ?? data?.ChatMode;
+      if (mode != null) {
+        setChatMode(normalizeChatMode(mode));
+      }
+
+      const sendChat = data?.canSendChat ?? data?.CanSendChat;
+      if (typeof sendChat === 'boolean') {
+        setCanSendChat(sendChat);
+      } else if (mode != null && hub) {
+        hub.invoke('LoadChatHistory').catch(console.error);
       }
 
       const manage = data?.canManageChat ?? data?.CanManageChat;
@@ -224,6 +248,25 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
     };
   }, [hub, streamNickname, profile, syncSlowModeFromServer]);
 
+  const refreshChatAccess = useCallback(() => {
+    if (!hub || hub.state !== signalR.HubConnectionState.Connected) return;
+    hub.invoke('LoadChatHistory').catch(console.error);
+  }, [hub]);
+
+  useEffect(() => {
+    const onSubscriptionChanged = (event: Event) => {
+      const detail = (event as CustomEvent<{ subscribed?: boolean }>).detail;
+      if (detail?.subscribed) {
+        setCanSendChat(true);
+        setChatError(null);
+      }
+      refreshChatAccess();
+    };
+
+    window.addEventListener('stream-subscription-changed', onSubscriptionChanged);
+    return () => window.removeEventListener('stream-subscription-changed', onSubscriptionChanged);
+  }, [refreshChatAccess]);
+
   const sendMessage = useCallback(
     async (text: string): Promise<boolean> => {
       if (!hub || !isReady || !streamNickname || !profile) return false;
@@ -245,7 +288,13 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
         return false;
       }
 
+      if (!canSendChat && !canManageChatRef.current) {
+        setChatError(mapChatError('ChatSubscribersOnly'));
+        return false;
+      }
+
       setChatError(null);
+      sendRejectedRef.current = false;
 
       const clientId = `local-${Date.now()}`;
       const optimistic: LocalChatMessage = {
@@ -263,16 +312,22 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
 
       try {
         await hub.invoke('SendChatMessage', trimmed);
+        await new Promise<void>((resolve) => {
+          window.setTimeout(resolve, 120);
+        });
+        if (sendRejectedRef.current) return false;
         return true;
       } catch (error) {
         setMessages((prev) => prev.filter((msg) => msg.clientId !== clientId));
         setInputRestore(trimmed);
-        setChatError('Не удалось отправить сообщение');
+        if (!sendRejectedRef.current) {
+          setChatError(mapChatError('ChatSendFailed'));
+        }
         console.error(error);
         return false;
       }
     },
-    [hub, isReady, streamNickname, profile, getSlowModeWaitSeconds]
+    [hub, isReady, streamNickname, profile, getSlowModeWaitSeconds, canSendChat]
   );
 
   const deleteMessage = useCallback(
@@ -365,6 +420,8 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
     slowModeSeconds,
     setSlowMode,
     chatRules,
+    chatMode,
+    canSendChat,
     canManageChat,
     bannedUserIds,
     inputRestore,

@@ -271,15 +271,17 @@ export const StyledVideoCardLink = styled(Link)({
 // StyledSidebar
 export const StyledSidebar = styled(Box)(() => ({
   position: 'sticky',
-  top: '0',
-  left: '0',
+  top: 0,
+  left: 0,
   display: 'flex',
   flexDirection: 'column',
-  minHeight: '100%',
-  background: 'var(--gradient-sidebar)',
-  zIndex: '1000',
+  width: 72,
+  minWidth: 72,
+  minHeight: '100vh',
+  background: 'rgba(12,10,28,0.92)',
+  borderRight: '1px solid rgba(255,255,255,0.08)',
+  zIndex: 1000,
   overflow: 'hidden',
-  transition: 'all .3s ease',
   '@media (max-width: 768px)': {
     display: 'none',
   },
@@ -298,17 +300,16 @@ export const StyledSidebarName = styled(Box)({
 export const StyledSidebarList = styled(List)({
   display: 'flex',
   flexDirection: 'column',
-  gap: '6px',
+  gap: 4,
   overflowY: 'auto',
+  overflowX: 'hidden',
 });
 
 export const StyledSidebarListItem = styled(ListItem)({
-  padding: '8px 12px',
-  borderRadius: '12px',
-  transition: 'all 0.25s ease',
-  '&:hover': {
-    background: 'rgb(61 58 108)',
-  },
+  padding: 0,
+  borderRadius: 10,
+  justifyContent: 'center',
+  width: '100%',
 });
 
 export const StyledSidebarLink = styled(Link)({

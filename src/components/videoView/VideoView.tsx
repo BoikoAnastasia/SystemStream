@@ -13,9 +13,10 @@ import {
 import { IStreamOnline } from '../../types/share';
 // hooks
 import { useCheckedImage } from '../../hooks/checkImgFunctions';
+import { getStreamersLeagueLabel } from '../../utils/streamersLeague';
 
 export const VideoView = ({ item }: { item: IStreamOnline }) => {
-  // const previewScr = useCheckedImage(`./img/preview/preview-01.jpg`);
+  const leagueLabel = getStreamersLeagueLabel(item.streamersLeague);
 
   return (
     <StyledVideoCard>
@@ -33,9 +34,11 @@ export const VideoView = ({ item }: { item: IStreamOnline }) => {
         <CardTypography fs={'18px'} sx={{ fontWeight: 600 }} isEllipsis={false}>
           {item.streamName}
         </CardTypography>
-        <CardTypography fs={'14px'} c={'var(--hover-header-menu)'} isEllipsis={false}>
-          {item.streamersLeague}
-        </CardTypography>
+        {leagueLabel && (
+          <CardTypography fs={'14px'} c={'var(--hover-header-menu)'} isEllipsis={false}>
+            {leagueLabel}
+          </CardTypography>
+        )}
       </StyledVideoCardInfo>
     </StyledVideoCard>
   );

@@ -286,6 +286,8 @@ export const MainPage: FC = appLayout((): JSX.Element => {
     slowModeSeconds,
     setSlowMode,
     chatRules,
+    chatMode,
+    canSendChat,
     canManageChat,
     bannedUserIds,
     inputRestore,
@@ -337,6 +339,8 @@ export const MainPage: FC = appLayout((): JSX.Element => {
             slowModeSeconds={slowModeSeconds}
             setSlowMode={setSlowMode}
             chatRules={chatRules}
+            chatMode={chatMode}
+            canSendChat={canSendChat}
             canManageChat={canManageChat}
             streamer={
               currentStream

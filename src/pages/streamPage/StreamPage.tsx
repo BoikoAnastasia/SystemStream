@@ -41,6 +41,8 @@ export const StreamPage = ({
   slowModeSeconds = 0,
   setSlowMode,
   chatRules = '',
+  chatMode = 'normal',
+  canSendChat = true,
   canManageChat = false,
   streamer,
 }: {
@@ -60,6 +62,8 @@ export const StreamPage = ({
   slowModeSeconds?: number;
   setSlowMode?: (seconds: number) => void;
   chatRules?: string;
+  chatMode?: 'normal' | 'emote_only' | 'subscribers_only';
+  canSendChat?: boolean;
   canManageChat?: boolean;
   streamer?: VideoPlayerStreamerInfo | null;
 }) => {
@@ -231,6 +235,8 @@ export const StreamPage = ({
                     slowModeSeconds={slowModeSeconds}
                     setSlowMode={setSlowMode}
                     chatRules={chatRules}
+                    chatMode={chatMode}
+                    canSendChat={canSendChat}
                     canManageChat={canManageChat}
                     streamerId={streamInfo?.streamerId}
                   />
@@ -256,6 +262,8 @@ export const StreamPage = ({
                 slowModeSeconds={slowModeSeconds}
                 setSlowMode={setSlowMode}
                 chatRules={chatRules}
+                chatMode={chatMode}
+                canSendChat={canSendChat}
                 canManageChat={canManageChat}
                 streamerId={streamInfo?.streamerId}
               />

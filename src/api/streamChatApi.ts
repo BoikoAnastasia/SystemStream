@@ -1,10 +1,13 @@
 import { getCookie } from '../utils/cookieFunctions';
 import { handleApiRequest } from '../utils/handleApiRequest';
 import { fetchStreamTeamAccess } from './streamTeamApi';
+import { ChatMode } from '../components/chat/chat.constants';
+import { normalizeChatMode } from '../components/chat/chat.utils';
 
 export type StreamChatSettings = {
   slowModeSeconds: number;
   chatRules: string;
+  chatMode: ChatMode;
 };
 
 export type StreamChatModerationLogEntry = {
@@ -32,6 +35,7 @@ const authHeaders = () => {
 const normalizeSettings = (raw: Record<string, unknown>): StreamChatSettings => ({
   slowModeSeconds: Number(raw.slowModeSeconds ?? raw.SlowModeSeconds ?? 0),
   chatRules: String(raw.chatRules ?? raw.ChatRules ?? ''),
+  chatMode: normalizeChatMode(raw.chatMode ?? raw.ChatMode),
 });
 
 const normalizeLogEntry = (raw: Record<string, unknown>): StreamChatModerationLogEntry => ({
@@ -72,6 +76,7 @@ export const updateStreamChatSettings = async (streamerId: number, payload: Part
     body: JSON.stringify({
       slowModeSeconds: payload.slowModeSeconds,
       chatRules: payload.chatRules,
+      chatMode: payload.chatMode,
     }),
   });
 

@@ -1,10 +1,14 @@
 import { getCookie } from '../../utils/cookieFunctions';
 import { createGuestKey } from '../../utils/createGuestKey';
+import { ISubscriber } from '../../types/share';
+import { normalizeSubscriber } from './StreamsActions';
 
 // получить список подписок пользователя
-export const fetchtSubsribtionsMy = async () => {
+export const fetchtSubsribtionsMy = async (): Promise<ISubscriber[] | null> => {
   try {
     const token = getCookie('tokenData');
+    if (!token) return [];
+
     const response = await fetch(`${process.env.REACT_APP_API_SUBSCRIPTIONS}/me/following`, {
       headers: {
         'Content-Type': 'application/json',
@@ -12,14 +16,15 @@ export const fetchtSubsribtionsMy = async () => {
       },
     });
     if (!response.ok) {
-      console.error('Ошибка получения подписчиков', response.statusText);
-      return [];
+      console.error('Ошибка получения подписок', response.statusText);
+      return null;
     }
     const data = await response.json();
-    return Array.isArray(data) ? data : [];
+    if (!Array.isArray(data)) return [];
+    return data.map((item: Record<string, unknown>) => normalizeSubscriber(item));
   } catch (error) {
     console.log('не удалось получить подписчиков');
-    return [];
+    return null;
   }
 };
 

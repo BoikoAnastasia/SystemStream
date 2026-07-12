@@ -11,7 +11,11 @@ import {
 
 export const useStreamChatSettings = (channelNickname: string, mode: 'own' | 'delegated') => {
   const { data: profile } = useAppSelector((state) => state.user);
-  const [settings, setSettings] = useState<StreamChatSettings>({ slowModeSeconds: 0, chatRules: '' });
+  const [settings, setSettings] = useState<StreamChatSettings>({
+    slowModeSeconds: 0,
+    chatRules: '',
+    chatMode: 'normal',
+  });
   const [modLog, setModLog] = useState<StreamChatModerationLogEntry[]>([]);
   const [canManageChat, setCanManageChat] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -87,6 +91,7 @@ export const useStreamChatSettings = (channelNickname: string, mode: 'own' | 'de
       const result = await updateStreamChatSettings(streamerId, {
         slowModeSeconds: patch.slowModeSeconds ?? settings.slowModeSeconds,
         chatRules: patch.chatRules ?? settings.chatRules,
+        chatMode: patch.chatMode ?? settings.chatMode,
       });
 
       setIsSaving(false);

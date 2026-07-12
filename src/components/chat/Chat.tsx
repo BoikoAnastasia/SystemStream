@@ -3,7 +3,8 @@ import { useAppSelector } from '../../hooks/redux';
 import { ChatCard } from './components/card/ChatCard';
 import { getNicknameColor } from '../../utils/getNicknameColor';
 import { getMessageKey } from './chat.utils';
-import { CHAT_MAX_MESSAGE_LENGTH, CHAT_SLOW_MODE_COLOR, CHAT_SLOW_MODE_COLOR_RGB } from './chat.constants';
+import { CHAT_MAX_MESSAGE_LENGTH, CHAT_SLOW_MODE_COLOR, CHAT_SLOW_MODE_COLOR_RGB, ChatMode } from './chat.constants';
+import { getChatModeLabel } from './chat.utils';
 import { ChatEmojiPicker } from './ChatEmojiPicker';
 import { ChatSlowModeButton } from './ChatSlowModeButton';
 import { Box, IconButton, Typography } from '@mui/material';
@@ -50,6 +51,8 @@ export const Chat = ({
   slowModeSeconds = 0,
   setSlowMode,
   chatRules = '',
+  chatMode = 'normal',
+  canSendChat = true,
   canManageChat = false,
   streamerId,
   layout = 'default',
@@ -69,6 +72,8 @@ export const Chat = ({
   slowModeSeconds?: number;
   setSlowMode?: (seconds: number) => void;
   chatRules?: string;
+  chatMode?: ChatMode;
+  canSendChat?: boolean;
   canManageChat?: boolean;
   streamerId?: number;
   layout?: 'default' | 'fullscreen';
@@ -145,6 +150,20 @@ export const Chat = ({
     consumeInputRestore();
   }, [inputRestore, consumeInputRestore]);
 
+  const chatInputBlocked = !isAuth || (!canSendChat && !canManageChat);
+  const emoteOnlyLocked = chatMode === 'emote_only' && !canManageChat && isAuth && canSendChat;
+
+  useEffect(() => {
+    if (!emoteOnlyLocked) return;
+    setReplyTo(null);
+    setText((prev) => {
+      const remaining = prev
+        .replace(/\p{Extended_Pictographic}(\uFE0F|\u200D\p{Extended_Pictographic})*/gu, '')
+        .replace(/\s+/g, '');
+      return remaining.length === 0 ? prev : '';
+    });
+  }, [emoteOnlyLocked, chatMode]);
+
   const handleSend = async () => {
     if (!text.trim() || text.length > CHAT_MAX_MESSAGE_LENGTH) return;
     const ok = await sendMessage(text);
@@ -154,26 +173,43 @@ export const Chat = ({
     }
   };
 
-  const handleReply = useCallback((msg: IChatMessage) => {
-    setReplyTo({ userId: msg.userId, username: msg.username });
-    const mention = `@${msg.username} `;
-    setText((prev) => {
-      const withoutMention = prev.replace(/^@\S+\s*/, '');
-      return withoutMention ? `${mention}${withoutMention}` : mention;
-    });
-    window.requestAnimationFrame(() => textareaRef.current?.focus());
-  }, []);
+  const handleReply = useCallback(
+    (msg: IChatMessage) => {
+      if (emoteOnlyLocked) return;
+      setReplyTo({ userId: msg.userId, username: msg.username });
+      const mention = `@${msg.username} `;
+      setText((prev) => {
+        const withoutMention = prev.replace(/^@\S+\s*/, '');
+        return withoutMention ? `${mention}${withoutMention}` : mention;
+      });
+      window.requestAnimationFrame(() => textareaRef.current?.focus());
+    },
+    [emoteOnlyLocked]
+  );
 
   const handleTextChange = (value: string) => {
-    if (value.length <= CHAT_MAX_MESSAGE_LENGTH) {
-      setText(value);
-      if (chatError && clearChatError) clearChatError();
+    if (value.length > CHAT_MAX_MESSAGE_LENGTH) return;
+    if (emoteOnlyLocked) {
+      const remaining = value
+        .replace(/\p{Extended_Pictographic}(\uFE0F|\u200D\p{Extended_Pictographic})*/gu, '')
+        .replace(/\s+/g, '');
+      if (remaining.length > 0) return;
     }
+    setText(value);
+    if (chatError && clearChatError) clearChatError();
   };
 
   const charsLeft = CHAT_MAX_MESSAGE_LENGTH - text.length;
   const isOverLimit = text.length > CHAT_MAX_MESSAGE_LENGTH;
-  const showCharCounter = Boolean(isAuth && isInputExpanded && text.length > 0);
+  const showCharCounter = Boolean(isAuth && isInputExpanded && text.length > 0 && !emoteOnlyLocked);
+  const inputDisabled = chatInputBlocked;
+  const inputPlaceholder = !isAuth
+    ? 'Войдите, чтобы писать в чат'
+    : !canSendChat && !canManageChat
+      ? 'Чат только для подписчиков канала'
+      : emoteOnlyLocked
+        ? 'Выберите эмодзи слева'
+        : 'Написать сообщение…';
 
   return (
     <StyledChatContainer>
@@ -196,6 +232,33 @@ export const Chat = ({
             >
               <TimerOutlinedIcon sx={{ fontSize: 14 }} />
               <Typography sx={{ fontSize: 11, fontWeight: 700 }}>{slowModeSeconds}с</Typography>
+            </Box>
+          )}
+          {chatMode !== 'normal' && (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                px: 1,
+                py: 0.25,
+                borderRadius: 1,
+                bgcolor: 'rgba(142,123,255,0.14)',
+                color: '#b8adff',
+                maxWidth: 160,
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {getChatModeLabel(chatMode)}
+              </Typography>
             </Box>
           )}
         </Box>
@@ -264,7 +327,7 @@ export const Chat = ({
                   currentUserId={profile?.id}
                   streamerId={streamerId}
                   isStreamer={isStreamer}
-                  onReply={handleReply}
+                  onReply={emoteOnlyLocked ? undefined : handleReply}
                   onDeleteMessage={deleteMessage}
                   onTimeoutUser={timeoutUser}
                   onBanUser={banUser}
@@ -319,16 +382,23 @@ export const Chat = ({
           </StyledChatReplyBar>
         )}
         <StyledChatInputWrap expanded={isInputExpanded}>
-          <ChatEmojiPicker disabled={!isAuth} onSelect={(emoji) => handleTextChange(text + emoji)} />
+          <ChatEmojiPicker disabled={inputDisabled} onSelect={(emoji) => handleTextChange(text + emoji)} />
           <StyledChatInputField>
             <StyledChatTextField
               inputRef={textareaRef}
-              placeholder={isAuth ? 'Написать сообщение…' : 'Войдите, чтобы писать в чат'}
+              placeholder={inputPlaceholder}
               autoComplete="off"
-              disabled={!isAuth}
+              disabled={inputDisabled}
               value={text}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTextChange(e.target.value)}
+              onPaste={(e: React.ClipboardEvent) => {
+                if (emoteOnlyLocked) e.preventDefault();
+              }}
               onKeyDown={(e: React.KeyboardEvent) => {
+                if (emoteOnlyLocked && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                  e.preventDefault();
+                  return;
+                }
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
                   handleSend();
@@ -337,7 +407,7 @@ export const Chat = ({
               multiline
               minRows={1}
               maxRows={3}
-              inputProps={{ maxLength: CHAT_MAX_MESSAGE_LENGTH }}
+              inputProps={{ readOnly: emoteOnlyLocked, maxLength: CHAT_MAX_MESSAGE_LENGTH }}
             />
           </StyledChatInputField>
           <StyledChatSendColumn>

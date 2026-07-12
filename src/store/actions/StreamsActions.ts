@@ -7,10 +7,31 @@ import {
   StreamsHistoryFetchError,
   StreamsHistoryFetchSuccess,
 } from '../slices/StreamsHistorySlice';
-import { IStreamsData } from '../../types/share';
+import { sanitizeStreamersLeague } from '../../utils/streamersLeague';
+import { SIDEBAR_LIVE_FETCH_PAGE_SIZE } from '../../components/sidebar/sidebar.constants';
+import { IStreamsData, IStreamOnline, ISubscriber } from '../../types/share';
+
+const normalizeOnlineUser = (raw: Record<string, unknown>): IStreamOnline => ({
+  nickname: String(raw.nickname ?? raw.Nickname ?? ''),
+  profileImage: String(raw.profileImage ?? raw.ProfileImage ?? ''),
+  isOnline: Boolean(raw.isOnline ?? raw.IsOnline ?? false),
+  streamersLeague: sanitizeStreamersLeague(String(raw.streamersLeague ?? raw.StreamersLeague ?? '')),
+  previewUrl: String(raw.previewUrl ?? raw.PreviewUrl ?? ''),
+  streamName: String(raw.streamName ?? raw.StreamName ?? ''),
+  streamId: (raw.streamId ?? raw.StreamId ?? null) as number | null,
+});
+
+export const normalizeSubscriber = (raw: Record<string, unknown>): ISubscriber => ({
+  nickname: String(raw.nickname ?? raw.Nickname ?? ''),
+  profileImage: String(raw.profileImage ?? raw.ProfileImage ?? ''),
+  isOnline: Boolean(raw.isOnline ?? raw.IsOnline ?? false),
+  streamersLeague: sanitizeStreamersLeague(String(raw.streamersLeague ?? raw.StreamersLeague ?? '')),
+  previewUrl: String(raw.previewUrl ?? raw.PreviewUrl ?? ''),
+  streamName: String(raw.streamName ?? raw.StreamName ?? ''),
+});
 
 export const fetchUserOnlineStreams =
-  (page = 1, pageSize = 25) =>
+  (page = 1, pageSize = SIDEBAR_LIVE_FETCH_PAGE_SIZE) =>
   async (dispatch: AppDispatch) => {
     const token = createGuestKey();
     try {
@@ -30,13 +51,12 @@ export const fetchUserOnlineStreams =
         return;
       }
       const data = await response.json();
+      const rawStreams = data.streams ?? data.Streams ?? [];
       const mappedData: IStreamsData = {
-        ...data,
-        streams: data.streams.map((s: any) => ({
-          ...s,
-          previewUrl: s.previewUrl ?? '',
-          streamId: s.streamId ?? null,
-        })),
+        totalStreams: data.totalStreams ?? data.TotalStreams ?? rawStreams.length,
+        page: data.page ?? data.Page ?? page,
+        pageSize: data.pageSize ?? data.PageSize ?? pageSize,
+        streams: rawStreams.map((s: Record<string, unknown>) => normalizeOnlineUser(s)),
       };
       dispatch(StreamsSliceFetchSuccess(mappedData));
     } catch (error) {
@@ -55,15 +75,19 @@ export const fecthStreamHistory =
         `${process.env.REACT_APP_API_USER}/${nickname}/streams/history?page=${page}&pageSize=${pageSize}`
       );
       if (!response.ok) {
-        const errorData = await response.json();
-        dispatch(StreamsHistoryFetchError(errorData));
+        const errorData = await response.json().catch(() => null);
+        const message =
+          typeof errorData?.message === 'string' ? errorData.message : 'Не удалось получить историю стримов';
+        dispatch(StreamsHistoryFetchError(message));
         return;
       }
       const data = await response.json();
       dispatch(StreamsHistoryFetchSuccess({ data, nickname }));
     } catch (error) {
       console.log('Не получилось получить историю стримов пользователя');
-      dispatch(StreamsHistoryFetchError(error));
+      dispatch(
+        StreamsHistoryFetchError(error instanceof Error ? error.message : 'Не удалось получить историю стримов')
+      );
     }
   };
 

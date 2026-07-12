@@ -1,11 +1,12 @@
 import { FC, ReactElement, ReactNode } from 'react';
 import { DrawerProvider } from './context/DrawerContext';
+import { SidebarPanelProvider } from './context/SidebarPanelContext';
 import { NicknameProvider } from './context/NicknameContext';
 import { HeaderModalProvider } from './context/HeaderModalContext';
 
 type ProviderComponent = React.ComponentType<{ children: ReactNode }>;
 
-const providers: ProviderComponent[] = [DrawerProvider, NicknameProvider, HeaderModalProvider];
+const providers: ProviderComponent[] = [DrawerProvider, SidebarPanelProvider, NicknameProvider, HeaderModalProvider];
 
 export const Providers: FC<{ children: ReactNode }> = ({ children }) => {
   const tree = providers.reduceRight<ReactElement | null>(

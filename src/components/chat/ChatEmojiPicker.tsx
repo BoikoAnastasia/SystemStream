@@ -1,4 +1,4 @@
-import { Box, IconButton, Popover, Tooltip, Typography } from '@mui/material';
+import { Box, IconButton, Popover, Tooltip } from '@mui/material';
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import { useState } from 'react';
 import { CHAT_EMOJIS } from './chat.constants';
@@ -9,8 +9,24 @@ type ChatEmojiPickerProps = {
   onSelect: (emoji: string) => void;
 };
 
+const pickerScrollbarSx = {
+  scrollbarWidth: 'thin',
+  scrollbarColor: 'rgba(142, 123, 255, 0.42) transparent',
+  '&::-webkit-scrollbar': {
+    width: 6,
+  },
+  '&::-webkit-scrollbar-thumb': {
+    background: 'rgba(142,123,255,0.45)',
+    borderRadius: 999,
+  },
+} as const;
+
 export const ChatEmojiPicker = ({ disabled, onSelect }: ChatEmojiPickerProps) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  const handleSelect = (emoji: string) => {
+    onSelect(emoji);
+  };
 
   return (
     <>
@@ -44,7 +60,9 @@ export const ChatEmojiPicker = ({ disabled, onSelect }: ChatEmojiPickerProps) =>
               border: '1px solid rgba(255,255,255,0.1)',
               borderRadius: 2,
               p: 1,
-              maxWidth: 280,
+              width: 'min(320px, calc(100vw - 24px))',
+              maxWidth: 'none',
+              overflow: 'hidden',
             },
           },
         }}
@@ -52,24 +70,44 @@ export const ChatEmojiPicker = ({ disabled, onSelect }: ChatEmojiPickerProps) =>
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(8, 1fr)',
-            gap: 0.25,
+            gridTemplateColumns: 'repeat(auto-fill, minmax(36px, 1fr))',
+            gap: 0.5,
+            maxHeight: 'min(240px, calc(100dvh - 160px))',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            ...pickerScrollbarSx,
           }}
         >
           {CHAT_EMOJIS.map((emoji) => (
-            <IconButton
+            <Box
               key={emoji}
-              size="small"
+              component="button"
+              type="button"
               onMouseDown={(e) => e.preventDefault()}
-              onClick={() => onSelect(emoji)}
+              onClick={() => handleSelect(emoji)}
               sx={{
-                fontSize: 20,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '100%',
+                minWidth: 36,
+                minHeight: 36,
+                aspectRatio: '1',
+                p: 0,
+                m: 0,
+                border: 'none',
                 borderRadius: 1,
+                bgcolor: 'transparent',
+                color: 'inherit',
+                fontSize: 22,
+                lineHeight: 1,
+                cursor: 'pointer',
+                fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif',
                 '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' },
               }}
             >
               {emoji}
-            </IconButton>
+            </Box>
           ))}
         </Box>
       </Popover>
