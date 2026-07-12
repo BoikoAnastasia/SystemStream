@@ -1,68 +1,40 @@
-import { ComponentType, FC, JSX, useEffect, useState } from 'react';
-// components
+import { FC, useEffect } from 'react';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { settingLayout } from '../../layout/SettingLayout';
-import { SettingsChangeProfile } from './components/settingsChangeProfile/SettingsChangeProfile';
-import { SettingsKey } from './components/settingsStream/SettingsStream';
-// hooks
-import { useDeviceDetect } from '../../hooks/useDeviceDetect';
-// mui
-import { Box, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
-import { StyledSettingsContainer, StyledSettingsLisContainer } from './StyledSettingsPage';
+import { SETTINGS_DEFAULT_SECTION, resolveSettingsSection } from './settings.constants';
+import { SettingsShell } from './SettingsShell';
 
-interface IListSettings {
-  value: string;
-  title: string;
-  component?: ComponentType<any>;
-}
-const itemsList: IListSettings[] = [
-  {
-    value: 'profile',
-    title: 'Настройки профиля',
-    component: SettingsChangeProfile,
-  },
-  {
-    value: 'stream',
-    title: 'Настройки стрима',
-    component: SettingsKey,
-  },
-  {
-    value: 'balance',
-    title: 'Пополнить баланс',
-  },
-];
-
-export const SettingsPage: FC = settingLayout((): JSX.Element => {
-  const [selectedItem, setSelectedItem] = useState<IListSettings | null>(itemsList[0]);
-  const { isMobile } = useDeviceDetect();
+export const SettingsPage: FC = settingLayout(() => {
+  const navigate = useNavigate();
+  const { section } = useParams<{ section?: string }>();
+  const activeSection = resolveSettingsSection(section);
 
   useEffect(() => {
-    const saved = localStorage.getItem('settings-selected');
-    if (saved) {
-      const found = itemsList.find((i) => i.value === saved);
-      if (found) setSelectedItem(found);
+    const legacy = localStorage.getItem('settings-selected');
+    if (legacy === 'stream') {
+      localStorage.removeItem('settings-selected');
+      navigate('/dashboard/stream', { replace: true });
+      return;
     }
-  }, []);
+    if (legacy && !section) {
+      localStorage.removeItem('settings-selected');
+    }
+  }, [navigate, section]);
 
-  const handleSelect = (item: IListSettings) => {
-    setSelectedItem(item);
-    localStorage.setItem('settings-selected', item.value);
-  };
+  useEffect(() => {
+    if (!section) return;
+    if (!activeSection) {
+      navigate(`/settings/${SETTINGS_DEFAULT_SECTION}`, { replace: true });
+    }
+  }, [section, activeSection, navigate]);
 
-  return (
-    <StyledSettingsContainer sx={{ flexDirection: isMobile ? 'column' : 'row' }} className="container">
-      <StyledSettingsLisContainer>
-        <List sx={{ position: 'sticky', top: 0 }}>
-          {itemsList &&
-            itemsList.map((item: IListSettings) => (
-              <ListItem disablePadding key={item.value}>
-                <ListItemButton onClick={() => handleSelect(item)}>
-                  <ListItemText primary={item.title} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-        </List>
-      </StyledSettingsLisContainer>
-      <Box sx={{ width: '100%' }}>{selectedItem?.component && <selectedItem.component />}</Box>
-    </StyledSettingsContainer>
-  );
+  if (!section) {
+    return <Navigate to={`/settings/${SETTINGS_DEFAULT_SECTION}`} replace />;
+  }
+
+  if (!activeSection) {
+    return <></>;
+  }
+
+  return <SettingsShell activeSection={activeSection} />;
 });

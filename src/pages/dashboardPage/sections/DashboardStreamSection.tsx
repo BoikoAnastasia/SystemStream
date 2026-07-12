@@ -7,6 +7,8 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { DashboardMode } from '../dashboard.constants';
 import { STREAM_LANGUAGE_OPTIONS, useStreamDashboardSettings } from '../../../hooks/useStreamDashboardSettings';
 import { DashboardSaveNotice } from '../components/DashboardSaveNotice';
+import { DashboardIngestPanel } from '../components/DashboardIngestPanel';
+import { DashboardStreamPreviewField } from '../components/DashboardStreamPreviewField';
 import { StyledDashboardSectionHint, StyledDashboardSectionTitle } from '../StyledDashboardPage';
 
 const panelSx = {
@@ -37,8 +39,17 @@ const formatLiveDuration = (startedAt: string) => {
 };
 
 export const DashboardStreamSection = ({ channelNickname, mode }: { channelNickname: string; mode: DashboardMode }) => {
-  const { settings, categories, canManageStream, isLoading, error, actionError, isSaving, saveSettings } =
-    useStreamDashboardSettings(channelNickname, mode);
+  const {
+    settings,
+    categories,
+    canManageStream,
+    isLoading,
+    error,
+    actionError,
+    isSaving,
+    saveSettings,
+    uploadPreview,
+  } = useStreamDashboardSettings(channelNickname, mode);
 
   const [streamName, setStreamName] = useState('');
   const [categoryId, setCategoryId] = useState<number | ''>('');
@@ -46,6 +57,8 @@ export const DashboardStreamSection = ({ channelNickname, mode }: { channelNickn
   const [announcement, setAnnouncement] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
+  const [previewFile, setPreviewFile] = useState<File | null>(null);
+  const [previewError, setPreviewError] = useState<string | null>(null);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
   const [liveDuration, setLiveDuration] = useState('');
 
@@ -75,6 +88,15 @@ export const DashboardStreamSection = ({ channelNickname, mode }: { channelNickn
     if (!settings) return;
 
     setSaveNotice(null);
+
+    if (previewFile) {
+      const previewResult = await uploadPreview(previewFile);
+      if (!previewResult.success) {
+        return;
+      }
+      setPreviewFile(null);
+    }
+
     const ok = await saveSettings({
       streamName: streamName.trim(),
       categoryId: categoryId === '' ? null : Number(categoryId),
@@ -121,10 +143,14 @@ export const DashboardStreamSection = ({ channelNickname, mode }: { channelNickn
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+      {mode === 'own' && <DashboardIngestPanel />}
+
       <Box>
         <StyledDashboardSectionTitle>Настройки эфира</StyledDashboardSectionTitle>
         <StyledDashboardSectionHint>
-          {mode === 'own' ? 'Параметры текущего или следующего эфира.' : `Параметры эфира канала ${channelNickname}.`}
+          {mode === 'own'
+            ? 'Параметры текущего или следующего эфира.'
+            : `Параметры эфира канала ${channelNickname}. Ключ трансляции доступен только владельцу.`}
         </StyledDashboardSectionHint>
 
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1.5, alignItems: 'center' }}>
@@ -175,6 +201,18 @@ export const DashboardStreamSection = ({ channelNickname, mode }: { channelNickn
       )}
 
       <Box sx={{ ...panelSx, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <DashboardStreamPreviewField
+          currentUrl={settings?.previewUrl}
+          value={previewFile}
+          onChange={(file) => {
+            setPreviewFile(file);
+            setPreviewError(null);
+          }}
+          onError={setPreviewError}
+          disabled={isSaving}
+        />
+        {previewError && <Typography sx={{ fontSize: 12, color: '#ff8a8a', mt: -1 }}>{previewError}</Typography>}
+
         <TextField
           label="Название стрима"
           fullWidth

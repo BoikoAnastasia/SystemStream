@@ -8,6 +8,7 @@ export type StreamDashboardSettings = {
   tags: string[];
   language: string;
   announcement: string;
+  previewUrl?: string | null;
   isLive: boolean;
   subscriberCount: number;
   startedAt?: string | null;
@@ -33,6 +34,7 @@ const normalizeSettings = (raw: Record<string, unknown>): StreamDashboardSetting
   })(),
   language: String(raw.language ?? raw.Language ?? 'ru'),
   announcement: String(raw.announcement ?? raw.Announcement ?? ''),
+  previewUrl: (raw.previewUrl ?? raw.PreviewUrl ?? null) as string | null,
   isLive: Boolean(raw.isLive ?? raw.IsLive),
   subscriberCount: Number(raw.subscriberCount ?? raw.SubscriberCount ?? 0),
   startedAt: (raw.startedAt ?? raw.StartedAt ?? null) as string | null,
@@ -68,4 +70,41 @@ export const updateStreamDashboardSettings = async (streamerId: number, payload:
   }
 
   return { success: true as const, settings: normalizeSettings(result.data) };
+};
+
+export const uploadStreamDashboardPreview = async (streamerId: number, file: File) => {
+  const token = getCookie('tokenData');
+  const formData = new FormData();
+  formData.append('previewImage', file);
+
+  try {
+    const response = await fetch(`${apiBase()}/${streamerId}/stream/preview`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      return {
+        success: false as const,
+        message: String(data.message ?? data.error ?? 'Не удалось загрузить превью'),
+      };
+    }
+
+    const settingsRaw = (data.settings ?? data) as Record<string, unknown>;
+    return {
+      success: true as const,
+      settings: normalizeSettings(settingsRaw),
+      previewUrl: String(data.previewUrl ?? settingsRaw.previewUrl ?? settingsRaw.PreviewUrl ?? ''),
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      message: error instanceof Error ? error.message : 'Не удалось загрузить превью',
+    };
+  }
 };

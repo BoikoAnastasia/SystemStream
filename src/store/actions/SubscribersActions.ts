@@ -2,6 +2,16 @@ import { getCookie } from '../../utils/cookieFunctions';
 import { createGuestKey } from '../../utils/createGuestKey';
 import { ISubscriber } from '../../types/share';
 import { normalizeSubscriber } from './StreamsActions';
+import { resolveMediaUrl } from '../../utils/resolveMediaUrl';
+
+const mapSubscription = (raw: Record<string, unknown>): ISubscriber => {
+  const item = normalizeSubscriber(raw);
+  return {
+    ...item,
+    profileImage: resolveMediaUrl(item.profileImage),
+    previewUrl: resolveMediaUrl(item.previewUrl),
+  };
+};
 
 // получить список подписок пользователя
 export const fetchtSubsribtionsMy = async (): Promise<ISubscriber[] | null> => {
@@ -20,8 +30,9 @@ export const fetchtSubsribtionsMy = async (): Promise<ISubscriber[] | null> => {
       return null;
     }
     const data = await response.json();
-    if (!Array.isArray(data)) return [];
-    return data.map((item: Record<string, unknown>) => normalizeSubscriber(item));
+    const items = Array.isArray(data) ? data : (data?.items ?? data?.Items ?? []);
+    if (!Array.isArray(items)) return [];
+    return items.map((item: Record<string, unknown>) => mapSubscription(item));
   } catch (error) {
     console.log('не удалось получить подписчиков');
     return null;

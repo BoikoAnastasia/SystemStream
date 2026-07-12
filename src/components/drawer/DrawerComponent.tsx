@@ -18,7 +18,7 @@ import {
 
 export const DrawerComponent = () => {
   const { open, setOpen } = useDrawer();
-  const { streams, streamsLoading, streamsError, subscribers, subsLoading, subsError, isAuth, refreshPanelData } =
+  const { streams, streamsLoading, streamsError, subscribers, subsLoading, subsError, hasSession, refreshPanelData } =
     useSidebarPanel();
 
   useEffect(() => {
@@ -53,7 +53,7 @@ export const DrawerComponent = () => {
           Главная
         </DrawerNavLink>
 
-        {isAuth && (
+        {hasSession && (
           <>
             <DrawerSectionTitle>Ваши подписки</DrawerSectionTitle>
             {subsLoading ? (

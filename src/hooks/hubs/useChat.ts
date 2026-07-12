@@ -2,7 +2,15 @@ import * as signalR from '@microsoft/signalr';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { IChatMessage, IProfile } from '../../types/share';
 import { CHAT_MAX_MESSAGE_LENGTH } from '../../components/chat/chat.constants';
-import { mapChatError, normalizeChatMessage, normalizeChatMode } from '../../components/chat/chat.utils';
+import {
+  mapChatError,
+  normalizeChatMessage,
+  normalizeChatMode,
+  getChatModeChangeNotice,
+  isSystemChatMessage,
+  appendSystemChatNotice,
+  dedupeSystemChatMessages,
+} from '../../components/chat/chat.utils';
 import type { ChatMode } from '../../components/chat/chat.constants';
 
 type LocalChatMessage = IChatMessage & { clientId?: string };
@@ -22,7 +30,12 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
   const slowModeSecondsRef = useRef(0);
   const canManageChatRef = useRef(false);
   const chatModeRef = useRef<ChatMode>('normal');
+  const isInitialChatSettingsRef = useRef(true);
   const sendRejectedRef = useRef(false);
+
+  useEffect(() => {
+    isInitialChatSettingsRef.current = true;
+  }, [streamNickname]);
 
   const clearChatError = useCallback(() => setChatError(null), []);
 
@@ -90,7 +103,17 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
     };
 
     const handleHistory = (rawMessages: Record<string, unknown>[]) => {
-      setMessages(rawMessages.map(normalizeChatMessage));
+      setMessages((prev) => {
+        const systemNotices = dedupeSystemChatMessages(prev.filter(isSystemChatMessage));
+        const history = rawMessages.map(normalizeChatMessage);
+        if (systemNotices.length === 0) return history;
+
+        return dedupeSystemChatMessages(
+          [...history, ...systemNotices].sort(
+            (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+          )
+        );
+      });
     };
 
     const handleError = (code: string) => {
@@ -131,15 +154,27 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
       }
 
       const mode = data?.chatMode ?? data?.ChatMode;
+      let nextMode: ChatMode | null = null;
       if (mode != null) {
-        setChatMode(normalizeChatMode(mode));
+        nextMode = normalizeChatMode(mode);
+        if (!isInitialChatSettingsRef.current && nextMode !== chatModeRef.current) {
+          const noticeText = getChatModeChangeNotice(nextMode);
+          setMessages((prev) => appendSystemChatNotice(prev, noticeText));
+        }
+        isInitialChatSettingsRef.current = false;
+        chatModeRef.current = nextMode;
+        setChatMode(nextMode);
+      } else {
+        isInitialChatSettingsRef.current = false;
       }
 
       const sendChat = data?.canSendChat ?? data?.CanSendChat;
       if (typeof sendChat === 'boolean') {
         setCanSendChat(sendChat);
-      } else if (mode != null && hub) {
+      } else if (nextMode === 'subscribers_only' && hub) {
         hub.invoke('LoadChatHistory').catch(console.error);
+      } else if (nextMode != null && !canManageChatRef.current) {
+        setCanSendChat(true);
       }
 
       const manage = data?.canManageChat ?? data?.CanManageChat;
@@ -220,10 +255,19 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
       // broadcast only — targeted user gets block on next send
     };
 
+    const handleNicknameChanged = (data: Record<string, unknown>) => {
+      const userId = Number(data?.userId ?? data?.UserId ?? 0);
+      const username = String(data?.username ?? data?.Username ?? '').trim();
+      if (!userId || !username) return;
+
+      setMessages((prev) => prev.map((item) => (item.userId === userId ? { ...item, username } : item)));
+    };
+
     const handleReconnected = () => {
       hub.invoke('LoadChatHistory').catch(console.error);
     };
 
+    hub.on('ChatUserNicknameChanged', handleNicknameChanged);
     hub.on('ReceiveChatMessage', handleReceive);
     hub.on('LoadChatHistory', handleHistory);
     hub.on('Error', handleError);
@@ -236,6 +280,7 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
     setIsReady(hub.state === signalR.HubConnectionState.Connected);
 
     return () => {
+      hub.off('ChatUserNicknameChanged', handleNicknameChanged);
       hub.off('ReceiveChatMessage', handleReceive);
       hub.off('LoadChatHistory', handleHistory);
       hub.off('Error', handleError);
@@ -247,6 +292,14 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
       setIsReady(false);
     };
   }, [hub, streamNickname, profile, syncSlowModeFromServer]);
+
+  useEffect(() => {
+    if (!profile?.id || !profile.nickname) return;
+
+    setMessages((prev) =>
+      prev.map((item) => (item.userId === profile.id ? { ...item, username: profile.nickname } : item))
+    );
+  }, [profile?.id, profile?.nickname]);
 
   const refreshChatAccess = useCallback(() => {
     if (!hub || hub.state !== signalR.HubConnectionState.Connected) return;

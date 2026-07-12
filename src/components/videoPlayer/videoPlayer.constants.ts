@@ -21,6 +21,12 @@ export const LIVE_HLS_CONFIG = {
   backBufferLength: 0,
 };
 
+/** Ожидание появления live-manifest (ffmpeg прогревается несколько секунд) */
+export const LIVE_MANIFEST_RETRY_MS = 2000;
+export const LIVE_MANIFEST_MAX_ATTEMPTS = 30;
+/** Плейлист старше этого считается остатком прошлого эфира */
+export const LIVE_MANIFEST_MAX_AGE_MS = 15000;
+
 export const VOD_HLS_CONFIG = {
   enableWorker: true,
   maxBufferLength: 60,

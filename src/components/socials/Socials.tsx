@@ -1,25 +1,6 @@
-import TwitterIcon from '@mui/icons-material/Twitter';
-import InstagramIcon from '@mui/icons-material/Instagram';
-import YouTubeIcon from '@mui/icons-material/YouTube';
-import FacebookIcon from '@mui/icons-material/Facebook';
-import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
 import { Box, IconButton, Tooltip } from '@mui/material';
 import { ISocialLink } from '../../types/share';
-
-const getIconSocial = (platform: string) => {
-  switch (platform.toLowerCase()) {
-    case 'instagram':
-      return <InstagramIcon sx={{ fontSize: 20 }} />;
-    case 'youtube':
-      return <YouTubeIcon sx={{ fontSize: 20 }} />;
-    case 'facebook':
-      return <FacebookIcon sx={{ fontSize: 20 }} />;
-    case 'twitter':
-      return <TwitterIcon sx={{ fontSize: 20 }} />;
-    default:
-      return <LinkOutlinedIcon sx={{ fontSize: 20 }} />;
-  }
-};
+import { getPlatformLabel, SocialPlatformIcon } from '../../constants/socialPlatforms';
 
 const socialButtonSx = {
   color: 'rgba(255,255,255,0.65)',
@@ -41,14 +22,14 @@ export const Socials = ({ socials }: { socials: ISocialLink[] | null | undefined
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, alignItems: 'center' }}>
       {socials.map((social) => (
-        <Tooltip key={`${social.platform}-${social.url}`} title={social.platform}>
+        <Tooltip key={`${social.platform}-${social.url}`} title={getPlatformLabel(social.platform)}>
           <IconButton
             size="small"
             onClick={() => window.open(social.url, '_blank', 'noopener,noreferrer')}
-            aria-label={social.platform}
+            aria-label={getPlatformLabel(social.platform)}
             sx={socialButtonSx}
           >
-            {getIconSocial(social.platform)}
+            <SocialPlatformIcon platform={social.platform} fontSize={20} />
           </IconButton>
         </Tooltip>
       ))}

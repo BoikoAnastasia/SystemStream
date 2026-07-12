@@ -87,6 +87,42 @@ export const getChatModeLabel = (mode: ChatMode) => {
   return 'Обычный чат';
 };
 
+export const getChatModeChangeNotice = (mode: ChatMode) => {
+  if (mode === 'normal') return 'Режим чата: обычный — все могут писать';
+  return `Режим чата изменён: ${getChatModeLabel(mode)}`;
+};
+
+export const isSystemChatMessage = (msg: IChatMessage) => msg.role === 'System';
+
+export const createChatSystemMessage = (text: string): IChatMessage => ({
+  id: `system-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+  userId: 0,
+  username: '',
+  text,
+  role: 'System',
+  timestamp: new Date().toISOString(),
+  offsetSeconds: 0,
+});
+
+export const dedupeSystemChatMessages = (messages: IChatMessage[]): IChatMessage[] => {
+  const seen = new Set<string>();
+
+  return messages.filter((msg) => {
+    if (!isSystemChatMessage(msg)) return true;
+    if (seen.has(msg.text)) return false;
+    seen.add(msg.text);
+    return true;
+  });
+};
+
+export const appendSystemChatNotice = (messages: IChatMessage[], text: string): IChatMessage[] => {
+  if (messages.some((msg) => isSystemChatMessage(msg) && msg.text === text)) {
+    return messages;
+  }
+
+  return [...messages, createChatSystemMessage(text)];
+};
+
 export const isEmoteOnlyMessage = (text: string) => {
   const trimmed = text.trim();
   if (!trimmed) return false;

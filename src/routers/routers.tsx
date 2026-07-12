@@ -61,6 +61,7 @@ export const routers = [
 
 export const privateRouters = [
   { path: '/settings', Element: SettingsPage },
+  { path: '/settings/:section', Element: SettingsPage },
   { path: '/dashboard', Element: DashboardPage },
   { path: '/dashboard/:section', Element: DashboardPage },
   { path: '/:nickname/manage', Element: ChannelManagePage },

@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppSelector } from '../../hooks/redux';
 import { ChatCard } from './components/card/ChatCard';
 import { getNicknameColor } from '../../utils/getNicknameColor';
-import { getMessageKey } from './chat.utils';
+import { getMessageKey, isSystemChatMessage } from './chat.utils';
+import { ChatSystemNotice } from './components/ChatSystemNotice';
 import { CHAT_MAX_MESSAGE_LENGTH, CHAT_SLOW_MODE_COLOR, CHAT_SLOW_MODE_COLOR_RGB, ChatMode } from './chat.constants';
 import { getChatModeLabel } from './chat.utils';
 import { ChatEmojiPicker } from './ChatEmojiPicker';
@@ -317,25 +318,29 @@ export const Chat = ({
         ) : (
           <>
             <StyledChatList ref={listRef} onScroll={handleScroll}>
-              {messages.map((msg, index) => (
-                <ChatCard
-                  customColor={getNicknameColor(msg.username)}
-                  msg={msg}
-                  key={getMessageKey(msg, index)}
-                  isAuth={isAuth}
-                  canManageChat={canManageChat}
-                  currentUserId={profile?.id}
-                  streamerId={streamerId}
-                  isStreamer={isStreamer}
-                  onReply={emoteOnlyLocked ? undefined : handleReply}
-                  onDeleteMessage={deleteMessage}
-                  onTimeoutUser={timeoutUser}
-                  onBanUser={banUser}
-                  onUnbanUser={unbanUser}
-                  bannedUserIds={bannedUserIds}
-                  currentUserNickname={profile?.nickname}
-                />
-              ))}
+              {messages.map((msg, index) =>
+                isSystemChatMessage(msg) ? (
+                  <ChatSystemNotice key={getMessageKey(msg, index)} text={msg.text} />
+                ) : (
+                  <ChatCard
+                    customColor={getNicknameColor(msg.username)}
+                    msg={msg}
+                    key={getMessageKey(msg, index)}
+                    isAuth={isAuth}
+                    canManageChat={canManageChat}
+                    currentUserId={profile?.id}
+                    streamerId={streamerId}
+                    isStreamer={isStreamer}
+                    onReply={emoteOnlyLocked ? undefined : handleReply}
+                    onDeleteMessage={deleteMessage}
+                    onTimeoutUser={timeoutUser}
+                    onBanUser={banUser}
+                    onUnbanUser={unbanUser}
+                    bannedUserIds={bannedUserIds}
+                    currentUserNickname={profile?.nickname}
+                  />
+                )
+              )}
             </StyledChatList>
             {showNewMessagesPill && (
               <StyledNewMessagesPill onClick={() => scrollToBottom(true)} role="button" tabIndex={0}>

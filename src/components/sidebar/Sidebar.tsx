@@ -85,7 +85,7 @@ const RailEmpty = ({ title }: { title: string }) => (
 
 export const Sidebar = () => {
   const { setOpen } = useDrawer();
-  const { streams, streamsLoading, subscribers, subsLoading, subsError, isAuth } = useSidebarPanel();
+  const { streams, streamsLoading, subscribers, subsLoading, subsError, hasSession } = useSidebarPanel();
 
   const { subscriptionsWithLive, liveOutsideSubscriptions } = buildSidebarLists(subscribers, streams);
 
@@ -122,7 +122,7 @@ export const Sidebar = () => {
       </Box>
 
       <StyledSidebarList sx={{ flex: 1, px: 0.75, pb: 1 }}>
-        {isAuth && (
+        {hasSession && (
           <>
             <RailSectionMarker title="Ваши подписки" accent="rgba(142,123,255,0.75)" icon={FavoriteBorderIcon} />
             {subsLoading ? (

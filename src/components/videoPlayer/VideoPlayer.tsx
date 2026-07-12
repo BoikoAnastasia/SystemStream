@@ -31,6 +31,9 @@ import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import {
   LIVE_CATCHUP_THRESHOLD_SEC,
   LIVE_HLS_CONFIG,
+  LIVE_MANIFEST_MAX_AGE_MS,
+  LIVE_MANIFEST_MAX_ATTEMPTS,
+  LIVE_MANIFEST_RETRY_MS,
   KEYBOARD_SHORTCUTS,
   VOD_HLS_CONFIG,
 } from './videoPlayer.constants';
@@ -177,6 +180,41 @@ export const VideoPlayer = ({
 
   const resolveSrc = (url: string) =>
     url.startsWith('http') ? url : `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`;
+
+  const toVariantManifestUrl = (masterUrl: string) => masterUrl.replace(/master\.m3u8(\?.*)?$/, '720p/index.m3u8');
+
+  const parseHttpDate = (value: string | null) => {
+    if (!value) return null;
+    const parsed = Date.parse(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  };
+
+  const isFreshLivePlaylist = (body: string, lastModifiedMs: number | null) => {
+    if (!body.includes('#EXTM3U')) return false;
+    if (body.includes('#EXT-X-ENDLIST')) return false;
+    if (lastModifiedMs == null) return false;
+    return Date.now() - lastModifiedMs <= LIVE_MANIFEST_MAX_AGE_MS;
+  };
+
+  const waitForLiveManifest = async (masterUrl: string, cancelled: () => boolean) => {
+    const variantUrl = toVariantManifestUrl(masterUrl);
+
+    for (let attempt = 0; attempt < LIVE_MANIFEST_MAX_ATTEMPTS; attempt++) {
+      if (cancelled()) return false;
+      try {
+        const response = await fetch(variantUrl, { method: 'GET', cache: 'no-store' });
+        if (response.ok) {
+          const body = await response.text();
+          const lastModified = parseHttpDate(response.headers.get('Last-Modified'));
+          if (isFreshLivePlaylist(body, lastModified)) return true;
+        }
+      } catch {
+        // manifest not ready yet
+      }
+      await new Promise((resolve) => setTimeout(resolve, LIVE_MANIFEST_RETRY_MS));
+    }
+    return false;
+  };
 
   const applyAudio = useCallback((video: HTMLVideoElement, nextVolume: number, nextMuted: boolean) => {
     video.volume = nextVolume / 100;
@@ -329,6 +367,11 @@ export const VideoPlayer = ({
     const resolved = resolveSrc(src);
     const saved = readSavedAudio();
     let hls: Hls | null = null;
+    let cancelled = false;
+    let manifestRetryTimer: ReturnType<typeof setTimeout> | null = null;
+    let liveManifestAttempts = 0;
+
+    const isCancelled = () => cancelled;
 
     const onPlay = () => {
       setIsPlaying(true);
@@ -360,47 +403,94 @@ export const VideoPlayer = ({
     volumeRef.current = saved.volume;
     mutedRef.current = saved.muted;
 
-    if (Hls.isSupported()) {
-      hls = new Hls(mode === 'live' ? LIVE_HLS_CONFIG : VOD_HLS_CONFIG);
-      hlsRef.current = hls;
+    const attachHls = () => {
+      if (isCancelled()) return;
 
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        const parsed = hls!.levels.map((l, i) => ({
-          index: i,
-          height: l.height,
-        }));
-        setLevels(parsed);
-        setIsLoading(false);
+      if (Hls.isSupported()) {
+        hls?.destroy();
+        hls = new Hls(mode === 'live' ? LIVE_HLS_CONFIG : VOD_HLS_CONFIG);
+        hlsRef.current = hls;
+
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          const parsed = hls!.levels.map((l, i) => ({
+            index: i,
+            height: l.height,
+          }));
+          setLevels(parsed);
+          setIsLoading(false);
+          video.play().catch(() => {});
+        });
+
+        hls.on(Hls.Events.LEVEL_SWITCHING, () => {
+          isSwitchingLevelRef.current = true;
+        });
+
+        hls.on(Hls.Events.LEVEL_SWITCHED, (_e, data) => {
+          isSwitchingLevelRef.current = false;
+          setCurrentLevel(data.level);
+        });
+
+        hls.on(Hls.Events.ERROR, (_e, data) => {
+          if (!hls) return;
+
+          const manifestMissing =
+            data.details === Hls.ErrorDetails.MANIFEST_LOAD_ERROR ||
+            data.details === Hls.ErrorDetails.MANIFEST_LOAD_TIMEOUT;
+
+          if (mode === 'live' && manifestMissing && liveManifestAttempts < LIVE_MANIFEST_MAX_ATTEMPTS) {
+            liveManifestAttempts += 1;
+            setIsLoading(true);
+            hls.destroy();
+            hlsRef.current = null;
+            hls = null;
+            if (manifestRetryTimer) clearTimeout(manifestRetryTimer);
+            manifestRetryTimer = setTimeout(() => {
+              void startPlayback();
+            }, LIVE_MANIFEST_RETRY_MS);
+            return;
+          }
+
+          if (!data.fatal) return;
+          if (data.type === Hls.ErrorTypes.NETWORK_ERROR) hls.startLoad();
+          else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) hls.recoverMediaError();
+          else {
+            hls.destroy();
+            hlsRef.current = null;
+          }
+        });
+
+        hls.loadSource(resolved);
+        hls.attachMedia(video);
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = resolved;
         video.play().catch(() => {});
-      });
+      }
+    };
 
-      hls.on(Hls.Events.LEVEL_SWITCHING, () => {
-        isSwitchingLevelRef.current = true;
-      });
+    const startPlayback = async () => {
+      if (isCancelled()) return;
 
-      hls.on(Hls.Events.LEVEL_SWITCHED, (_e, data) => {
-        isSwitchingLevelRef.current = false;
-        setCurrentLevel(data.level);
-      });
-
-      hls.on(Hls.Events.ERROR, (_e, data) => {
-        if (!hls || !data.fatal) return;
-        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) hls.startLoad();
-        else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) hls.recoverMediaError();
-        else {
-          hls.destroy();
-          hlsRef.current = null;
+      if (mode === 'live') {
+        setIsLoading(true);
+        const ready = await waitForLiveManifest(resolved, isCancelled);
+        if (isCancelled()) return;
+        if (!ready) {
+          if (manifestRetryTimer) clearTimeout(manifestRetryTimer);
+          manifestRetryTimer = setTimeout(() => {
+            void startPlayback();
+          }, LIVE_MANIFEST_RETRY_MS);
+          return;
         }
-      });
+      }
 
-      hls.loadSource(resolved);
-      hls.attachMedia(video);
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = resolved;
-      video.play().catch(() => {});
-    }
+      attachHls();
+    };
+
+    void startPlayback();
 
     return () => {
+      cancelled = true;
+      if (manifestRetryTimer) clearTimeout(manifestRetryTimer);
       video.removeEventListener('play', onPlay);
       video.removeEventListener('pause', onPause);
       video.removeEventListener('waiting', onWaiting);

@@ -6,6 +6,7 @@ import {
   fetchStreamDashboardSettings,
   StreamDashboardSettings,
   updateStreamDashboardSettings,
+  uploadStreamDashboardPreview,
 } from '../api/streamDashboardApi';
 import { ICategories } from '../types/share';
 
@@ -108,6 +109,26 @@ export const useStreamDashboardSettings = (channelNickname: string, mode: 'own' 
     [settings]
   );
 
+  const uploadPreview = useCallback(async (file: File) => {
+    const streamerId = streamerIdRef.current;
+    if (!streamerId) return { success: false as const, message: 'Канал не найден' };
+
+    setIsSaving(true);
+    setActionError(null);
+
+    const result = await uploadStreamDashboardPreview(streamerId, file);
+
+    setIsSaving(false);
+
+    if (!result.success) {
+      setActionError(result.message);
+      return result;
+    }
+
+    setSettings(result.settings);
+    return result;
+  }, []);
+
   return {
     settings,
     categories,
@@ -117,6 +138,7 @@ export const useStreamDashboardSettings = (channelNickname: string, mode: 'own' 
     actionError,
     isSaving,
     saveSettings,
+    uploadPreview,
     reload: load,
   };
 };

@@ -1,10 +1,13 @@
-import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../store/store';
-import { fetchUserOnlineStreams, selectStreams } from '../store/actions/StreamsActions';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { fetchLiveStreamsFromApi } from '../api/liveStreamsApi';
 import { fetchtSubsribtionsMy } from '../store/actions/SubscribersActions';
 import { useAppSelector } from '../hooks/redux';
 import { IStreamOnline, ISubscriber } from '../types/share';
+import { SIDEBAR_LIVE_FETCH_PAGE_SIZE } from '../components/sidebar/sidebar.constants';
+import { getCookie } from '../utils/cookieFunctions';
+
+const SIDEBAR_POLL_MS = 15_000;
+const SUBS_POLL_MS = 60_000;
 
 type SidebarPanelContextType = {
   streams: IStreamOnline[];
@@ -13,75 +16,127 @@ type SidebarPanelContextType = {
   subscribers: ISubscriber[];
   subsLoading: boolean;
   subsError: boolean;
-  isAuth: boolean;
+  hasSession: boolean;
   refreshPanelData: () => void;
 };
 
 const SidebarPanelContext = createContext<SidebarPanelContextType | undefined>(undefined);
 
 export const SidebarPanelProvider = ({ children }: { children: ReactNode }) => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { isAuth } = useAppSelector((state) => state.user);
-  const streams = useAppSelector(selectStreams);
-  const { isLoading, isError, data } = useAppSelector((state) => state.streams);
+  const { isAuth, data: profile } = useAppSelector((state) => state.user);
+  const hasSession = Boolean(isAuth || profile?.id || getCookie('tokenData'));
 
+  const [streams, setStreams] = useState<IStreamOnline[]>([]);
+  const [streamsLoading, setStreamsLoading] = useState(true);
+  const [streamsError, setStreamsError] = useState(false);
   const [subscribers, setSubscribers] = useState<ISubscriber[]>([]);
   const [subsLoading, setSubsLoading] = useState(false);
   const [subsError, setSubsError] = useState(false);
+  const streamsLoadedRef = useRef(false);
+  const subsLoadedRef = useRef(false);
 
-  const refreshStreams = useCallback(() => {
-    dispatch(fetchUserOnlineStreams());
-  }, [dispatch]);
+  const refreshStreams = useCallback(async (silent = false) => {
+    if (!silent) {
+      setStreamsLoading(true);
+    }
 
-  const refreshSubscriptions = useCallback(async () => {
-    if (!isAuth) {
+    const { data, error } = await fetchLiveStreamsFromApi(1, SIDEBAR_LIVE_FETCH_PAGE_SIZE);
+
+    if (error || !data) {
+      if (!silent || !streamsLoadedRef.current) {
+        setStreamsError(true);
+        setStreams([]);
+      }
+    } else {
+      setStreams(data.streams);
+      setStreamsError(false);
+      streamsLoadedRef.current = true;
+    }
+
+    setStreamsLoading(false);
+  }, []);
+
+  const refreshSubscriptions = useCallback(async (silent = false) => {
+    const token = getCookie('tokenData');
+    if (!token) {
       setSubscribers([]);
       setSubsError(false);
       setSubsLoading(false);
+      subsLoadedRef.current = false;
       return;
     }
 
-    setSubsLoading(true);
+    if (!silent) {
+      setSubsLoading(true);
+    }
     setSubsError(false);
 
     const users = await fetchtSubsribtionsMy();
     if (users === null) {
-      setSubsError(true);
-      setSubscribers([]);
+      if (!silent || !subsLoadedRef.current) {
+        setSubsError(true);
+        setSubscribers([]);
+      }
     } else {
       setSubscribers(users);
       setSubsError(false);
+      subsLoadedRef.current = true;
     }
+
     setSubsLoading(false);
-  }, [isAuth]);
+  }, []);
 
   const refreshPanelData = useCallback(() => {
-    refreshStreams();
-    void refreshSubscriptions();
+    void refreshStreams(false);
+    void refreshSubscriptions(false);
   }, [refreshStreams, refreshSubscriptions]);
 
   useEffect(() => {
-    if (data === null && !isLoading) {
-      refreshStreams();
-    }
-  }, [data, isLoading, refreshStreams]);
+    void refreshStreams(false);
+    const timer = window.setInterval(() => {
+      void refreshStreams(true);
+    }, SIDEBAR_POLL_MS);
+    return () => window.clearInterval(timer);
+  }, [refreshStreams]);
 
   useEffect(() => {
-    void refreshSubscriptions();
+    if (!hasSession) {
+      setSubscribers([]);
+      setSubsError(false);
+      setSubsLoading(false);
+      subsLoadedRef.current = false;
+      return;
+    }
+
+    void refreshSubscriptions(false);
+    const timer = window.setInterval(() => {
+      void refreshSubscriptions(true);
+    }, SUBS_POLL_MS);
+
+    return () => window.clearInterval(timer);
+  }, [hasSession, profile?.id, refreshSubscriptions]);
+
+  useEffect(() => {
+    const onSubscriptionChanged = () => {
+      void refreshSubscriptions(true);
+    };
+
+    window.addEventListener('stream-subscription-changed', onSubscriptionChanged);
+    return () => window.removeEventListener('stream-subscription-changed', onSubscriptionChanged);
   }, [refreshSubscriptions]);
 
   const value = useMemo(
     () => ({
       streams,
-      streamsLoading: isLoading || data === null,
-      streamsError: Boolean(isError),
+      streamsLoading,
+      streamsError,
       subscribers,
       subsLoading,
       subsError,
-      isAuth: Boolean(isAuth),
+      hasSession,
       refreshPanelData,
     }),
-    [streams, isLoading, data, isError, subscribers, subsLoading, subsError, isAuth, refreshPanelData]
+    [streams, streamsLoading, streamsError, subscribers, subsLoading, subsError, hasSession, refreshPanelData]
   );
 
   return <SidebarPanelContext.Provider value={value}>{children}</SidebarPanelContext.Provider>;

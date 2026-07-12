@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { IProfile } from '../../../../types/share';
+import { Socials } from '../../../../components/socials/Socials';
 
 const panelSx = {
   borderRadius: 2,
@@ -10,6 +11,7 @@ const panelSx = {
 
 export const UserAbout = ({ userData }: { userData: IProfile | null }) => {
   const description = userData?.profileDescription?.trim();
+  const socialLinks = userData?.socialLinks?.filter((link) => link.url?.trim()) ?? [];
 
   return (
     <Box sx={{ py: 2 }}>
@@ -29,6 +31,24 @@ export const UserAbout = ({ userData }: { userData: IProfile | null }) => {
         >
           {description || 'Стример пока не добавил описание канала.'}
         </Typography>
+
+        {socialLinks.length > 0 && (
+          <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            <Typography
+              sx={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.4)',
+                mb: 1,
+              }}
+            >
+              Ссылки
+            </Typography>
+            <Socials socials={socialLinks} />
+          </Box>
+        )}
       </Box>
     </Box>
   );

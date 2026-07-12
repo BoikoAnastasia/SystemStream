@@ -51,7 +51,7 @@ export const HeaderMenuAvatar = () => {
     },
     {
       authOnly: true,
-      href: '/settings',
+      href: '/settings/balance',
       icon: SavingsIcon,
       value: 'Баланс: 0 руб',
     },

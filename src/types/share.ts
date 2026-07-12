@@ -109,6 +109,7 @@ export interface IStreamOnline {
   streamName: string;
   streamersLeague: string;
   totalCount?: number;
+  viewerCount?: number;
 }
 
 export interface IStreamsData {

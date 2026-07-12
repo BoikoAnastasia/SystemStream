@@ -195,6 +195,7 @@ export const StreamPage = ({
                 }}
               >
                 <VideoPlayer
+                  key={`${streamInfo?.streamId ?? 'live'}-${streamInfo?.hlsUrl ?? ''}`}
                   src={streamInfo?.hlsUrl}
                   mode={streamInfo?.isLive === false ? 'vod' : 'live'}
                   variant="embedded"

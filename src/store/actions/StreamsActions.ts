@@ -1,6 +1,5 @@
 import { AppDispatch, RootState } from '../store';
 import { StreamsSliceFetch, StreamsSliceFetchError, StreamsSliceFetchSuccess } from '../slices/StreamsSlice';
-import { createGuestKey } from '../../utils/createGuestKey';
 import { createSelector } from '@reduxjs/toolkit';
 import {
   StreamsHistoryFetch,
@@ -9,17 +8,10 @@ import {
 } from '../slices/StreamsHistorySlice';
 import { sanitizeStreamersLeague } from '../../utils/streamersLeague';
 import { SIDEBAR_LIVE_FETCH_PAGE_SIZE } from '../../components/sidebar/sidebar.constants';
-import { IStreamsData, IStreamOnline, ISubscriber } from '../../types/share';
+import { ISubscriber } from '../../types/share';
+import { fetchLiveStreamsFromApi } from '../../api/liveStreamsApi';
 
-const normalizeOnlineUser = (raw: Record<string, unknown>): IStreamOnline => ({
-  nickname: String(raw.nickname ?? raw.Nickname ?? ''),
-  profileImage: String(raw.profileImage ?? raw.ProfileImage ?? ''),
-  isOnline: Boolean(raw.isOnline ?? raw.IsOnline ?? false),
-  streamersLeague: sanitizeStreamersLeague(String(raw.streamersLeague ?? raw.StreamersLeague ?? '')),
-  previewUrl: String(raw.previewUrl ?? raw.PreviewUrl ?? ''),
-  streamName: String(raw.streamName ?? raw.StreamName ?? ''),
-  streamId: (raw.streamId ?? raw.StreamId ?? null) as number | null,
-});
+export { normalizeOnlineUser } from '../../api/liveStreamsApi';
 
 export const normalizeSubscriber = (raw: Record<string, unknown>): ISubscriber => ({
   nickname: String(raw.nickname ?? raw.Nickname ?? ''),
@@ -30,39 +22,29 @@ export const normalizeSubscriber = (raw: Record<string, unknown>): ISubscriber =
   streamName: String(raw.streamName ?? raw.StreamName ?? ''),
 });
 
+type FetchStreamsOptions = {
+  silent?: boolean;
+};
+
 export const fetchUserOnlineStreams =
-  (page = 1, pageSize = SIDEBAR_LIVE_FETCH_PAGE_SIZE) =>
+  (page = 1, pageSize = SIDEBAR_LIVE_FETCH_PAGE_SIZE, options: FetchStreamsOptions = {}) =>
   async (dispatch: AppDispatch) => {
-    const token = createGuestKey();
-    try {
+    const { silent = false } = options;
+
+    if (!silent) {
       dispatch(StreamsSliceFetch());
-      const response = await fetch(
-        `${process.env.REACT_APP_API_USER}/online/streams?page=${page}&pageSize=${pageSize}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) {
-        const errorData = await response.json();
-        dispatch(StreamsSliceFetchError(errorData.message || 'Не удалось получить стримы'));
-        return;
-      }
-      const data = await response.json();
-      const rawStreams = data.streams ?? data.Streams ?? [];
-      const mappedData: IStreamsData = {
-        totalStreams: data.totalStreams ?? data.TotalStreams ?? rawStreams.length,
-        page: data.page ?? data.Page ?? page,
-        pageSize: data.pageSize ?? data.PageSize ?? pageSize,
-        streams: rawStreams.map((s: Record<string, unknown>) => normalizeOnlineUser(s)),
-      };
-      dispatch(StreamsSliceFetchSuccess(mappedData));
-    } catch (error) {
-      console.log('Не получилось получить онлайн стримы пользователя');
-      dispatch(StreamsSliceFetchError(error instanceof Error ? error.message : 'Неизвестная ошибка'));
     }
+
+    const { data, error } = await fetchLiveStreamsFromApi(page, pageSize);
+
+    if (error || !data) {
+      if (!silent) {
+        dispatch(StreamsSliceFetchError(error || 'Не удалось получить стримы'));
+      }
+      return;
+    }
+
+    dispatch(StreamsSliceFetchSuccess(data));
   };
 
 export const fecthStreamHistory =

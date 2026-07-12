@@ -9,7 +9,7 @@ export const SectionListVideo = ({ list }: { list: IStreamOnline[] }) => {
   return (
     <StyledVideoGrid>
       {(list ?? []).map((item) => (
-        <VideoView item={item} key={item.streamId} />
+        <VideoView item={item} key={item.streamId ?? item.nickname} />
       ))}
     </StyledVideoGrid>
   );

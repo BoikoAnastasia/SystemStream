@@ -5,6 +5,7 @@ import { SelectUserSlice } from '../slices/SelectUserSlice';
 // utils
 import { getCookie, removeCookie, setCookie } from '../../utils/cookieFunctions';
 import { handleApiRequest } from '../../utils/handleApiRequest';
+import { mapUserProfileFromApi } from '../../utils/mapUserProfile';
 
 const { UserFetch, UserFetchError, UserFetchSuccess, UserLogout } = UserProfileSlice.actions;
 const { SelectUserFetch, SelectUserError, SelectUserFetchSuccess, Clear } = SelectUserSlice.actions;
@@ -87,7 +88,7 @@ export const userProfile = () => async (dispatch: AppDispatch) => {
       return { ok: false, unauthorized: false };
     }
 
-    const data = await response.json();
+    const data = mapUserProfileFromApi(await response.json());
     dispatch(UserFetchSuccess(data));
     return { ok: true, payload: data };
   } catch (error) {
@@ -110,7 +111,7 @@ export const fetchUserByNickname = (nickname: string) => async (dispatch: AppDis
       console.error('Ошибка авторизации:', error.message || response.statusText);
       return dispatch(SelectUserError(error.message || 'ERROR'));
     }
-    const data = await response.json();
+    const data = mapUserProfileFromApi(await response.json());
     if (!data || Object.keys(data).length === 0) {
       return dispatch(SelectUserError('NOT_FOUND'));
     }
@@ -129,7 +130,7 @@ export const fetchUserById = (id: number) => async (dispatch: AppDispatch) => {
       const error = await response.json();
       console.error('Ошибка авторизации:', error.message || response.statusText);
     }
-    const data = await response.json();
+    const data = mapUserProfileFromApi(await response.json());
     return dispatch(SelectUserFetchSuccess(data));
   } catch (error) {
     return dispatch(SelectUserError(error));

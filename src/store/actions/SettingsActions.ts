@@ -69,7 +69,7 @@ export const fetchCategory = async (search?: string) => {
 
   const url = search
     ? `${process.env.REACT_APP_API_SETTINGS}/categories?search=${encodeURIComponent(search)}&page=1&pageSize=20`
-    : `${process.env.REACT_APP_API_SETTINGS}//categories?page=1&pageSize=20`;
+    : `${process.env.REACT_APP_API_SETTINGS}/categories?page=1&pageSize=20`;
 
   try {
     const response = await fetch(url, {
