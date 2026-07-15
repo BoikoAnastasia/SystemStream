@@ -32,3 +32,16 @@ export const getStreamDuration = (start: string | Date, end: string | Date) => {
   // Формат: HH:MM
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 };
+
+/** Live-stream elapsed time for viewers/dashboard, e.g. "12 мин" / "1 ч 5 мин". */
+export const formatLiveDuration = (startedAt: string | Date) => {
+  const start = typeof startedAt === 'string' ? new Date(startedAt) : startedAt;
+  const ms = Date.now() - start.getTime();
+  if (Number.isNaN(ms) || ms < 0) return '—';
+
+  const totalMinutes = Math.floor(ms / 60000);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours > 0) return `${hours} ч ${minutes} мин`;
+  return `${minutes} мин`;
+};

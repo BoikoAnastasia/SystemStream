@@ -10,6 +10,7 @@ import { DashboardSaveNotice } from '../components/DashboardSaveNotice';
 import { DashboardIngestPanel } from '../components/DashboardIngestPanel';
 import { DashboardStreamPreviewField } from '../components/DashboardStreamPreviewField';
 import { StyledDashboardSectionHint, StyledDashboardSectionTitle } from '../StyledDashboardPage';
+import { formatLiveDuration } from '../../../utils/formatDate';
 
 const panelSx = {
   p: 2,
@@ -26,16 +27,6 @@ const fieldSx = {
   },
   '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.55)' },
   '& .MuiSelect-icon': { color: 'rgba(255,255,255,0.6)' },
-};
-
-const formatLiveDuration = (startedAt: string) => {
-  const ms = Date.now() - new Date(startedAt).getTime();
-  if (Number.isNaN(ms) || ms < 0) return '—';
-  const totalMinutes = Math.floor(ms / 60000);
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  if (hours > 0) return `${hours} ч ${minutes} мин`;
-  return `${minutes} мин`;
 };
 
 export const DashboardStreamSection = ({ channelNickname, mode }: { channelNickname: string; mode: DashboardMode }) => {

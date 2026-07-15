@@ -1,8 +1,29 @@
+import { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { StyledButtonLive, StyledTitle } from '../../../../components/StylesComponents';
 import { StyledButtonWathers, StyledHeaderStreamPage } from '../../StyledStreamPage';
 import { IStream } from '../../../../types/share';
+import { formatLiveDuration } from '../../../../utils/formatDate';
+
+const LiveDurationBadge = ({ startedAt }: { startedAt: string | Date }) => {
+  const [label, setLabel] = useState(() => formatLiveDuration(startedAt));
+
+  useEffect(() => {
+    const update = () => setLabel(formatLiveDuration(startedAt));
+    update();
+    const timer = window.setInterval(update, 30_000);
+    return () => window.clearInterval(timer);
+  }, [startedAt]);
+
+  return (
+    <StyledButtonWathers>
+      <AccessTimeIcon sx={{ width: 10, height: 10 }} />
+      {label}
+    </StyledButtonWathers>
+  );
+};
 
 export const HeaderStreamPage = ({ streamInfo, viewerCount }: { streamInfo: IStream | null; viewerCount: number }) => {
   if (!streamInfo) {
@@ -26,6 +47,7 @@ export const HeaderStreamPage = ({ streamInfo, viewerCount }: { streamInfo: IStr
           <StyledButtonWathers>
             <VisibilityIcon sx={{ width: '10px', height: '10px' }} /> {String(viewerCount)}
           </StyledButtonWathers>
+          {streamInfo.startedAt && <LiveDurationBadge startedAt={streamInfo.startedAt} />}
         </Box>
         <Typography
           sx={{
