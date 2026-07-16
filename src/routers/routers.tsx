@@ -38,6 +38,12 @@ const ChannelManagePage = lazy(() =>
   }))
 );
 
+const StaffPage = lazy(() =>
+  import('../pages/staffPage/StaffPage').then(({ StaffPage }) => ({
+    default: StaffPage,
+  }))
+);
+
 // TEMP: demo-плеер — удалить вместе с pages/playerDemo/
 const PlayerDemoPage = lazy(() =>
   import('../pages/playerDemo/PlayerDemoPage').then(({ PlayerDemoPage }) => ({
@@ -64,6 +70,8 @@ export const privateRouters = [
   { path: '/settings/:section', Element: SettingsPage },
   { path: '/dashboard', Element: DashboardPage },
   { path: '/dashboard/:section', Element: DashboardPage },
+  { path: '/staff', Element: StaffPage },
+  { path: '/staff/:section', Element: StaffPage },
   { path: '/:nickname/manage', Element: ChannelManagePage },
   { path: '/:nickname/manage/:section', Element: ChannelManagePage },
 ];

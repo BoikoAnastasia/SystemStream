@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Avatar, Box, Button, Typography } from '@mui/material';
 import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
+import FlagOutlinedIcon from '@mui/icons-material/FlagOutlined';
 import { Socials } from '../../../../components/socials/Socials';
 import { BannerEffect } from '../../../../components/ui/bannerEffect/BannerEffect';
+import { ReportDialog } from '../../../../components/report/ReportDialog';
 import { deleteSubscribe, streamerFolows, subscribeToUser } from '../../../../store/actions/SubscribersActions';
 import { useAppSelector } from '../../../../hooks/redux';
 import { useHeaderModal } from '../../../../context/HeaderModalContext';
@@ -85,6 +87,7 @@ export const UserBanner = ({ userData, isNotProfileData, isLive = false }: UserB
 
   const [subscribers, setSubscribers] = useState<ISubscriber[]>([]);
   const [isSubscriber, setIsSubscriber] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const fetchSubscribers = useCallback(async () => {
     if (!userData) return;
@@ -150,6 +153,34 @@ export const UserBanner = ({ userData, isNotProfileData, isLive = false }: UserB
       </Button>
     ));
 
+  const reportControl = isNotProfileData && isAuth && userData?.id && (
+    <Button
+      onClick={() => setReportOpen(true)}
+      startIcon={<FlagOutlinedIcon sx={{ fontSize: '16px !important' }} />}
+      sx={{
+        ...unfollowButtonSx,
+        color: 'rgba(255,255,255,0.65)',
+        borderColor: 'rgba(255,255,255,0.16)',
+      }}
+    >
+      Пожаловаться
+    </Button>
+  );
+
+  const reportDialog = userData?.id ? (
+    <ReportDialog
+      open={reportOpen}
+      title="Пожаловаться на канал"
+      subtitle={userData.nickname}
+      payload={{
+        targetType: 'channel',
+        targetUserId: userData.id,
+        streamerId: userData.id,
+      }}
+      onClose={() => setReportOpen(false)}
+    />
+  ) : null;
+
   const subscriberRow = (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
       <PeopleOutlineIcon sx={{ fontSize: 16, color: 'rgba(255,255,255,0.45)' }} />
@@ -196,6 +227,7 @@ export const UserBanner = ({ userData, isNotProfileData, isLive = false }: UserB
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, flexWrap: 'wrap', ml: { xs: 'auto', sm: 0 } }}>
             {followControl}
+            {reportControl}
             <Socials socials={userData?.socialLinks} />
           </Box>
         </Box>
@@ -222,6 +254,7 @@ export const UserBanner = ({ userData, isNotProfileData, isLive = false }: UserB
             <StreamerDescription text={profileDescription} compact />
           </Box>
         )}
+        {reportDialog}
       </Box>
     );
   }
@@ -298,10 +331,12 @@ export const UserBanner = ({ userData, isNotProfileData, isLive = false }: UserB
 
           <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.25 }}>
             {followControl}
+            {reportControl}
             <Socials socials={userData?.socialLinks} />
           </Box>
         </Box>
       </Box>
+      {reportDialog}
     </Box>
   );
 };

@@ -1,4 +1,9 @@
-import React, { useState } from 'react';
+import DashboardCustomizeOutlinedIcon from '@mui/icons-material/DashboardCustomizeOutlined';
+import GavelOutlinedIcon from '@mui/icons-material/GavelOutlined';
+import PermIdentityIcon from '@mui/icons-material/PermIdentity';
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 // redux
 import { AppDispatch } from '../../../store/store';
@@ -14,10 +19,7 @@ import { IconButton, MenuItem } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import SavingsIcon from '@mui/icons-material/Savings';
 import SettingsIcon from '@mui/icons-material/Settings';
-import DashboardCustomizeOutlinedIcon from '@mui/icons-material/DashboardCustomizeOutlined';
-import PermIdentityIcon from '@mui/icons-material/PermIdentity';
-import LoginIcon from '@mui/icons-material/Login';
-import LogoutIcon from '@mui/icons-material/Logout';
+import { fetchStaffMe } from '../../../api/reportsApi';
 
 export const HeaderMenuAvatar = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -25,12 +27,26 @@ export const HeaderMenuAvatar = () => {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openModal, setOpenModal] = useState(false);
+  const [isStaff, setIsStaff] = useState(false);
+
+  useEffect(() => {
+    if (!isAuth) {
+      setIsStaff(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const result = await fetchStaffMe();
+      if (!cancelled) {
+        setIsStaff(Boolean(result.success && result.permissions.canAccessStaffPanel));
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuth]);
+
   const menuData = [
-    // {
-    //   authOnly: true,
-    //   href: '/',
-    //   value: 'Личный кабинет',
-    // },
     {
       authOnly: true,
       href: `/${profile?.nickname}`,
@@ -43,6 +59,16 @@ export const HeaderMenuAvatar = () => {
       icon: DashboardCustomizeOutlinedIcon,
       value: 'Панель стрима',
     },
+    ...(isStaff
+      ? [
+          {
+            authOnly: true,
+            href: '/staff/reports',
+            icon: GavelOutlinedIcon,
+            value: 'Staff',
+          },
+        ]
+      : []),
     {
       authOnly: true,
       href: '/settings',

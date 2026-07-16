@@ -4,10 +4,12 @@ import TimerOffOutlinedIcon from '@mui/icons-material/TimerOffOutlined';
 import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
 import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
 import ReplyOutlinedIcon from '@mui/icons-material/ReplyOutlined';
+import FlagOutlinedIcon from '@mui/icons-material/FlagOutlined';
 import { useState } from 'react';
 import { CHAT_TIMEOUT_PRESETS } from './chat.constants';
 import { getChatPopoverContainer } from './chat.utils';
 import { IChatMessage } from '../../types/share';
+import { ReportDialog } from '../report/ReportDialog';
 
 const modMenuItemSx = {
   gap: 1,
@@ -31,6 +33,7 @@ type ChatModMenuProps = {
   anchorEl: HTMLElement | null;
   onClose: () => void;
   onReply: (msg: IChatMessage) => void;
+  streamerId?: number;
   showModActions?: boolean;
   isBanned?: boolean;
   onDelete?: (messageId: string) => void;
@@ -44,6 +47,7 @@ export const ChatModMenu = ({
   anchorEl,
   onClose,
   onReply,
+  streamerId,
   showModActions = false,
   isBanned = false,
   onDelete,
@@ -52,8 +56,11 @@ export const ChatModMenu = ({
   onUnban,
 }: ChatModMenuProps) => {
   const [timeoutAnchorEl, setTimeoutAnchorEl] = useState<HTMLElement | null>(null);
+  const [reportOpen, setReportOpen] = useState(false);
 
   if (!msg.id) return null;
+
+  const canReport = msg.role !== 'System' && Boolean(msg.userId);
 
   const handleClose = () => {
     setTimeoutAnchorEl(null);
@@ -87,6 +94,19 @@ export const ChatModMenu = ({
           <ReplyOutlinedIcon sx={{ fontSize: 18 }} />
           Ответить
         </MenuItem>
+
+        {canReport && (
+          <MenuItem
+            onClick={() => {
+              setReportOpen(true);
+              handleClose();
+            }}
+            sx={{ ...modMenuItemSx }}
+          >
+            <FlagOutlinedIcon sx={{ fontSize: 18 }} />
+            Пожаловаться
+          </MenuItem>
+        )}
 
         {showModActions && onDelete && onTimeout && (onBan || onUnban) && (
           <>
@@ -170,6 +190,22 @@ export const ChatModMenu = ({
             </MenuItem>
           ))}
         </Menu>
+      )}
+
+      {canReport && (
+        <ReportDialog
+          open={reportOpen}
+          title="Пожаловаться на сообщение"
+          subtitle={`${msg.username}: ${msg.text?.slice(0, 120) || '…'}`}
+          payload={{
+            targetType: 'message',
+            targetUserId: msg.userId,
+            messageId: msg.id,
+            messageSnapshot: msg.text || undefined,
+            streamerId,
+          }}
+          onClose={() => setReportOpen(false)}
+        />
       )}
     </>
   );

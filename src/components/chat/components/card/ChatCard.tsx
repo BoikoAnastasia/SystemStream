@@ -120,6 +120,7 @@ export const ChatCard = ({
           anchorEl={menuAnchorEl}
           onClose={() => setMenuAnchorEl(null)}
           onReply={onReply}
+          streamerId={streamerId}
           showModActions={showModActions}
           isBanned={isBanned}
           onDelete={onDeleteMessage}
