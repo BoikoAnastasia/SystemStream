@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Box, Button, Chip, CircularProgress, MenuItem, TextField, Typography } from '@mui/material';
 import LiveTvOutlinedIcon from '@mui/icons-material/LiveTvOutlined';
 import OfflineBoltOutlinedIcon from '@mui/icons-material/OfflineBoltOutlined';
@@ -8,9 +8,13 @@ import { DashboardMode } from '../dashboard.constants';
 import { STREAM_LANGUAGE_OPTIONS, useStreamDashboardSettings } from '../../../hooks/useStreamDashboardSettings';
 import { DashboardSaveNotice } from '../components/DashboardSaveNotice';
 import { DashboardIngestPanel } from '../components/DashboardIngestPanel';
+import { DashboardStreamingBanBanner } from '../components/DashboardStreamingBanBanner';
 import { DashboardStreamPreviewField } from '../components/DashboardStreamPreviewField';
 import { StyledDashboardSectionHint, StyledDashboardSectionTitle } from '../StyledDashboardPage';
 import { formatLiveDuration } from '../../../utils/formatDate';
+import { useStreamIngest } from '../../../hooks/useStreamIngest';
+import { useHeaderModal } from '../../../context/HeaderModalContext';
+import { sanctionTypeLabel } from '../../../api/appealsApi';
 
 const panelSx = {
   p: 2,
@@ -52,6 +56,24 @@ export const DashboardStreamSection = ({ channelNickname, mode }: { channelNickn
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
   const [liveDuration, setLiveDuration] = useState('');
+  const ingest = useStreamIngest(mode === 'own');
+  const { showAlert } = useHeaderModal();
+  const wasBlockedRef = useRef<boolean | null>(null);
+
+  useEffect(() => {
+    if (mode !== 'own') return;
+    // Skip first load — banner is enough; toast only when ban appears while already on dashboard.
+    if (wasBlockedRef.current === null) {
+      wasBlockedRef.current = ingest.streamingBlocked;
+      return;
+    }
+    if (ingest.streamingBlocked && !wasBlockedRef.current) {
+      const reason = ingest.blockReason ? ` Причина: ${ingest.blockReason}` : '';
+      const type = ingest.blockType ? sanctionTypeLabel(ingest.blockType) : 'бан стрима';
+      showAlert(`Эфир запрещён.${reason}`, 'warning', `Наказание: ${type}`);
+    }
+    wasBlockedRef.current = ingest.streamingBlocked;
+  }, [mode, ingest.streamingBlocked, ingest.blockReason, ingest.blockType, showAlert]);
 
   useEffect(() => {
     if (!settings) return;
@@ -134,6 +156,16 @@ export const DashboardStreamSection = ({ channelNickname, mode }: { channelNickn
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+      {mode === 'own' && (
+        <DashboardStreamingBanBanner
+          blocked={ingest.streamingBlocked}
+          type={ingest.blockType}
+          reason={ingest.blockReason}
+          expiresAt={ingest.blockExpiresAt}
+          message={ingest.blockMessage}
+        />
+      )}
+
       {mode === 'own' && <DashboardIngestPanel />}
 
       <Box>

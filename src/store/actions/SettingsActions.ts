@@ -5,6 +5,7 @@ import { getCookie } from '../../utils/cookieFunctions';
 // types
 import { handleApiRequest } from '../../utils/handleApiRequest';
 import { SettingsSlice } from '../slices/SettingsSlice';
+import { RootState } from '../store';
 
 const { SettingsSliceFetch, SettingsSliceError, SettingsSliceSuccess } = SettingsSlice.actions;
 
@@ -25,7 +26,7 @@ export const changeProfileData = (data: FormData) => async (dispatch: AppDispatc
   );
 };
 
-export const postStreamKey = () => async (dispatch: AppDispatch) => {
+export const postStreamKey = () => async (dispatch: AppDispatch, getState: () => RootState) => {
   try {
     dispatch(SettingsSliceFetch());
     const token = getCookie('tokenData');
@@ -43,7 +44,13 @@ export const postStreamKey = () => async (dispatch: AppDispatch) => {
     }
 
     const data = await response.json();
-    dispatch(SettingsSliceSuccess(data));
+    const prev = getState().settings.data;
+    dispatch(
+      SettingsSliceSuccess({
+        ...(prev ?? { streamKey: '' }),
+        streamKey: data.streamKey ?? data.StreamKey ?? '',
+      })
+    );
   } catch (error: any) {
     dispatch(SettingsSliceError(error.message || 'Не удалось поменять ключ'));
   }

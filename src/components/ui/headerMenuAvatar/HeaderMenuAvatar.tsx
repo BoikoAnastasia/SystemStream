@@ -2,6 +2,7 @@ import DashboardCustomizeOutlinedIcon from '@mui/icons-material/DashboardCustomi
 import GavelOutlinedIcon from '@mui/icons-material/GavelOutlined';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import LoginIcon from '@mui/icons-material/Login';
+import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -27,6 +28,7 @@ export const HeaderMenuAvatar = () => {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openModal, setOpenModal] = useState(false);
+  const [authTab, setAuthTab] = useState(0);
   const [isStaff, setIsStaff] = useState(false);
 
   useEffect(() => {
@@ -82,8 +84,18 @@ export const HeaderMenuAvatar = () => {
       value: 'Баланс: 0 руб',
     },
   ];
-  const styledItem = {
-    '&.MuiMenuItem-root': { color: 'var(--white)', display: 'flex', gap: '4px' },
+  const menuItemSx = {
+    color: 'var(--white)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 1.25,
+    minHeight: 40,
+    px: 1.75,
+    py: 0.75,
+    '& .MuiSvgIcon-root': {
+      fontSize: 20,
+      flexShrink: 0,
+    },
   };
 
   const open = Boolean(anchorEl);
@@ -92,7 +104,8 @@ export const HeaderMenuAvatar = () => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleOpenModal = () => {
+  const handleOpenAuth = (tab: 0 | 1) => {
+    setAuthTab(tab);
     setOpenModal(true);
     handleClose();
   };
@@ -131,24 +144,35 @@ export const HeaderMenuAvatar = () => {
         {menuData
           .filter((item) => (item.authOnly ? isAuth : true))
           .map((item, index) => (
-            <MenuItem sx={{ styledItem }} key={index} component={Link} to={item.href}>
+            <MenuItem sx={menuItemSx} key={index} component={Link} to={item.href}>
               {item.icon && <item.icon />}
               {item.value}
             </MenuItem>
           ))}
         {isAuth ? (
-          <MenuItem sx={{ styledItem }} onClick={logout}>
+          <MenuItem sx={menuItemSx} onClick={logout}>
             <LogoutIcon />
             Выйти
           </MenuItem>
         ) : (
-          <MenuItem sx={{ styledItem }} onClick={handleOpenModal}>
-            <LoginIcon />
-            Войти
-          </MenuItem>
+          <>
+            <MenuItem sx={menuItemSx} onClick={() => handleOpenAuth(0)}>
+              <LoginIcon />
+              Войти
+            </MenuItem>
+            <MenuItem sx={menuItemSx} onClick={() => handleOpenAuth(1)}>
+              <PersonAddAlt1Icon />
+              Зарегистрироваться
+            </MenuItem>
+          </>
         )}
       </StyledMenu>
-      <ModalComponent open={openModal} setOpen={setOpenModal} title="Войти или зарегистрироваться" />
+      <ModalComponent
+        open={openModal}
+        setOpen={setOpenModal}
+        initialTab={authTab}
+        title="Войти или зарегистрироваться"
+      />
     </>
   );
 };

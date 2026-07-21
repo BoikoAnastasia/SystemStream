@@ -46,7 +46,7 @@ export interface IStreamsHistorySlice {
 }
 
 // Types
-export type NotificationsType = 'NewFollower' | 'StreamStarted';
+export type NotificationsType = 'NewFollower' | 'StreamStarted' | 'SupportTicketReply' | string;
 
 export type AlertType = 'success' | 'error' | 'info' | 'warning';
 
@@ -121,6 +121,12 @@ export interface IStreamsData {
 
 export interface ISetting {
   streamKey: string;
+  streamingBlocked?: boolean;
+  blockMessage?: string | null;
+  blockType?: string | null;
+  blockReason?: string | null;
+  blockExpiresAt?: string | null;
+  blockSanctionId?: number | null;
 }
 
 export interface IStream {
@@ -219,6 +225,8 @@ export interface ITabPanelProps {
 export interface ITabsComponentProps {
   propsChild: (ReactNode | (() => ReactNode))[];
   propTabsTitle: string[];
+  /** Which tab is selected when the tabs mount / remount. */
+  initialTab?: number;
 }
 
 export interface IModalRegistForm {
@@ -238,7 +246,7 @@ export type SidebarContextType = {
 };
 
 export type ModalContextType = {
-  showAlert: (message: string, type?: AlertType) => void;
+  showAlert: (message: string, type?: AlertType, title?: string) => void;
 };
 
 export interface ICardTypography {

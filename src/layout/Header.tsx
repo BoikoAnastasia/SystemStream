@@ -4,6 +4,7 @@ import { SearchInput } from '../components/ui/searchInput/SearchInput';
 import { HeaderNotificationMenu } from '../components/ui/headerNotificationMenu/HeaderNotificationMenu';
 // hooks
 import { useDeviceDetect } from '../hooks/useDeviceDetect';
+import { useNotificationHub } from '../hooks/hubs/useNotificationHub';
 // style
 import { StyleHeader, StyleHeaderBlock, StyleHeaderContainer } from './StyledLayout';
 import { HeaderMenuAvatar } from '../components/ui/headerMenuAvatar/HeaderMenuAvatar';
@@ -17,6 +18,7 @@ export const Header = () => {
   const { isMobile } = useDeviceDetect();
   const { open, setOpen } = useDrawer();
   const { isAuth } = useAppSelector((state) => state.user);
+  useNotificationHub(Boolean(isAuth));
 
   return (
     <StyleHeader>

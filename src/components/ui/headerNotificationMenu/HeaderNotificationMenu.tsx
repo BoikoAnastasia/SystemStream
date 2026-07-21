@@ -24,6 +24,8 @@ import { formatDate } from '../../../utils/formatDate';
 import { IconNotidicationCount, StyledMenu } from '../../../layout/StyledLayout';
 import { INotificationUnified } from '../../../types/share';
 
+const REFRESH_MS = 45_000;
+
 export const HeaderNotificationMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -34,13 +36,22 @@ export const HeaderNotificationMenu = () => {
   const { page, limit, totalCount } = useAppSelector((state) => state.notiications.paged);
 
   useEffect(() => {
-    if (notifications.length === 0) dispatch(notificationWithPagination());
-  }, [notifications.length, dispatch]);
+    dispatch(notificationWithPagination());
+    const onFocus = () => dispatch(notificationWithPagination());
+    window.addEventListener('focus', onFocus);
+    const timer = window.setInterval(() => dispatch(notificationWithPagination()), REFRESH_MS);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      window.clearInterval(timer);
+    };
+  }, [dispatch]);
 
-  const pageCount = Math.ceil(totalCount / limit);
+  const pageCount = Math.ceil(totalCount / limit) || 1;
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
+    // Refresh when opening the bell so new sanctions appear even without SignalR.
+    dispatch(notificationWithPagination(page, limit));
   };
 
   const handleClose = () => {

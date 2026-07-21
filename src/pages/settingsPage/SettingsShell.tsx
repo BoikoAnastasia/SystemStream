@@ -9,6 +9,7 @@ import { getSettingsNavItems, SettingsSection } from './settings.constants';
 import { SettingsProfileSection } from './sections/SettingsProfileSection';
 import { SettingsSecuritySection } from './sections/SettingsSecuritySection';
 import { SettingsBalanceSection } from './sections/SettingsBalanceSection';
+import { SettingsSupportSection } from './sections/SettingsSupportSection';
 import { SettingsNoticeProvider } from './context/SettingsNoticeContext';
 import {
   StyledSettingsContainer,
@@ -26,6 +27,7 @@ const SECTION_COMPONENTS: Record<SettingsSection, FC> = {
   profile: SettingsProfileSection,
   security: SettingsSecuritySection,
   balance: SettingsBalanceSection,
+  support: SettingsSupportSection,
 };
 
 type SettingsShellProps = {

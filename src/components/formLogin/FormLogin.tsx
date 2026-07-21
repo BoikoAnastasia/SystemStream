@@ -1,5 +1,4 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 // store
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../store/store';
@@ -31,7 +30,6 @@ export const FormLogin = ({
   setMessage: Dispatch<SetStateAction<string | null>>;
 }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
 
   const [errorMessage, setErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -49,12 +47,9 @@ export const FormLogin = ({
     setErrorMessage('');
     const isRight = await loginUser({ loginOrEmail: values.loginOrEmail, password: values.password });
     if (isRight) {
-      setMessage('Вы успешно вошли!');
-      const action = await dispatch(userProfile());
-      const userData = action?.payload;
+      await dispatch(userProfile());
+      setMessage(null);
       handleClose();
-      if (userData?.nickname) navigate(`/${userData.nickname}`);
-      else navigate('/');
     } else {
       setMessage(null);
       setErrorMessage('Неверный логин или пароль.');

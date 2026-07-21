@@ -23,7 +23,9 @@ export const NotificationSlice = createSlice({
       state.isLoading = true;
     },
     NotificationFetchSuccess: (state, action: PayloadAction<any>) => {
-      const mapped = action.payload.notifications.map((not: INotificationBase) => mapHubNotification(not));
+      const mapped = action.payload.notifications
+        .map((not: INotificationBase) => mapHubNotification(not))
+        .filter(Boolean);
 
       state.paged.notifications = mapped;
       state.paged.limit = action.payload.limit;
@@ -39,6 +41,7 @@ export const NotificationSlice = createSlice({
     },
     AddNotification: (state, action: PayloadAction<INotificationBase>) => {
       const notif = mapHubNotification(action.payload);
+      if (!notif) return;
 
       // проверяем, нет ли уже такого уведомления в live или paged
       const exists =

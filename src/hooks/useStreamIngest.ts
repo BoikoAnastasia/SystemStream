@@ -6,6 +6,8 @@ import { fetchStreamKey } from '../store/actions/StreamActions';
 import { postStreamKey } from '../store/actions/SettingsActions';
 import { getRtmpServerUrl } from '../utils/getRtmpServerUrl';
 
+const BLOCK_POLL_MS = 30_000;
+
 /** Stream ingest credentials — only for the channel owner (never moderators). */
 export const useStreamIngest = (enabled: boolean) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -18,13 +20,25 @@ export const useStreamIngest = (enabled: boolean) => {
   }, [dispatch, enabled]);
 
   useEffect(() => {
-    if (!enabled || data?.streamKey) return;
+    if (!enabled) return;
     loadKey();
-  }, [enabled, data?.streamKey, loadKey]);
+
+    const onFocus = () => loadKey();
+    window.addEventListener('focus', onFocus);
+    const timer = window.setInterval(loadKey, BLOCK_POLL_MS);
+
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      window.clearInterval(timer);
+    };
+  }, [enabled, loadKey]);
 
   const regenerateKey = useCallback(() => {
     if (!enabled) return;
-    dispatch(postStreamKey());
+    dispatch(postStreamKey()).then(() => {
+      // Keep block status after key reset (PUT streamKey may return only the key).
+      dispatch(fetchStreamKey());
+    });
   }, [dispatch, enabled]);
 
   return {
@@ -34,6 +48,12 @@ export const useStreamIngest = (enabled: boolean) => {
     setShowKey,
     isError: isError ? String(isError) : null,
     isLoading,
+    streamingBlocked: Boolean(data?.streamingBlocked),
+    blockMessage: data?.blockMessage ?? null,
+    blockType: data?.blockType ?? null,
+    blockReason: data?.blockReason ?? null,
+    blockExpiresAt: data?.blockExpiresAt ?? null,
+    blockSanctionId: data?.blockSanctionId ?? null,
     loadKey,
     regenerateKey,
   };

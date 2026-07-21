@@ -26,7 +26,8 @@ const copyText = async (text: string) => {
 /** OBS / RTMP credentials — only for channel owner. Never show to moderators. */
 export const DashboardIngestPanel = () => {
   const { showAlert } = useHeaderModal();
-  const { streamKey, rtmpUrl, showKey, setShowKey, isError, isLoading, regenerateKey } = useStreamIngest(true);
+  const { streamKey, rtmpUrl, showKey, setShowKey, isError, isLoading, regenerateKey, streamingBlocked } =
+    useStreamIngest(true);
   const [confirmReset, setConfirmReset] = useState(false);
 
   const handleCopy = async (label: string, value: string) => {
@@ -55,6 +56,12 @@ export const DashboardIngestPanel = () => {
           </Typography>
         </Box>
       </Box>
+
+      {streamingBlocked && (
+        <Typography sx={{ fontSize: 12, color: '#ff8a80', lineHeight: 1.4 }}>
+          Ключ сейчас не сработает — см. баннер выше. После снятия наказания можно снова выходить в эфир.
+        </Typography>
+      )}
 
       {isLoading && !streamKey ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>

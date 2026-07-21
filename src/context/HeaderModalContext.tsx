@@ -7,10 +7,14 @@ const HeaderModalContext = createContext<ModalContextType | undefined>(undefined
 
 export const HeaderModalProvider = ({ children }: { children: ReactNode }) => {
   const [open, setOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState<{ type: AlertType; message: string } | null>(null);
+  const [alertMessage, setAlertMessage] = useState<{
+    type: AlertType;
+    message: string;
+    title?: string;
+  } | null>(null);
 
-  const showAlert = (message: string, type: AlertType = 'info') => {
-    setAlertMessage({ message, type });
+  const showAlert = (message: string, type: AlertType = 'info', title?: string) => {
+    setAlertMessage({ message, type, title });
     setOpen(true);
   };
 
@@ -20,7 +24,13 @@ export const HeaderModalProvider = ({ children }: { children: ReactNode }) => {
     <HeaderModalContext.Provider value={{ showAlert }}>
       {children}
       {alertMessage && (
-        <ModalAlert message={alertMessage.message} type={alertMessage.type} open={open} onClose={handleClose} />
+        <ModalAlert
+          message={alertMessage.message}
+          type={alertMessage.type}
+          title={alertMessage.title}
+          open={open}
+          onClose={handleClose}
+        />
       )}
     </HeaderModalContext.Provider>
   );

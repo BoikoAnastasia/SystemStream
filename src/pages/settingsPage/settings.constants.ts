@@ -1,4 +1,4 @@
-export type SettingsSection = 'profile' | 'security' | 'balance';
+export type SettingsSection = 'profile' | 'security' | 'balance' | 'support';
 
 export type SettingsNavItem = {
   value: SettingsSection;
@@ -28,12 +28,20 @@ export const getSettingsNavItems = (): SettingsNavItem[] => [
     description: 'Пополнение и история',
     path: '/settings/balance',
   },
+  {
+    value: 'support',
+    title: 'Поддержка',
+    description: 'Тикеты и апелляции',
+    path: '/settings/support',
+  },
 ];
 
 export const isSettingsSection = (value?: string): value is SettingsSection =>
-  value === 'profile' || value === 'security' || value === 'balance';
+  value === 'profile' || value === 'security' || value === 'balance' || value === 'support';
 
 export const resolveSettingsSection = (section?: string): SettingsSection | null => {
   if (!section) return null;
+  // Old bookmark /settings/appeals → support
+  if (section === 'appeals') return 'support';
   return isSettingsSection(section) ? section : null;
 };

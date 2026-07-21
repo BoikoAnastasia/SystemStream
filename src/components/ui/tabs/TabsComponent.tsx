@@ -6,8 +6,8 @@ import { StyledTab, StyledTabs } from './StyledTabsComponent';
 // types
 import { ITabPanelProps, ITabsComponentProps } from '../../../types/share';
 
-export const TabsComponent = ({ propsChild, propTabsTitle }: ITabsComponentProps) => {
-  const [value, setValue] = useState(0);
+export const TabsComponent = ({ propsChild, propTabsTitle, initialTab = 0 }: ITabsComponentProps) => {
+  const [value, setValue] = useState(initialTab);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);

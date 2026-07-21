@@ -1,35 +1,56 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import * as signalR from '@microsoft/signalr';
-// store
 import { AppDispatch } from '../../store/store';
 import { NotificationSlice } from '../../store/slices/NotificationSlice';
-// utils
+import { mapHubNotification } from '../../store/actions/NotificationActions';
 import { getCookie } from '../../utils/cookieFunctions';
-// types
-import { INotificationBase } from '../../types/share';
+import { useHeaderModal } from '../../context/HeaderModalContext';
+import { AlertType } from '../../types/share';
 
-export const useNotificationHub = (addNotification: (n: INotificationBase) => void) => {
+/** Connects to NotificationHub while authenticated and pushes into Redux + optional alert. */
+export const useNotificationHub = (enabled: boolean) => {
   const hubRef = useRef<signalR.HubConnection | null>(null);
   const hubUrl = `${process.env.REACT_APP_API_LOCAL}/hubs/notificationHub`;
-  const token = getCookie('tokenData');
   const dispatch = useDispatch<AppDispatch>();
-
+  const { showAlert } = useHeaderModal();
   const { AddNotification } = NotificationSlice.actions;
+  const showAlertRef = useRef(showAlert);
+  showAlertRef.current = showAlert;
 
   useEffect(() => {
+    if (!enabled) return;
+
+    const token = getCookie('tokenData');
+    if (!token) return;
+
     const hub = new signalR.HubConnectionBuilder()
-      .withUrl(hubUrl, { accessTokenFactory: () => token })
+      .withUrl(hubUrl, {
+        accessTokenFactory: () => getCookie('tokenData') ?? '',
+      })
       .withAutomaticReconnect()
       .build();
 
     hubRef.current = hub;
 
-    hub.on('ReceiveNotification', (data: any) => {
-      console.log('Raw notification payload:', data);
-
+    hub.on('ReceiveNotification', (data: unknown) => {
       if (!data) return;
-      dispatch(AddNotification(data));
+      dispatch(AddNotification(data as any));
+
+      const mapped = mapHubNotification(data as any);
+      if (!mapped) return;
+
+      const type = String((data as any).type ?? (data as any).Type ?? '')
+        .trim()
+        .toLowerCase();
+      const isSanction = type === 'platformsanction' || type === '8';
+      const isAppeal = type === 'platformappeal' || type === '9';
+      const isSupport = type === 'supportticketreply' || type === '7';
+
+      if (isSanction || isAppeal || isSupport) {
+        const alertType: AlertType = isSanction ? 'warning' : 'info';
+        showAlertRef.current(mapped.message, alertType, mapped.title);
+      }
     });
 
     hub
@@ -39,6 +60,7 @@ export const useNotificationHub = (addNotification: (n: INotificationBase) => vo
 
     return () => {
       hub.stop().catch(() => {});
+      hubRef.current = null;
     };
-  }, [AddNotification, dispatch, hubUrl, token]);
+  }, [AddNotification, dispatch, enabled, hubUrl]);
 };

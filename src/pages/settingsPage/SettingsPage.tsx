@@ -23,6 +23,10 @@ export const SettingsPage: FC = settingLayout(() => {
 
   useEffect(() => {
     if (!section) return;
+    if (section === 'appeals') {
+      navigate('/settings/support', { replace: true });
+      return;
+    }
     if (!activeSection) {
       navigate(`/settings/${SETTINGS_DEFAULT_SECTION}`, { replace: true });
     }

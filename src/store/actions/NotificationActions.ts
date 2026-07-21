@@ -10,8 +10,10 @@ import {
 // mui
 import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import SupportAgentIcon from '@mui/icons-material/SupportAgent';
+import GavelIcon from '@mui/icons-material/Gavel';
 // types
-import { INotificationBase } from '../../types/share';
+import { INotificationBase, INotificationUnified } from '../../types/share';
 import { createSelector } from '@reduxjs/toolkit';
 
 export const notificationWithPagination =
@@ -91,34 +93,83 @@ export const notificationUnread = () => {
   // REACT_APP_API_NOTIFICATIONS
 };
 
-export const mapHubNotification = (data: INotificationBase) => {
-  let payload = null;
+const normalizeNotificationType = (type: unknown) =>
+  String(type ?? '')
+    .trim()
+    .toLowerCase();
+
+export const mapHubNotification = (data: INotificationBase): INotificationUnified | null => {
+  let payload: Record<string, any> | null = null;
+  const rawPayload = (data as any).payload ?? (data as any).Payload;
   try {
-    payload = typeof data.payload === 'string' ? JSON.parse(data.payload) : data.payload;
+    payload = typeof rawPayload === 'string' ? JSON.parse(rawPayload) : (rawPayload as any);
   } catch (e) {
     console.error('Failed to parse payload', e);
   }
-  switch (data.type) {
-    case 'NewFollower':
+
+  const type = normalizeNotificationType((data as any).type ?? (data as any).Type);
+  const date = data.date || data.createdAt || (data as any).Date || new Date().toISOString();
+  const isRead = data.isRead || (data as any).IsRead || false;
+  const id = data.id ?? (data as any).Id;
+
+  switch (type) {
+    case 'newfollower':
+    case '3':
       return {
-        id: data.id,
+        id: id!,
         title: 'Новый подписчик!',
-        message: `${payload.SubscriberName} подписался на вас.`,
-        link: `/${payload.SubscriberName}`,
-        date: data.date || data.createdAt || new Date().toISOString(),
+        message: `${payload?.SubscriberName ?? payload?.subscriberName} подписался на вас.`,
+        link: `/${payload?.SubscriberName ?? payload?.subscriberName}`,
+        date,
         icon: PersonAddIcon,
-        isRead: data.isRead || false,
+        isRead,
       };
-    case 'StreamStarted':
+    case 'streamstarted':
+    case '1':
       return {
-        id: payload.StreamId,
-        date: data.date || data.createdAt || new Date().toISOString(),
+        id: id ?? payload?.StreamId ?? payload?.streamId,
+        date,
         title: 'Новый стрим!',
-        message: `${payload.StreamerName} начал стрим ${payload.StreamName}.`,
-        link: `/${payload.StreamerName}`,
+        message: `${payload?.StreamerName ?? payload?.streamerName} начал стрим ${payload?.StreamName ?? payload?.streamName}.`,
+        link: `/${payload?.StreamerName ?? payload?.streamerName}`,
         icon: SmartDisplayIcon,
-        isRead: data.isRead || false,
+        isRead,
       };
+    case 'supportticketreply':
+    case '7':
+      return {
+        id: id!,
+        title: 'Ответ поддержки',
+        message: payload?.Message ?? payload?.message ?? 'Поддержка ответила на ваш тикет',
+        link: '/settings/support',
+        date,
+        icon: SupportAgentIcon,
+        isRead,
+      };
+    case 'platformsanction':
+    case '8':
+      return {
+        id: id!,
+        title: payload?.Title ?? payload?.title ?? 'Вам выдали наказание',
+        message: payload?.Message ?? payload?.message ?? 'Обновление по наказанию платформы',
+        link: '/settings/support',
+        date,
+        icon: GavelIcon,
+        isRead,
+      };
+    case 'platformappeal':
+    case '9':
+      return {
+        id: id!,
+        title: 'Апелляция',
+        message: payload?.Message ?? payload?.message ?? payload?.Title ?? 'Решение по апелляции',
+        link: '/settings/support',
+        date,
+        icon: GavelIcon,
+        isRead,
+      };
+    default:
+      return null;
   }
 };
 export const selectNotifications = (state: RootState) => state.notiications.paged.notifications;

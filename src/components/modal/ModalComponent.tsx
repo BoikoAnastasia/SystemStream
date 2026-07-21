@@ -12,7 +12,18 @@ import { StyledTitleModal } from '../StylesComponents';
 import { StyleModalContent } from './StyledModal';
 
 export const ModalComponent = memo(
-  ({ title, open, setOpen }: { title: string; open: boolean; setOpen: (open: boolean) => void }) => {
+  ({
+    title,
+    open,
+    setOpen,
+    initialTab = 0,
+  }: {
+    title: string;
+    open: boolean;
+    setOpen: (open: boolean) => void;
+    /** 0 = Вход, 1 = Регистрация */
+    initialTab?: number;
+  }) => {
     const handleClose = () => setOpen(false);
     const [message, setMessage] = useState<null | string>(null);
 
@@ -37,13 +48,18 @@ export const ModalComponent = memo(
         <StyleModalContent>
           <StyledTitleModal>{title}</StyledTitleModal>
           {message !== null && message}
-          <TabsComponent
-            propsChild={[
-              <FormLogin handleClose={handleClose} setMessage={setMessage} />,
-              <FormAuth setMessage={setMessage} />,
-            ]}
-            propTabsTitle={['Вход', 'Регистрация']}
-          />
+          {/* key remounts tabs so initialTab applies each open */}
+          {open && (
+            <TabsComponent
+              key={initialTab}
+              initialTab={initialTab}
+              propsChild={[
+                <FormLogin handleClose={handleClose} setMessage={setMessage} />,
+                <FormAuth handleClose={handleClose} setMessage={setMessage} />,
+              ]}
+              propTabsTitle={['Вход', 'Регистрация']}
+            />
+          )}
         </StyleModalContent>
       </Modal>
     );

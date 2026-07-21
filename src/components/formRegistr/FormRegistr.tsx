@@ -1,6 +1,15 @@
 import { Dispatch, MouseEvent, SetStateAction, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 // reducer
-import { checkExistEmail, checkExistNickname, registrationUser } from '../../store/actions/UserActions';
+import {
+  checkExistEmail,
+  checkExistNickname,
+  loginUser,
+  registrationUser,
+  userProfile,
+} from '../../store/actions/UserActions';
+import { AppDispatch } from '../../store/store';
 // formik
 import { Formik, Form } from 'formik';
 import { validationRegist } from '../../validation/validation';
@@ -21,7 +30,15 @@ import {
 import { IModalRegistForm } from '../../types/share';
 import { useHeaderModal } from '../../context/HeaderModalContext';
 
-export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<string | null>> }) => {
+export const FormAuth = ({
+  handleClose,
+  setMessage,
+}: {
+  handleClose: () => void;
+  setMessage: Dispatch<SetStateAction<string | null>>;
+}) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { showAlert } = useHeaderModal();
@@ -61,10 +78,22 @@ export const FormAuth = ({ setMessage }: { setMessage: Dispatch<SetStateAction<s
       if (!registrationResult.success) {
         throw new Error(registrationResult.message);
       }
-      showAlert('Вы успешно прошли регистрацию! Теперь авторизуйтесь.', 'success');
+
+      const loggedIn = await loginUser({ loginOrEmail: values.email!, password: values.password });
+      if (!loggedIn) {
+        setMessage('Аккаунт создан — войдите на вкладке «Вход».');
+        resetForm();
+        return;
+      }
+
+      const action = await dispatch(userProfile());
+      const userData = action?.payload;
+      setMessage(null);
+      handleClose();
+      navigate(`/${userData?.nickname || values.username}`);
       resetForm();
     } catch (error: any) {
-      showAlert('Произошла ошибка.', 'error');
+      showAlert(error?.message || 'Произошла ошибка при регистрации.', 'error');
     } finally {
       setSubmitting(false);
     }

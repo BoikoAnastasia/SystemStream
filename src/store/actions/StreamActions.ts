@@ -29,7 +29,17 @@ export const fetchStreamKey = () => async (dispatch: AppDispatch) => {
     }
 
     const data = await response.json();
-    dispatch(SettingsSliceSuccess(data));
+    dispatch(
+      SettingsSliceSuccess({
+        streamKey: data.streamKey ?? data.StreamKey ?? '',
+        streamingBlocked: Boolean(data.streamingBlocked ?? data.StreamingBlocked),
+        blockMessage: (data.blockMessage ?? data.BlockMessage ?? null) as string | null,
+        blockType: (data.blockType ?? data.BlockType ?? null) as string | null,
+        blockReason: (data.blockReason ?? data.BlockReason ?? null) as string | null,
+        blockExpiresAt: (data.blockExpiresAt ?? data.BlockExpiresAt ?? null) as string | null,
+        blockSanctionId: (data.blockSanctionId ?? data.BlockSanctionId ?? null) as number | null,
+      })
+    );
   } catch (error: any) {
     dispatch(SettingsSliceError(error.message || 'Не удалось получить ключ'));
   }
