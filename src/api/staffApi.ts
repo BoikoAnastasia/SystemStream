@@ -1,15 +1,7 @@
-import { getCookie } from '../utils/cookieFunctions';
+import { authHeaders } from './httpClient';
 import { handleApiRequest } from '../utils/handleApiRequest';
 
 const apiLocal = () => process.env.REACT_APP_API_LOCAL;
-
-const authHeaders = () => {
-  const token = getCookie('tokenData');
-  return {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  };
-};
 
 export type StaffRole = 'User' | 'Support' | 'Moderator' | 'Admin' | 'SuperAdmin';
 

@@ -1,4 +1,4 @@
-import { getCookie } from '../utils/cookieFunctions';
+import { authHeaders } from './httpClient';
 import { handleApiRequest } from '../utils/handleApiRequest';
 
 export type ReportTargetType = 'user' | 'message' | 'channel' | 'stream';
@@ -49,14 +49,6 @@ export const REPORT_REASON_OPTIONS: { value: ReportReason; label: string }[] = [
 ];
 
 const apiLocal = () => process.env.REACT_APP_API_LOCAL;
-
-const authHeaders = () => {
-  const token = getCookie('tokenData');
-  return {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  };
-};
 
 const normalizeReport = (raw: Record<string, unknown>): PlatformReport => ({
   id: Number(raw.id ?? raw.Id ?? 0),

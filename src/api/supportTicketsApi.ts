@@ -1,4 +1,4 @@
-import { getCookie } from '../utils/cookieFunctions';
+import { authHeaders } from './httpClient';
 import { handleApiRequest } from '../utils/handleApiRequest';
 
 export type TicketCategory = 'account' | 'stream' | 'payments' | 'abuse' | 'other';
@@ -46,14 +46,6 @@ export const TICKET_CATEGORY_LABELS: Record<string, string> = {
 };
 
 const apiLocal = () => process.env.REACT_APP_API_LOCAL;
-
-const authHeaders = () => {
-  const token = getCookie('tokenData');
-  return {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  };
-};
 
 const normalizeMessage = (raw: Record<string, unknown>): SupportTicketMessage => ({
   id: Number(raw.id ?? raw.Id ?? 0),

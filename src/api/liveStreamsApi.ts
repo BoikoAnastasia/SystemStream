@@ -1,4 +1,4 @@
-import { createGuestKey } from '../utils/createGuestKey';
+import { apiFetch } from './httpClient';
 import { sanitizeStreamersLeague } from '../utils/streamersLeague';
 import { IStreamOnline, IStreamsData } from '../types/share';
 
@@ -12,21 +12,25 @@ export const normalizeOnlineUser = (raw: Record<string, unknown>): IStreamOnline
   streamId: (raw.streamId ?? raw.StreamId ?? null) as number | null,
   totalCount: Number(raw.totalViews ?? raw.TotalViews ?? raw.totalCount ?? raw.TotalCount ?? 0),
   viewerCount: Number(raw.viewerCount ?? raw.ViewerCount ?? 0),
+  categoryId: (raw.categoryId ?? raw.CategoryId ?? null) as number | null,
+  categoryName: (raw.categoryName ?? raw.CategoryName ?? null) as string | null,
 });
 
 export const fetchLiveStreamsFromApi = async (
   page = 1,
-  pageSize = 25
+  pageSize = 25,
+  categoryId?: number | null,
+  tag?: string | null
 ): Promise<{ data: IStreamsData | null; error: string | null }> => {
-  const token = createGuestKey();
-
   try {
-    const response = await fetch(`${process.env.REACT_APP_API_USER}/online/streams?page=${page}&pageSize=${pageSize}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
+    const qs = new URLSearchParams({
+      page: String(page),
+      pageSize: String(pageSize),
     });
+    if (categoryId && categoryId > 0) qs.set('categoryId', String(categoryId));
+    if (tag) qs.set('tag', tag);
+
+    const response = await apiFetch(`${process.env.REACT_APP_API_USER}/online/streams?${qs}`);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);

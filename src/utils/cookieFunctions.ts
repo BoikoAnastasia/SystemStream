@@ -11,13 +11,11 @@ export const getCookie = (nameCookie: string) => {
 export const setCookie = (name: string, value: string, days: number, path = '/') => {
   const expires = new Date();
   expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=${path}`;
+  const secure = window.location.protocol === 'https:' ? ';Secure' : '';
+  document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=${path};SameSite=Lax${secure}`;
 };
 
 export const removeCookie = (nameCookie: string) => {
-  if (checkCookie(nameCookie)) {
-    Cookies.remove(nameCookie);
-  } else {
-    return console.log(`Не удалось удалить cookie ${nameCookie}`);
-  }
+  document.cookie = `${nameCookie}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax`;
+  Cookies.remove(nameCookie, { path: '/' });
 };

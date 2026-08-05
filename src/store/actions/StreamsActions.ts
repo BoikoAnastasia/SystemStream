@@ -24,18 +24,20 @@ export const normalizeSubscriber = (raw: Record<string, unknown>): ISubscriber =
 
 type FetchStreamsOptions = {
   silent?: boolean;
+  categoryId?: number | null;
+  tag?: string | null;
 };
 
 export const fetchUserOnlineStreams =
   (page = 1, pageSize = SIDEBAR_LIVE_FETCH_PAGE_SIZE, options: FetchStreamsOptions = {}) =>
   async (dispatch: AppDispatch) => {
-    const { silent = false } = options;
+    const { silent = false, categoryId = null, tag = null } = options;
 
     if (!silent) {
       dispatch(StreamsSliceFetch());
     }
 
-    const { data, error } = await fetchLiveStreamsFromApi(page, pageSize);
+    const { data, error } = await fetchLiveStreamsFromApi(page, pageSize, categoryId, tag);
 
     if (error || !data) {
       if (!silent) {

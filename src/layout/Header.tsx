@@ -30,7 +30,7 @@ export const Header = () => {
           {isMobile ? <></> : <Logo />}
 
           <StyleHeaderBlock>
-            <SearchInput width={'200px'} />
+            <SearchInput width={'min(360px, 42vw)'} />
             {isAuth ? <HeaderNotificationMenu /> : <></>}
             <HeaderMenuAvatar />
           </StyleHeaderBlock>

@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useRef, useState } from 'react';
 // store
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../store/store';
@@ -12,7 +12,6 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Box, FormControl, InputAdornment } from '@mui/material';
 import {
   StyledButtonsForm,
-  StyledButtonForm,
   StyledIconButton,
   StyledInputLabel,
   StyledTextFieldOutlined,
@@ -21,6 +20,9 @@ import {
 } from '../StylesComponents';
 // types
 import { IModalLoginForm } from '../../types/share';
+
+const RATE_LIMIT_COOLDOWN_MS = 60_000;
+const RATE_LIMIT_MESSAGE = 'Слишком много попыток. Подождите минуту и попробуйте снова.';
 
 export const FormLogin = ({
   handleClose,
@@ -33,6 +35,7 @@ export const FormLogin = ({
 
   const [errorMessage, setErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const cooldownUntilRef = useRef(0);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -44,16 +47,29 @@ export const FormLogin = ({
   };
 
   const checkUserAuth = async (values: IModalLoginForm) => {
+    setMessage(null);
+
+    if (Date.now() < cooldownUntilRef.current) {
+      setErrorMessage(RATE_LIMIT_MESSAGE);
+      return;
+    }
+
     setErrorMessage('');
-    const isRight = await loginUser({ loginOrEmail: values.loginOrEmail, password: values.password });
-    if (isRight) {
+    const result = await loginUser({ loginOrEmail: values.loginOrEmail, password: values.password });
+    if (result.ok) {
+      cooldownUntilRef.current = 0;
       await dispatch(userProfile());
       setMessage(null);
       handleClose();
-    } else {
-      setMessage(null);
-      setErrorMessage('Неверный логин или пароль.');
+      return;
     }
+
+    if (result.status === 429) {
+      cooldownUntilRef.current = Date.now() + RATE_LIMIT_COOLDOWN_MS;
+      setErrorMessage(result.message || RATE_LIMIT_MESSAGE);
+      return;
+    }
+    setErrorMessage('Неверный логин или пароль.');
   };
 
   return (
@@ -113,10 +129,6 @@ export const FormLogin = ({
           )}
           <StyledButtonsForm>
             <StyledFollowButton type="submit">Войти</StyledFollowButton>
-            <Box sx={{ color: 'var(--white)', fontSize: '14px' }}>или</Box>
-            <StyledButtonForm bgcolor={'var(--background-line)'} c={'var(--input-background)'}>
-              Продолжить с помощью Google
-            </StyledButtonForm>
           </StyledButtonsForm>
         </Form>
       )}

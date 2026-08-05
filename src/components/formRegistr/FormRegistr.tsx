@@ -80,7 +80,11 @@ export const FormAuth = ({
       }
 
       const loggedIn = await loginUser({ loginOrEmail: values.email!, password: values.password });
-      if (!loggedIn) {
+      if (!loggedIn.ok) {
+        if (loggedIn.status === 429) {
+          showAlert(loggedIn.message || 'Слишком много запросов. Подождите минуту.', 'error');
+          return;
+        }
         setMessage('Аккаунт создан — войдите на вкладке «Вход».');
         resetForm();
         return;

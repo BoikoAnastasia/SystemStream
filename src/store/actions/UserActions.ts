@@ -9,8 +9,16 @@ import { mapUserProfileFromApi } from '../../utils/mapUserProfile';
 
 const { UserFetch, UserFetchError, UserFetchSuccess, UserLogout } = UserProfileSlice.actions;
 const { SelectUserFetch, SelectUserError, SelectUserFetchSuccess, Clear } = SelectUserSlice.actions;
+export type LoginResult = { ok: true } | { ok: false; status: number; message?: string };
+
 // user
-export const loginUser = async ({ loginOrEmail, password }: { loginOrEmail: string; password: string }) => {
+export const loginUser = async ({
+  loginOrEmail,
+  password,
+}: {
+  loginOrEmail: string;
+  password: string;
+}): Promise<LoginResult> => {
   try {
     const response = await fetch(`${process.env.REACT_APP_API_USER}/login`, {
       method: 'POST',
@@ -20,20 +28,21 @@ export const loginUser = async ({ loginOrEmail, password }: { loginOrEmail: stri
       body: JSON.stringify({ loginOrEmail: loginOrEmail, password: password }),
     });
     if (!response.ok) {
-      const err = await response.json();
-      console.error('Ошибка авторизации:', err.message || response.statusText);
-      return false;
+      const err = await response.json().catch(() => null);
+      const message = err?.message || response.statusText;
+      console.error('Ошибка авторизации:', message);
+      return { ok: false, status: response.status, message };
     }
     const data = await response.json();
     if (!data.token) {
       console.error('Токен не получен');
-      return false;
+      return { ok: false, status: response.status, message: 'Токен не получен' };
     }
     setCookie('tokenData', data.token, 1);
-    return true;
+    return { ok: true };
   } catch (error: any) {
     console.error(error.message);
-    return false;
+    return { ok: false, status: 0, message: error.message };
   }
 };
 

@@ -9,11 +9,14 @@ export const handleApiRequest = async <T = any>(
 ): Promise<IApiResponse<T>> => {
   try {
     const response = await fetch(url, options);
-    const data = await response.json();
+    const data = await response.json().catch(() => null);
 
     if (!response.ok) {
-      // Можно проверять код ошибки и формировать сообщение
-      const message = data?.message || `Ошибка сервера (${response.status})`;
+      const message =
+        data?.message ||
+        (response.status === 429
+          ? 'Слишком много запросов. Подождите минуту и попробуйте снова.'
+          : `Ошибка сервера (${response.status})`);
       return { success: false, message, code: response.status };
     }
 
