@@ -8,7 +8,6 @@ import { useAppSelector } from '../../hooks/redux';
 import { getSettingsNavItems, SettingsSection } from './settings.constants';
 import { SettingsProfileSection } from './sections/SettingsProfileSection';
 import { SettingsSecuritySection } from './sections/SettingsSecuritySection';
-import { SettingsBalanceSection } from './sections/SettingsBalanceSection';
 import { SettingsSupportSection } from './sections/SettingsSupportSection';
 import { SettingsNoticeProvider } from './context/SettingsNoticeContext';
 import {
@@ -26,7 +25,6 @@ import {
 const SECTION_COMPONENTS: Record<SettingsSection, FC> = {
   profile: SettingsProfileSection,
   security: SettingsSecuritySection,
-  balance: SettingsBalanceSection,
   support: SettingsSupportSection,
 };
 
@@ -51,7 +49,7 @@ export const SettingsShell = ({ activeSection }: SettingsShellProps) => {
               <Typography sx={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>Настройки аккаунта</Typography>
             </Box>
             <Typography sx={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.4 }}>
-              Профиль, безопасность и баланс. Настройки эфира — в панели стрима.
+              Профиль, безопасность и поддержка. Настройки эфира — в панели стрима.
             </Typography>
             {profile?.nickname && (
               <Typography sx={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', mt: 0.5 }}>

@@ -14,12 +14,6 @@ const UserPage = lazy(() =>
   }))
 );
 
-// const StreamPage = lazy(() =>
-//   import('../pages/streamPage/StreamPage').then(({ StreamPage }) => ({
-//     default: StreamPage,
-//   }))
-// );
-
 const SettingsPage = lazy(() =>
   import('../pages/settingsPage/SettingsPage').then(({ SettingsPage }) => ({
     default: SettingsPage,
@@ -44,13 +38,6 @@ const StaffPage = lazy(() =>
   }))
 );
 
-// TEMP: demo-плеер — удалить вместе с pages/playerDemo/
-const PlayerDemoPage = lazy(() =>
-  import('../pages/playerDemo/PlayerDemoPage').then(({ PlayerDemoPage }) => ({
-    default: PlayerDemoPage,
-  }))
-);
-
 export const PrivateRoute = () => {
   const { isAuth } = useAppSelector((state) => state.user);
 
@@ -59,10 +46,7 @@ export const PrivateRoute = () => {
 
 export const routers = [
   { path: '/', Element: MainPage },
-  // TEMP: demo-плеер — удалить строку + pages/playerDemo/ (должен быть ВЫШЕ /:nickname)
-  { path: '/player-demo', Element: PlayerDemoPage },
   { path: '/:nickname', Element: UserPage },
-  // { path: '/stream', Element: StreamPage },
 ];
 
 export const privateRouters = [

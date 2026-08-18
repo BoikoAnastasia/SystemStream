@@ -27,6 +27,10 @@ export const SettingsPage: FC = settingLayout(() => {
       navigate('/settings/support', { replace: true });
       return;
     }
+    if (section === 'balance') {
+      navigate(`/settings/${SETTINGS_DEFAULT_SECTION}`, { replace: true });
+      return;
+    }
     if (!activeSection) {
       navigate(`/settings/${SETTINGS_DEFAULT_SECTION}`, { replace: true });
     }

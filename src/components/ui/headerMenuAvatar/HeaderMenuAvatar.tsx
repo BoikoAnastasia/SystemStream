@@ -18,7 +18,6 @@ import { ModalComponent } from '../../modal/ModalComponent';
 // mui
 import { IconButton, MenuItem } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
-import SavingsIcon from '@mui/icons-material/Savings';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { fetchStaffMe } from '../../../api/reportsApi';
 
@@ -76,12 +75,6 @@ export const HeaderMenuAvatar = () => {
       href: '/settings',
       icon: SettingsIcon,
       value: 'Настройки',
-    },
-    {
-      authOnly: true,
-      href: '/settings/balance',
-      icon: SavingsIcon,
-      value: 'Баланс: 0 руб',
     },
   ];
   const menuItemSx = {

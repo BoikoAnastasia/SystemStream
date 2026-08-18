@@ -90,13 +90,3 @@ export const StyledSettingsSectionHint = styled(Typography)({
   marginBottom: 24,
   lineHeight: 1.45,
 });
-
-export const StyledSettingsPlaceholder = styled(Box)({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 12,
-  padding: '20px',
-  borderRadius: 12,
-  border: '1px dashed rgba(255,255,255,0.12)',
-  background: 'rgba(255,255,255,0.02)',
-});
