@@ -4,7 +4,7 @@ import * as signalR from '@microsoft/signalr';
 import { AppDispatch } from '../../store/store';
 import { NotificationSlice } from '../../store/slices/NotificationSlice';
 import { mapHubNotification } from '../../store/actions/NotificationActions';
-import { getCookie } from '../../utils/cookieFunctions';
+import { hasAuthSession } from '../../api/authSession';
 import { useHeaderModal } from '../../context/HeaderModalContext';
 import { AlertType } from '../../types/share';
 
@@ -20,13 +20,12 @@ export const useNotificationHub = (enabled: boolean) => {
 
   useEffect(() => {
     if (!enabled) return;
-
-    const token = getCookie('tokenData');
-    if (!token) return;
+    if (!hasAuthSession()) return;
 
     const hub = new signalR.HubConnectionBuilder()
       .withUrl(hubUrl, {
-        accessTokenFactory: () => getCookie('tokenData') ?? '',
+        withCredentials: true,
+        accessTokenFactory: () => '',
       })
       .withAutomaticReconnect()
       .build();

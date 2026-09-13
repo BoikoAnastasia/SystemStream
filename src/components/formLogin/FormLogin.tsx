@@ -58,7 +58,11 @@ export const FormLogin = ({
     const result = await loginUser({ loginOrEmail: values.loginOrEmail, password: values.password });
     if (result.ok) {
       cooldownUntilRef.current = 0;
-      await dispatch(userProfile());
+      const profileResult = await dispatch(userProfile());
+      if (!profileResult?.ok) {
+        setErrorMessage('Не удалось загрузить профиль после входа.');
+        return;
+      }
       setMessage(null);
       handleClose();
       return;

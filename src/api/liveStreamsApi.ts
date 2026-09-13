@@ -42,6 +42,12 @@ export const fetchLiveStreamsFromApi = async (
 
     const payload = await response.json();
     const rawStreams = payload.streams ?? payload.Streams ?? [];
+    if (!Array.isArray(rawStreams)) {
+      return {
+        data: null,
+        error: 'Не удалось получить стримы',
+      };
+    }
 
     return {
       data: {

@@ -1,4 +1,5 @@
-import { getCookie } from '../../utils/cookieFunctions';
+import { ensureAccessToken } from '../../api/authSession';
+import { apiFetch } from '../../api/httpClient';
 import { AppDispatch, RootState } from '../store';
 import {
   NotificationFetch,
@@ -19,15 +20,11 @@ import { createSelector } from '@reduxjs/toolkit';
 export const notificationWithPagination =
   (page = 1, limit = 5) =>
   async (dispatch: AppDispatch) => {
-    const token = getCookie('tokenData');
+    const token = await ensureAccessToken();
     if (!token) return;
     try {
       dispatch(NotificationFetch());
-      const response = await fetch(`${process.env.REACT_APP_API_NOTIFICATIONS}?page=${page}&limit=${limit}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await apiFetch(`${process.env.REACT_APP_API_NOTIFICATIONS}?page=${page}&limit=${limit}`);
       if (!response.ok) {
         console.error('Ошибка получения уведомлений', response.statusText);
         return null;
@@ -42,16 +39,12 @@ export const notificationWithPagination =
 
 // Массив ID уведомлений, которые нужно пометить
 export const notificationMarkRead = (arrIDMark: Array<number>) => async (dispatch: AppDispatch) => {
-  const token = getCookie('tokenData');
+  const token = await ensureAccessToken();
   if (!token) return;
   try {
     dispatch(NotificationFetch());
-    const response = await fetch(`${process.env.REACT_APP_API_NOTIFICATIONS}/mark-read`, {
+    const response = await apiFetch(`${process.env.REACT_APP_API_NOTIFICATIONS}/mark-read`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
       body: JSON.stringify(arrIDMark),
     });
     if (!response.ok) {
@@ -66,17 +59,13 @@ export const notificationMarkRead = (arrIDMark: Array<number>) => async (dispatc
 };
 
 export const notificationAllRead = () => async (dispatch: AppDispatch) => {
-  const token = getCookie('tokenData');
+  const token = await ensureAccessToken();
   if (!token) return;
 
   try {
     dispatch(NotificationFetch());
-    const response = await fetch(`${process.env.REACT_APP_API_NOTIFICATIONS}/mark-all-read`, {
+    const response = await apiFetch(`${process.env.REACT_APP_API_NOTIFICATIONS}/mark-all-read`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
     });
     if (!response.ok) {
       console.error('Ошибка отметки уведомлений', response.statusText);
@@ -99,12 +88,21 @@ const normalizeNotificationType = (type: unknown) =>
     .toLowerCase();
 
 export const mapHubNotification = (data: INotificationBase): INotificationUnified | null => {
+  if (!data || typeof data !== 'object') return null;
+
   let payload: Record<string, any> | null = null;
   const rawPayload = (data as any).payload ?? (data as any).Payload;
   try {
-    payload = typeof rawPayload === 'string' ? JSON.parse(rawPayload) : (rawPayload as any);
+    if (typeof rawPayload === 'string') {
+      payload = JSON.parse(rawPayload);
+    } else if (rawPayload && typeof rawPayload === 'object') {
+      payload = rawPayload as any;
+    } else {
+      payload = null;
+    }
   } catch (e) {
     console.error('Failed to parse payload', e);
+    return null;
   }
 
   const type = normalizeNotificationType((data as any).type ?? (data as any).Type);
@@ -112,11 +110,13 @@ export const mapHubNotification = (data: INotificationBase): INotificationUnifie
   const isRead = data.isRead || (data as any).IsRead || false;
   const id = data.id ?? (data as any).Id;
 
+  if (id == null || id === '') return null;
+
   switch (type) {
     case 'newfollower':
     case '3':
       return {
-        id: id!,
+        id,
         title: 'Новый подписчик!',
         message: `${payload?.SubscriberName ?? payload?.subscriberName} подписался на вас.`,
         link: `/${payload?.SubscriberName ?? payload?.subscriberName}`,
@@ -138,7 +138,7 @@ export const mapHubNotification = (data: INotificationBase): INotificationUnifie
     case 'supportticketreply':
     case '7':
       return {
-        id: id!,
+        id,
         title: 'Ответ поддержки',
         message: payload?.Message ?? payload?.message ?? 'Поддержка ответила на ваш тикет',
         link: '/settings/support',
@@ -149,7 +149,7 @@ export const mapHubNotification = (data: INotificationBase): INotificationUnifie
     case 'platformsanction':
     case '8':
       return {
-        id: id!,
+        id,
         title: payload?.Title ?? payload?.title ?? 'Вам выдали наказание',
         message: payload?.Message ?? payload?.message ?? 'Обновление по наказанию платформы',
         link: '/settings/support',
@@ -160,7 +160,7 @@ export const mapHubNotification = (data: INotificationBase): INotificationUnifie
     case 'platformappeal':
     case '9':
       return {
-        id: id!,
+        id,
         title: 'Апелляция',
         message: payload?.Message ?? payload?.message ?? payload?.Title ?? 'Решение по апелляции',
         link: '/settings/support',
@@ -185,10 +185,19 @@ export const selectUnreadNotifications = createSelector([selectLiveNotifications
   live.filter((n) => !n.isRead)
 );
 
-// объединяем live + paged
+// объединяем live + paged (dedupe by id, live wins)
 export const selectAllNotificationsUnified = createSelector(
   [selectUnreadNotifications, selectPagedNotifications],
-  (live, paged) => [...live, ...paged]
+  (live, paged) => {
+    const seen = new Set<string | number>();
+    const result: typeof live = [];
+    for (const n of [...live, ...paged]) {
+      if (n?.id == null || seen.has(n.id)) continue;
+      seen.add(n.id);
+      result.push(n);
+    }
+    return result;
+  }
 );
 // export const SelectAllNotification = (state: RootState) => {
 //   const live = state.notiications.live;

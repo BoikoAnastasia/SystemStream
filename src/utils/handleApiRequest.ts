@@ -8,7 +8,10 @@ export const handleApiRequest = async <T = any>(
   onSuccess?: (data: T) => void
 ): Promise<IApiResponse<T>> => {
   try {
-    const response = await fetch(url, options);
+    const response = await fetch(url, {
+      ...options,
+      credentials: options?.credentials ?? 'include',
+    });
     const data = await response.json().catch(() => null);
 
     if (!response.ok) {

@@ -1,8 +1,6 @@
 import { Box } from '@mui/material';
 import React from 'react';
 import { StyledFollowButton, StyledTitleH3 } from '../StylesComponents';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../store/store';
 
 const formatErrorMessage = (error: unknown) => {
   if (typeof error === 'string') return error;
@@ -14,11 +12,11 @@ const formatErrorMessage = (error: unknown) => {
 };
 
 export const ErrorBlock = ({ error, onRetry }: { error: unknown; onRetry: () => void }) => {
-  const dispatch = useDispatch<AppDispatch>();
+  const hasRetryValue = typeof onRetry === 'function';
   return (
     <Box sx={{ textAlign: 'center', padding: '20px' }}>
       <StyledTitleH3>Что-то пошло не так: {formatErrorMessage(error)}</StyledTitleH3>
-      {onRetry && <StyledFollowButton onClick={() => dispatch(onRetry)}>Повторить</StyledFollowButton>}
+      {hasRetryValue && <StyledFollowButton onClick={() => onRetry()}>Повторить</StyledFollowButton>}
     </Box>
   );
 };

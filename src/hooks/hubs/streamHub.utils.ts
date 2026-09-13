@@ -1,11 +1,23 @@
 import { IStream } from '../../types/share';
 
+const toBooleanOrNull = (value: unknown): boolean | null => {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === 'true') return true;
+    if (normalized === 'false') return false;
+  }
+
+  return null;
+};
+
 export const mapStreamFromHub = (streamInfo: Record<string, unknown> | null | undefined): IStream | null => {
   if (!streamInfo) return null;
 
   const isLive = streamInfo.isLive ?? streamInfo.IsLive;
   const hlsUrl = String(streamInfo.hlsUrl ?? streamInfo.HlsUrl ?? '');
-  const live = isLive !== undefined ? Boolean(isLive) : Boolean(hlsUrl);
+  const explicitLive = toBooleanOrNull(isLive);
+  const live = explicitLive ?? Boolean(hlsUrl);
 
   if (!live) return null;
 

@@ -1,5 +1,5 @@
-import { getCookie } from '../utils/cookieFunctions';
 import { handleApiRequest } from '../utils/handleApiRequest';
+import { authHeaders } from './httpClient';
 
 export type StreamChatBan = {
   userId: number;
@@ -10,14 +10,6 @@ export type StreamChatBan = {
 
 const bansApiBase = () => `${process.env.REACT_APP_API_LOCAL}/api/streamers`;
 
-const authHeaders = () => {
-  const token = getCookie('tokenData');
-  return {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  };
-};
-
 const normalizeBan = (raw: Record<string, unknown>): StreamChatBan => ({
   userId: Number(raw.userId ?? raw.UserId ?? 0),
   username: String(raw.username ?? raw.Username ?? ''),
@@ -27,6 +19,7 @@ const normalizeBan = (raw: Record<string, unknown>): StreamChatBan => ({
 
 export const fetchStreamBans = async (streamerId: number) => {
   const result = await handleApiRequest<{ bans: Record<string, unknown>[] }>(`${bansApiBase()}/${streamerId}/bans`, {
+    credentials: 'include',
     headers: authHeaders(),
   });
 
@@ -45,6 +38,7 @@ export const unbanStreamUser = async (streamerId: number, userId: number) => {
     `${bansApiBase()}/${streamerId}/bans/${userId}`,
     {
       method: 'DELETE',
+      credentials: 'include',
       headers: authHeaders(),
     }
   );

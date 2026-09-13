@@ -31,6 +31,7 @@ export const UserProfileSlice = createSlice({
     UserFetchError: (state, action) => {
       state.isError = action.payload;
       state.isLoading = false;
+      // Do not clear isAuth — network/5xx must not look like a logout.
     },
     SetAuth: (state, action: PayloadAction<boolean>) => {
       state.isAuth = action.payload;

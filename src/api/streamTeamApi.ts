@@ -1,5 +1,5 @@
-import { getCookie } from '../utils/cookieFunctions';
 import { handleApiRequest } from '../utils/handleApiRequest';
+import { authHeaders } from './httpClient';
 
 export type StreamTeamRole = 'Moderator' | 'Assistant';
 
@@ -23,14 +23,6 @@ export type StreamTeamAccess = {
 
 const teamApiBase = () => `${process.env.REACT_APP_API_LOCAL}/api/streamers`;
 
-const authHeaders = () => {
-  const token = getCookie('tokenData');
-  return {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  };
-};
-
 const normalizeMember = (raw: Record<string, unknown>): StreamTeamMember => ({
   userId: Number(raw.userId ?? raw.UserId ?? 0),
   nickname: String(raw.nickname ?? raw.Nickname ?? ''),
@@ -52,7 +44,7 @@ const normalizeAccess = (raw: Record<string, unknown>): StreamTeamAccess => ({
 export const fetchStreamTeam = async (streamerId: number) => {
   const result = await handleApiRequest<{ members: Record<string, unknown>[]; access: Record<string, unknown> }>(
     `${teamApiBase()}/${streamerId}/team`,
-    { headers: authHeaders() }
+    { credentials: 'include', headers: authHeaders() }
   );
 
   if (!result.success || !result.data) {
@@ -69,7 +61,7 @@ export const fetchStreamTeam = async (streamerId: number) => {
 export const fetchStreamTeamAccess = async (nickname: string) => {
   const result = await handleApiRequest<Record<string, unknown>>(
     `${teamApiBase()}/by-nickname/${encodeURIComponent(nickname)}/team/access`,
-    { headers: authHeaders() }
+    { credentials: 'include', headers: authHeaders() }
   );
 
   if (!result.success || !result.data) {
@@ -87,6 +79,7 @@ export const fetchStreamTeamAccess = async (nickname: string) => {
 export const addStreamTeamMember = async (streamerId: number, nickname: string, role: StreamTeamRole) => {
   const result = await handleApiRequest<{ members: Record<string, unknown>[] }>(`${teamApiBase()}/${streamerId}/team`, {
     method: 'POST',
+    credentials: 'include',
     headers: authHeaders(),
     body: JSON.stringify({ nickname, role }),
   });
@@ -106,6 +99,7 @@ export const removeStreamTeamMember = async (streamerId: number, memberUserId: n
     `${teamApiBase()}/${streamerId}/team/${memberUserId}`,
     {
       method: 'DELETE',
+      credentials: 'include',
       headers: authHeaders(),
     }
   );

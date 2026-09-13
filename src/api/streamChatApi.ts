@@ -1,5 +1,5 @@
-import { getCookie } from '../utils/cookieFunctions';
 import { handleApiRequest } from '../utils/handleApiRequest';
+import { authHeaders } from './httpClient';
 import { fetchStreamTeamAccess } from './streamTeamApi';
 import { ChatMode } from '../components/chat/chat.constants';
 import { normalizeChatMode } from '../components/chat/chat.utils';
@@ -23,14 +23,6 @@ export type StreamChatModerationLogEntry = {
 };
 
 const apiBase = () => `${process.env.REACT_APP_API_LOCAL}/api/streamers`;
-
-const authHeaders = () => {
-  const token = getCookie('tokenData');
-  return {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  };
-};
 
 const normalizeSettings = (raw: Record<string, unknown>): StreamChatSettings => ({
   slowModeSeconds: Number(raw.slowModeSeconds ?? raw.SlowModeSeconds ?? 0),
@@ -59,6 +51,7 @@ export const resolveStreamerId = async (channelNickname: string, mode: 'own' | '
 
 export const fetchStreamChatSettings = async (streamerId: number) => {
   const result = await handleApiRequest<Record<string, unknown>>(`${apiBase()}/${streamerId}/chat/settings`, {
+    credentials: 'include',
     headers: authHeaders(),
   });
 
@@ -72,6 +65,7 @@ export const fetchStreamChatSettings = async (streamerId: number) => {
 export const updateStreamChatSettings = async (streamerId: number, payload: Partial<StreamChatSettings>) => {
   const result = await handleApiRequest<Record<string, unknown>>(`${apiBase()}/${streamerId}/chat/settings`, {
     method: 'PUT',
+    credentials: 'include',
     headers: authHeaders(),
     body: JSON.stringify({
       slowModeSeconds: payload.slowModeSeconds,
@@ -92,6 +86,7 @@ export const fetchStreamModerationLog = async (streamerId: number, page = 1) => 
     items: Record<string, unknown>[];
     total: number;
   }>(`${apiBase()}/${streamerId}/chat/modlog?page=${page}&pageSize=30`, {
+    credentials: 'include',
     headers: authHeaders(),
   });
 

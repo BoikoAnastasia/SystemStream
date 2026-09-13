@@ -43,6 +43,15 @@ export const formatChatTime = (timestamp: string) => {
   }
 };
 
+const toSafeNumber = (value: unknown, fallback = 0) => {
+  try {
+    const normalized = Number(value ?? fallback);
+    return Number.isFinite(normalized) ? normalized : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
 export const normalizeChatMessage = (raw: Record<string, unknown>): IChatMessage => {
   const isDeleted = Boolean(raw.isDeleted ?? raw.IsDeleted);
   const deletedTextRaw = raw.deletedText ?? raw.DeletedText;
@@ -50,12 +59,12 @@ export const normalizeChatMessage = (raw: Record<string, unknown>): IChatMessage
 
   return {
     id: String(raw.id ?? raw.Id ?? ''),
-    userId: Number(raw.userId ?? raw.UserId ?? 0),
+    userId: toSafeNumber(raw.userId ?? raw.UserId, 0),
     username: String(raw.username ?? raw.Username ?? ''),
     text: isDeleted ? '' : String(raw.text ?? raw.Text ?? ''),
     role: String(raw.role ?? raw.Role ?? 'User'),
     timestamp: String(raw.timestamp ?? raw.Timestamp ?? new Date().toISOString()),
-    offsetSeconds: Number(raw.offsetSeconds ?? raw.OffsetSeconds ?? 0),
+    offsetSeconds: toSafeNumber(raw.offsetSeconds ?? raw.OffsetSeconds, 0),
     isDeleted,
     deletedText,
   };

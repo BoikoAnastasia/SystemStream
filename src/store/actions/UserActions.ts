@@ -3,9 +3,16 @@ import { AppDispatch } from '../store';
 import { UserProfileSlice } from '../slices/UserProfileSlice';
 import { SelectUserSlice } from '../slices/SelectUserSlice';
 // utils
-import { getCookie, removeCookie, setCookie } from '../../utils/cookieFunctions';
 import { handleApiRequest } from '../../utils/handleApiRequest';
 import { mapUserProfileFromApi } from '../../utils/mapUserProfile';
+import {
+  clearAuthTokens,
+  clearLegacyAuthCookies,
+  ensureAccessToken,
+  hasAuthSession,
+  refreshAccessToken,
+} from '../../api/authSession';
+import { apiFetch } from '../../api/httpClient';
 
 const { UserFetch, UserFetchError, UserFetchSuccess, UserLogout } = UserProfileSlice.actions;
 const { SelectUserFetch, SelectUserError, SelectUserFetchSuccess, Clear } = SelectUserSlice.actions;
@@ -22,6 +29,7 @@ export const loginUser = async ({
   try {
     const response = await fetch(`${process.env.REACT_APP_API_USER}/login`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -33,12 +41,14 @@ export const loginUser = async ({
       console.error('Ошибка авторизации:', message);
       return { ok: false, status: response.status, message };
     }
-    const data = await response.json();
-    if (!data.token) {
-      console.error('Токен не получен');
-      return { ok: false, status: response.status, message: 'Токен не получен' };
+
+    // HttpOnly cookies + sp_auth marker come from Set-Cookie.
+    clearLegacyAuthCookies();
+    await response.json().catch(() => null);
+
+    if (!hasAuthSession()) {
+      console.warn('Auth session marker cookie missing after login');
     }
-    setCookie('tokenData', data.token, 1);
     return { ok: true };
   } catch (error: any) {
     console.error(error.message);
@@ -48,11 +58,20 @@ export const loginUser = async ({
 
 export const logoutUser = () => async (dispatch: AppDispatch) => {
   try {
-    removeCookie('tokenData');
+    await fetch(`${process.env.REACT_APP_API_USER}/logout`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    }).catch(() => undefined);
+    clearAuthTokens();
     dispatch(UserLogout());
     dispatch(Clear());
     console.log('Пользователь успешно вышел');
   } catch (error) {
+    clearAuthTokens();
+    dispatch(UserLogout());
+    dispatch(Clear());
     console.error('Ошибка при выходе: ', error);
   }
 };
@@ -60,6 +79,7 @@ export const logoutUser = () => async (dispatch: AppDispatch) => {
 export const registrationUser = async (username: string, email: string, password: string) => {
   return handleApiRequest(`${process.env.REACT_APP_API_USER}/register`, {
     method: 'POST',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -69,7 +89,7 @@ export const registrationUser = async (username: string, email: string, password
 
 // profile
 export const userProfile = () => async (dispatch: AppDispatch) => {
-  const token = getCookie('tokenData');
+  let token = await ensureAccessToken();
   if (!token) {
     dispatch(UserLogout());
     return { ok: false, unauthorized: true };
@@ -77,22 +97,31 @@ export const userProfile = () => async (dispatch: AppDispatch) => {
 
   try {
     dispatch(UserFetch());
-    const response = await fetch(`${process.env.REACT_APP_API_USER}/profile`, {
+    let response = await apiFetch(`${process.env.REACT_APP_API_USER}/profile`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
     });
 
+    if (response.status === 401) {
+      token = await refreshAccessToken();
+      if (!token) {
+        clearAuthTokens();
+        dispatch(UserLogout());
+        return { ok: false, unauthorized: true };
+      }
+      response = await apiFetch(`${process.env.REACT_APP_API_USER}/profile`, {
+        method: 'GET',
+      });
+    }
+
     if (response.status === 401 || response.status === 403) {
-      removeCookie('tokenData');
+      clearAuthTokens();
       dispatch(UserLogout());
       return { ok: false, unauthorized: true };
     }
 
     if (!response.ok) {
       const message = await response.text().catch(() => response.statusText);
+      // Keep isAuth — transient backend errors must not look like logout.
       dispatch(UserFetchError(message || `Ошибка сервера (${response.status})`));
       return { ok: false, unauthorized: false };
     }
@@ -111,7 +140,9 @@ export const userProfile = () => async (dispatch: AppDispatch) => {
 export const fetchUserByNickname = (nickname: string) => async (dispatch: AppDispatch) => {
   try {
     dispatch(SelectUserFetch());
-    const response = await fetch(`${process.env.REACT_APP_API_USER}/by-nickname/${nickname}`);
+    const response = await fetch(`${process.env.REACT_APP_API_USER}/by-nickname/${nickname}`, {
+      credentials: 'include',
+    });
     if (!response.ok) {
       if (response.status === 404) {
         return dispatch(SelectUserError('NOT_FOUND'));
@@ -134,7 +165,9 @@ export const fetchUserByNickname = (nickname: string) => async (dispatch: AppDis
 export const fetchUserById = (id: number) => async (dispatch: AppDispatch) => {
   try {
     dispatch(SelectUserFetch());
-    const response = await fetch(`${process.env.REACT_APP_API_USER}/public-profile-id?userId=${id}`);
+    const response = await fetch(`${process.env.REACT_APP_API_USER}/public-profile-id?userId=${id}`, {
+      credentials: 'include',
+    });
     if (!response.ok) {
       const error = await response.json();
       console.error('Ошибка авторизации:', error.message || response.statusText);

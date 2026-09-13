@@ -23,14 +23,19 @@ export const NotificationSlice = createSlice({
       state.isLoading = true;
     },
     NotificationFetchSuccess: (state, action: PayloadAction<any>) => {
-      const mapped = action.payload.notifications
+      const payload = action.payload ?? {};
+      const rawNotifications = payload.notifications;
+      const notifications: INotificationBase[] = Array.isArray(rawNotifications) ? rawNotifications : [];
+
+      const mapped = notifications
         .map((not: INotificationBase) => mapHubNotification(not))
-        .filter(Boolean);
+        .filter((n): n is NonNullable<typeof n> => Boolean(n));
 
       state.paged.notifications = mapped;
-      state.paged.limit = action.payload.limit;
-      state.paged.totalCount = action.payload.totalCount;
-      state.paged.page = action.payload.page;
+      state.paged.limit = typeof payload.limit === 'number' ? payload.limit : initialState.paged.limit;
+      state.paged.totalCount =
+        typeof payload.totalCount === 'number' ? payload.totalCount : initialState.paged.totalCount;
+      state.paged.page = typeof payload.page === 'number' ? payload.page : initialState.paged.page;
 
       state.isError = null;
       state.isLoading = false;
@@ -68,6 +73,8 @@ export const NotificationSlice = createSlice({
       state.live = [];
     },
     ClearNotification: (state) => {
+      state.isError = null;
+      state.isLoading = false;
       state.live = [];
       state.paged.notifications = [];
       state.paged.page = 1;

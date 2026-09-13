@@ -3,7 +3,8 @@ import { AppDispatch } from '../store';
 import { SettingsSlice } from '../slices/SettingsSlice';
 import { StreamSlice } from '../slices/StreamSlice';
 // utils
-import { getCookie } from '../../utils/cookieFunctions';
+import { ensureAccessToken } from '../../api/authSession';
+import { apiFetch, authHeaders } from '../../api/httpClient';
 import { handleApiRequest } from '../../utils/handleApiRequest';
 
 const { SettingsSliceFetch, SettingsSliceError, SettingsSliceSuccess } = SettingsSlice.actions;
@@ -13,14 +14,10 @@ const { StreamSliceError, StreamSliceFetch, StreamSliceSuccess } = StreamSlice.a
 export const fetchStreamKey = () => async (dispatch: AppDispatch) => {
   try {
     dispatch(SettingsSliceFetch());
-    const token = getCookie('tokenData');
+    const token = await ensureAccessToken();
     if (!token) return;
-    const response = await fetch(`${process.env.REACT_APP_API_USER}/stream-key`, {
+    const response = await apiFetch(`${process.env.REACT_APP_API_USER}/stream-key`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
     });
     console.log(response);
     if (!response.ok) {
@@ -64,13 +61,11 @@ export const fetchStreamView = (nickname: string) => async (dispatch: AppDispatc
 
 // get stream status
 export const fetchStatusCurrentStream = async () => {
-  const token = getCookie('tokenData');
+  const token = await ensureAccessToken();
   if (!token) return { success: false, message: 'Вы не авторизованы' };
   return handleApiRequest(`${process.env.REACT_APP_API_STREAM}/status`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
+    credentials: 'include',
+    headers: authHeaders(),
   });
 };

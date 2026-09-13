@@ -24,7 +24,7 @@ export const MainPage: FC = appLayout((): JSX.Element => {
   const activeCategoryId = categoryId && Number.isFinite(categoryId) && categoryId > 0 ? categoryId : null;
 
   const { data, isLoading, isError } = useAppSelector((state) => state.streams);
-  const streams = data?.streams ?? [];
+  const streams = Array.isArray(data?.streams) ? data!.streams : [];
   const { page = 1, pageSize = HOME_PAGE_SIZE, totalStreams = 0 } = data ?? {};
   const pageCount = Math.max(1, Math.ceil(totalStreams / pageSize));
   const categoryLabel = useMemo(

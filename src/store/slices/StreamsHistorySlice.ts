@@ -16,9 +16,23 @@ export const StreamsHistorySlice = createSlice({
       state.isError = null;
       state.isLoading = true;
     },
-    StreamsHistoryFetchSuccess: (state, action: PayloadAction<{ data: IStreamHistoryData; nickname: string }>) => {
-      state.data = action.payload.data;
-      state.lastNickname = action.payload.nickname;
+    StreamsHistoryFetchSuccess: (
+      state,
+      action: PayloadAction<{ data: IStreamHistoryData; nickname: string } | null | undefined>
+    ) => {
+      const payload = action.payload;
+      const hasValidData = payload && payload.data && typeof payload.data === 'object' && !Array.isArray(payload.data);
+      const hasValidNickname = payload && typeof payload.nickname === 'string';
+      if (!hasValidData || !hasValidNickname) {
+        state.data = null;
+        state.lastNickname = null;
+        state.isError = null;
+        state.isLoading = false;
+        return;
+      }
+
+      state.data = payload.data;
+      state.lastNickname = payload.nickname;
       state.isError = null;
       state.isLoading = false;
     },

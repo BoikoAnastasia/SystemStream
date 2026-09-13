@@ -1,5 +1,5 @@
-import { getCookie } from '../../utils/cookieFunctions';
-import { createGuestKey } from '../../utils/createGuestKey';
+import { ensureAccessToken, hasAuthSession } from '../../api/authSession';
+import { apiFetch } from '../../api/httpClient';
 import { ISubscriber } from '../../types/share';
 import { normalizeSubscriber } from './StreamsActions';
 import { resolveMediaUrl } from '../../utils/resolveMediaUrl';
@@ -16,15 +16,9 @@ const mapSubscription = (raw: Record<string, unknown>): ISubscriber => {
 // получить список подписок пользователя
 export const fetchtSubsribtionsMy = async (): Promise<ISubscriber[] | null> => {
   try {
-    const token = getCookie('tokenData');
-    if (!token) return [];
+    if (!hasAuthSession()) return [];
 
-    const response = await fetch(`${process.env.REACT_APP_API_SUBSCRIPTIONS}/me/following`, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await apiFetch(`${process.env.REACT_APP_API_SUBSCRIPTIONS}/me/following`);
     if (!response.ok) {
       console.error('Ошибка получения подписок', response.statusText);
       return null;
@@ -42,12 +36,10 @@ export const fetchtSubsribtionsMy = async (): Promise<ISubscriber[] | null> => {
 // подписаться на пользователя
 export const subscribeToUser = async (id: number) => {
   try {
-    const token = getCookie('tokenData');
-    const response = await fetch(`${process.env.REACT_APP_API_SUBSCRIPTIONS}/follow/${id}`, {
+    const token = await ensureAccessToken();
+    if (!token) return;
+    const response = await apiFetch(`${process.env.REACT_APP_API_SUBSCRIPTIONS}/follow/${id}`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
     if (!response.ok) {
       const error = await response.json();
@@ -64,12 +56,10 @@ export const subscribeToUser = async (id: number) => {
 // отписаться на пользователя
 export const deleteSubscribe = async (id: number) => {
   try {
-    const token = getCookie('tokenData');
-    const response = await fetch(`${process.env.REACT_APP_API_SUBSCRIPTIONS}/unfollow/${id}`, {
+    const token = await ensureAccessToken();
+    if (!token) return;
+    const response = await apiFetch(`${process.env.REACT_APP_API_SUBSCRIPTIONS}/unfollow/${id}`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
     if (!response.ok) {
       const error = await response.json();
@@ -86,14 +76,8 @@ export const deleteSubscribe = async (id: number) => {
 // список подписчиков пользователя (авторизованный или гостевой ключ)
 export const streamerFolows = async (id: number) => {
   try {
-    const token = createGuestKey();
-    if (!token) return;
-    const response = await fetch(`${process.env.REACT_APP_API_SUBSCRIPTIONS}/${id}/subscribers`, {
+    const response = await apiFetch(`${process.env.REACT_APP_API_SUBSCRIPTIONS}/${id}/subscribers`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
     });
     if (!response.ok) {
       const error = await response.json();

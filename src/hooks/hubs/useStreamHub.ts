@@ -2,17 +2,19 @@ import { useEffect, useRef, useState } from 'react';
 import * as signalR from '@microsoft/signalr';
 import { createGuestKey } from '../../utils/createGuestKey';
 import { IStream } from '../../types/share';
-import { getCookie } from '../../utils/cookieFunctions';
+import { hasAuthSession } from '../../api/authSession';
 import { mapStreamFromHub } from './streamHub.utils';
 
 interface UseStreamHubProps {
   nickname: string | undefined;
   userData: { id: number } | null;
+  /** Logged-in viewer id; used to detect login/logout and reconnect SignalR with/without JWT. */
+  authUserId?: number | null;
 }
 
 const STATUS_POLL_MS = 8000;
 
-export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
+export const useStreamHub = ({ nickname, userData, authUserId = null }: UseStreamHubProps) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hubRef = useRef<signalR.HubConnection | null>(null);
   const intervalRef = useRef<NodeJS.Timer | null>(null);
@@ -20,12 +22,16 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
   const nicknameRef = useRef<string | undefined>(nickname);
   const streamerIdRef = useRef<number | undefined>(userData?.id);
   const joinedNicknameRef = useRef<string | null>(null);
+  /** Whether the current hub was negotiated with a JWT (cookie). */
+  const connectedWithAuthRef = useRef(false);
+  const hubUrlRef = useRef(`${process.env.REACT_APP_API_LOCAL}/hubs/streamHub`);
+  const startGenerationRef = useRef(0);
 
   const [currentStream, setCurrentStream] = useState<IStream | null>(null);
   const [viewerCount, setViewerCount] = useState<number>(0);
   const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
 
-  const hubUrl = `${process.env.REACT_APP_API_LOCAL}/hubs/streamHub`;
+  const hubUrl = hubUrlRef.current;
 
   nicknameRef.current = nickname;
   streamerIdRef.current = userData?.id;
@@ -48,6 +54,12 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
     handlersRef.current.handleStreamStatusChanged = (data: any) => {
       const status = String(data?.status ?? data?.Status ?? '').toLowerCase();
       const streamPayload = data?.stream ?? data?.Stream;
+
+      if (['offline', 'stopped'].includes(status)) {
+        setCurrentStream(null);
+        return;
+      }
+
       const mapped = mapStreamFromHub(streamPayload as Record<string, unknown> | undefined);
 
       if (mapped) {
@@ -63,10 +75,6 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
       if (['live', 'started', 'on'].includes(status) && streamPayload) {
         handlersRef.current.handleStreamJoined(streamPayload);
         return;
-      }
-
-      if (['offline', 'stopped'].includes(status)) {
-        setCurrentStream(null);
       }
     };
 
@@ -103,6 +111,60 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
     }, STATUS_POLL_MS);
   };
 
+  const clearStatusPoll = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
+
+  const startHub = () => {
+    const generation = ++startGenerationRef.current;
+    const hasAuthToken = hasAuthSession();
+    connectedWithAuthRef.current = hasAuthToken;
+
+    const hub = new signalR.HubConnectionBuilder()
+      .withUrl(hubUrl, {
+        withCredentials: true,
+        accessTokenFactory: () => '',
+      })
+      .withAutomaticReconnect()
+      .build();
+
+    hubRef.current = hub;
+    bindHandlers(hub);
+
+    hub
+      .start()
+      .then(() => {
+        if (startGenerationRef.current !== generation || hubRef.current !== hub) return;
+        setConnection(hub);
+        joinStream(hub);
+        ensureStatusPoll(hub);
+      })
+      .catch(console.error);
+
+    hub.onreconnected(() => {
+      if (hubRef.current !== hub) return;
+      setConnection(hub);
+      joinStream(hub);
+    });
+
+    return hub;
+  };
+
+  const stopHub = (hub: signalR.HubConnection) => {
+    hub.off('StreamJoined', handlersRef.current.handleStreamJoined);
+    hub.off('UpdateViewerCount', handlersRef.current.handleUpdateViewerCount);
+    hub.off('StreamStatusChanged', handlersRef.current.handleStreamStatusChanged);
+    hub.stop().catch(() => {});
+    if (hubRef.current === hub) {
+      hubRef.current = null;
+      connectedWithAuthRef.current = false;
+    }
+  };
+
+  // Primary connection lifecycle (streamer page).
   useEffect(() => {
     if (!nickname || !userData?.id) return;
 
@@ -125,46 +187,48 @@ export const useStreamHub = ({ nickname, userData }: UseStreamHubProps) => {
       return;
     }
 
-    const hub = new signalR.HubConnectionBuilder()
-      .withUrl(hubUrl, {
-        accessTokenFactory: () => getCookie('tokenData') ?? '',
-      })
-      .withAutomaticReconnect()
-      .build();
-
-    hubRef.current = hub;
-    bindHandlers(hub);
-
-    hub
-      .start()
-      .then(() => {
-        setConnection(hub);
-        joinStream(hub);
-        ensureStatusPoll(hub);
-      })
-      .catch(console.error);
-
-    hub.onreconnected(() => {
-      setConnection(hub);
-      joinStream(hub);
-    });
+    const hub = startHub();
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-
-      hub.off('StreamJoined', handlersRef.current.handleStreamJoined);
-      hub.off('UpdateViewerCount', handlersRef.current.handleUpdateViewerCount);
-      hub.off('StreamStatusChanged', handlersRef.current.handleStreamStatusChanged);
-
-      hub.stop().catch(() => {});
-      hubRef.current = null;
+      clearStatusPoll();
+      stopHub(hub);
       joinedNicknameRef.current = null;
       setConnection(null);
     };
   }, [nickname, userData?.id, hubUrl]);
+
+  // After login/logout the JWT cookie changes, but SignalR only sends it at negotiate —
+  // rebuild the hub when cookie auth no longer matches the live connection.
+  useEffect(() => {
+    if (!nickname || !userData?.id) return;
+
+    const hasAuthToken = hasAuthSession();
+    const existingHub = hubRef.current;
+    if (!existingHub) return;
+    if (hasAuthToken === connectedWithAuthRef.current) {
+      // Profile hydrated after a cookie-backed connection — just refresh chat ACL.
+      if (existingHub.state === signalR.HubConnectionState.Connected) {
+        joinStream(existingHub);
+      }
+      return;
+    }
+
+    clearStatusPoll();
+    stopHub(existingHub);
+    setConnection(null);
+    setCurrentStream(null);
+    setViewerCount(0);
+
+    const hub = startHub();
+    return () => {
+      // Only tear down if this effect still owns the hub (streamer effect may replace it).
+      if (hubRef.current === hub) {
+        clearStatusPoll();
+        stopHub(hub);
+        setConnection(null);
+      }
+    };
+  }, [authUserId, nickname, userData?.id]);
 
   return {
     videoRef,

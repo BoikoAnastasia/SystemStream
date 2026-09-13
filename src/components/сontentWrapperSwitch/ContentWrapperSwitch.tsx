@@ -22,7 +22,7 @@ export const ContentWrapperSwitch = ({
 
   if (isError) return <ErrorBlock error={isError} onRetry={onRetry} />;
 
-  if (!data || data.length === 0) {
+  if (!Array.isArray(data) || data.length === 0) {
     return <EmptyBlock text={text} />;
   }
   return <>{children}</>;

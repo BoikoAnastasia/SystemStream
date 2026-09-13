@@ -15,6 +15,17 @@ import type { ChatMode } from '../../components/chat/chat.constants';
 
 type LocalChatMessage = IChatMessage & { clientId?: string };
 
+const toSafeNumber = (value: unknown, fallback = 0) => {
+  try {
+    const normalized = Number(value ?? fallback);
+    return Number.isFinite(normalized) ? normalized : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const isValidChatMessage = (message: IChatMessage) => message.userId > 0 && Boolean(message.username?.trim());
+
 export const useChat = (hub: signalR.HubConnection | null, streamNickname?: string, profile?: IProfile | null) => {
   const [messages, setMessages] = useState<LocalChatMessage[]>([]);
   const [isReady, setIsReady] = useState(false);
@@ -32,9 +43,25 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
   const chatModeRef = useRef<ChatMode>('normal');
   const isInitialChatSettingsRef = useRef(true);
   const sendRejectedRef = useRef(false);
+  const sessionRef = useRef(0);
 
   useEffect(() => {
+    sessionRef.current += 1;
     isInitialChatSettingsRef.current = true;
+    lastSuccessfulSentAtRef.current = 0;
+    slowModeSecondsRef.current = 0;
+    canManageChatRef.current = false;
+    chatModeRef.current = 'normal';
+    sendRejectedRef.current = false;
+    setMessages([]);
+    setChatError(null);
+    setSlowModeSeconds(0);
+    setChatRules('');
+    setChatMode('normal');
+    setCanSendChat(true);
+    setCanManageChat(false);
+    setBannedUserIds([]);
+    setInputRestore(null);
   }, [streamNickname]);
 
   const clearChatError = useCallback(() => setChatError(null), []);
@@ -78,17 +105,24 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
       return;
     }
 
-    const handleReceive = (raw: Record<string, unknown>) => {
-      const msg = normalizeChatMessage(raw);
+    const sessionId = sessionRef.current;
+    const isStaleSession = () => sessionId !== sessionRef.current;
+
+    const handleReceive = (raw: unknown) => {
+      if (isStaleSession() || !raw || typeof raw !== 'object' || Array.isArray(raw)) return;
+      const msg = normalizeChatMessage(raw as Record<string, unknown>);
+      if (!isValidChatMessage(msg)) return;
 
       if (profile && msg.userId === profile.id) {
         lastSuccessfulSentAtRef.current = Date.now();
       }
 
       setMessages((prev) => {
-        const withoutOptimistic = prev.filter(
-          (item) => !(item.clientId && item.userId === msg.userId && item.text === msg.text)
+        const optimisticIndex = prev.findIndex(
+          (item) => item.clientId && item.userId === msg.userId && item.text === msg.text
         );
+        const withoutOptimistic =
+          optimisticIndex >= 0 ? [...prev.slice(0, optimisticIndex), ...prev.slice(optimisticIndex + 1)] : prev;
 
         if (msg.id && withoutOptimistic.some((item) => item.id === msg.id)) {
           return withoutOptimistic;
@@ -102,14 +136,18 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
       });
     };
 
-    const handleHistory = (rawMessages: Record<string, unknown>[]) => {
+    const handleHistory = (rawMessages: unknown) => {
+      if (isStaleSession() || !Array.isArray(rawMessages)) return;
       setMessages((prev) => {
         const systemNotices = dedupeSystemChatMessages(prev.filter(isSystemChatMessage));
-        const history = rawMessages.map(normalizeChatMessage);
-        if (systemNotices.length === 0) return history;
+        const history = rawMessages
+          .filter((m): m is Record<string, unknown> => Boolean(m) && typeof m === 'object' && !Array.isArray(m))
+          .map(normalizeChatMessage);
+        const validHistory = history.filter(isValidChatMessage);
+        if (systemNotices.length === 0) return validHistory;
 
         return dedupeSystemChatMessages(
-          [...history, ...systemNotices].sort(
+          [...validHistory, ...systemNotices].sort(
             (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
           )
         );
@@ -117,6 +155,7 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
     };
 
     const handleError = (code: string) => {
+      if (isStaleSession()) return;
       const errorCode = String(code);
       setChatError(mapChatError(errorCode));
 
@@ -143,6 +182,7 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
     };
 
     const handleSettings = (data: Record<string, unknown>) => {
+      if (isStaleSession() || !data || typeof data !== 'object' || Array.isArray(data)) return;
       const seconds = data?.slowModeSeconds ?? data?.SlowModeSeconds;
       if (typeof seconds === 'number') {
         setSlowModeSeconds(Math.max(0, seconds));
@@ -185,12 +225,13 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
 
       const banned = data?.bannedUserIds ?? data?.BannedUserIds;
       if (Array.isArray(banned)) {
-        setBannedUserIds(banned.map((id) => Number(id)).filter((id) => id > 0));
+        setBannedUserIds(banned.map((id) => toSafeNumber(id, 0)).filter((id) => id > 0));
       }
     };
 
     const handleUserBanned = (data: Record<string, unknown>) => {
-      const userId = Number(data?.userId ?? data?.UserId ?? 0);
+      if (isStaleSession() || !data || typeof data !== 'object' || Array.isArray(data)) return;
+      const userId = toSafeNumber(data?.userId ?? data?.UserId, 0);
       if (!userId) return;
       setBannedUserIds((prev) => (prev.includes(userId) ? prev : [...prev, userId]));
 
@@ -224,12 +265,14 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
     };
 
     const handleUserUnbanned = (data: Record<string, unknown>) => {
-      const userId = Number(data?.userId ?? data?.UserId ?? 0);
+      if (isStaleSession() || !data || typeof data !== 'object' || Array.isArray(data)) return;
+      const userId = toSafeNumber(data?.userId ?? data?.UserId, 0);
       if (!userId) return;
       setBannedUserIds((prev) => prev.filter((id) => id !== userId));
     };
 
     const handleMessageDeleted = (data: Record<string, unknown>) => {
+      if (isStaleSession() || !data || typeof data !== 'object' || Array.isArray(data)) return;
       const messageId = String(data?.messageId ?? data?.MessageId ?? '');
       if (!messageId) return;
 
@@ -256,7 +299,7 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
     };
 
     const handleNicknameChanged = (data: Record<string, unknown>) => {
-      const userId = Number(data?.userId ?? data?.UserId ?? 0);
+      const userId = toSafeNumber(data?.userId ?? data?.UserId, 0);
       const username = String(data?.username ?? data?.Username ?? '').trim();
       if (!userId || !username) return;
 
@@ -342,7 +385,9 @@ export const useChat = (hub: signalR.HubConnection | null, streamNickname?: stri
       }
 
       if (!canSendChat && !canManageChatRef.current) {
-        setChatError(mapChatError('ChatSubscribersOnly'));
+        setChatError(
+          mapChatError(chatModeRef.current === 'subscribers_only' ? 'ChatSubscribersOnly' : 'ChatForbidden')
+        );
         return false;
       }
 

@@ -47,6 +47,7 @@ export const useUserPage = (paramNickname?: string) => {
   const { videoRef, currentStream, viewerCount, connection } = useStreamHub({
     nickname: nickname || paramNickname,
     userData,
+    authUserId: profile?.id ?? null,
   });
 
   const {

@@ -1,5 +1,5 @@
-import { getCookie } from '../utils/cookieFunctions';
 import { handleApiRequest } from '../utils/handleApiRequest';
+import { authHeaders, sessionAuthHeaders } from './httpClient';
 
 export type StreamDashboardSettings = {
   streamName: string;
@@ -15,14 +15,6 @@ export type StreamDashboardSettings = {
 };
 
 const apiBase = () => `${process.env.REACT_APP_API_LOCAL}/api/streamers`;
-
-const authHeaders = () => {
-  const token = getCookie('tokenData');
-  return {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  };
-};
 
 const normalizeSettings = (raw: Record<string, unknown>): StreamDashboardSettings => ({
   streamName: String(raw.streamName ?? raw.StreamName ?? ''),
@@ -42,6 +34,7 @@ const normalizeSettings = (raw: Record<string, unknown>): StreamDashboardSetting
 
 export const fetchStreamDashboardSettings = async (streamerId: number) => {
   const result = await handleApiRequest<Record<string, unknown>>(`${apiBase()}/${streamerId}/stream/settings`, {
+    credentials: 'include',
     headers: authHeaders(),
   });
 
@@ -55,6 +48,7 @@ export const fetchStreamDashboardSettings = async (streamerId: number) => {
 export const updateStreamDashboardSettings = async (streamerId: number, payload: Partial<StreamDashboardSettings>) => {
   const result = await handleApiRequest<Record<string, unknown>>(`${apiBase()}/${streamerId}/stream/settings`, {
     method: 'PUT',
+    credentials: 'include',
     headers: authHeaders(),
     body: JSON.stringify({
       streamName: payload.streamName,
@@ -73,16 +67,14 @@ export const updateStreamDashboardSettings = async (streamerId: number, payload:
 };
 
 export const uploadStreamDashboardPreview = async (streamerId: number, file: File) => {
-  const token = getCookie('tokenData');
   const formData = new FormData();
   formData.append('previewImage', file);
 
   try {
     const response = await fetch(`${apiBase()}/${streamerId}/stream/preview`, {
       method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include',
+      headers: sessionAuthHeaders(),
       body: formData,
     });
 

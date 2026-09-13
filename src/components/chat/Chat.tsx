@@ -207,7 +207,9 @@ export const Chat = ({
   const inputPlaceholder = !isAuth
     ? 'Войдите, чтобы писать в чат'
     : !canSendChat && !canManageChat
-      ? 'Чат только для подписчиков канала'
+      ? chatMode === 'subscribers_only'
+        ? 'Чат только для подписчиков канала'
+        : 'Нет доступа к чату'
       : emoteOnlyLocked
         ? 'Выберите эмодзи слева'
         : 'Написать сообщение…';

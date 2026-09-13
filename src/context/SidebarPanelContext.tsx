@@ -4,7 +4,7 @@ import { fetchtSubsribtionsMy } from '../store/actions/SubscribersActions';
 import { useAppSelector } from '../hooks/redux';
 import { IStreamOnline, ISubscriber } from '../types/share';
 import { SIDEBAR_LIVE_FETCH_PAGE_SIZE } from '../components/sidebar/sidebar.constants';
-import { getCookie } from '../utils/cookieFunctions';
+import { hasAuthSession } from '../api/authSession';
 
 const SIDEBAR_POLL_MS = 15_000;
 const SUBS_POLL_MS = 60_000;
@@ -24,7 +24,7 @@ const SidebarPanelContext = createContext<SidebarPanelContextType | undefined>(u
 
 export const SidebarPanelProvider = ({ children }: { children: ReactNode }) => {
   const { isAuth, data: profile } = useAppSelector((state) => state.user);
-  const hasSession = Boolean(isAuth || profile?.id || getCookie('tokenData'));
+  const hasSession = Boolean(isAuth || profile?.id || hasAuthSession());
 
   const [streams, setStreams] = useState<IStreamOnline[]>([]);
   const [streamsLoading, setStreamsLoading] = useState(true);
@@ -57,8 +57,7 @@ export const SidebarPanelProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const refreshSubscriptions = useCallback(async (silent = false) => {
-    const token = getCookie('tokenData');
-    if (!token) {
+    if (!hasAuthSession()) {
       setSubscribers([]);
       setSubsError(false);
       setSubsLoading(false);

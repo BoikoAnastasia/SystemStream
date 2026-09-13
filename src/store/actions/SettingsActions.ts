@@ -1,7 +1,8 @@
 import { AppDispatch } from '../store';
 // actions, utils
 import { userProfile } from './UserActions';
-import { getCookie } from '../../utils/cookieFunctions';
+import { ensureAccessToken } from '../../api/authSession';
+import { apiFetch, sessionAuthHeaders } from '../../api/httpClient';
 // types
 import { handleApiRequest } from '../../utils/handleApiRequest';
 import { SettingsSlice } from '../slices/SettingsSlice';
@@ -10,15 +11,14 @@ import { RootState } from '../store';
 const { SettingsSliceFetch, SettingsSliceError, SettingsSliceSuccess } = SettingsSlice.actions;
 
 export const changeProfileData = (data: FormData) => async (dispatch: AppDispatch) => {
-  const token = getCookie('tokenData');
+  const token = await ensureAccessToken();
   if (!token) return { success: false, message: 'Вы не авторизованы' };
   return handleApiRequest(
     `${process.env.REACT_APP_API_SETTINGS}/profile`,
     {
       method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: 'include',
+      headers: sessionAuthHeaders(),
       body: data,
     },
     dispatch,
@@ -29,13 +29,10 @@ export const changeProfileData = (data: FormData) => async (dispatch: AppDispatc
 export const postStreamKey = () => async (dispatch: AppDispatch, getState: () => RootState) => {
   try {
     dispatch(SettingsSliceFetch());
-    const token = getCookie('tokenData');
+    const token = await ensureAccessToken();
     if (!token) return;
-    const response = await fetch(`${process.env.REACT_APP_API_SETTINGS}/streamKey`, {
+    const response = await apiFetch(`${process.env.REACT_APP_API_SETTINGS}/streamKey`, {
       method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
     console.log(response);
     if (!response.ok) {
@@ -58,20 +55,19 @@ export const postStreamKey = () => async (dispatch: AppDispatch, getState: () =>
 
 // update stream info
 export const updateCurrentStream = async (values: FormData) => {
-  const token = getCookie('tokenData');
+  const token = await ensureAccessToken();
   if (!token) return { success: false, message: 'Вы не авторизованы' };
   return handleApiRequest(`${process.env.REACT_APP_API_SETTINGS}/stream`, {
     method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    credentials: 'include',
+    headers: sessionAuthHeaders(),
     body: values,
   });
 };
 
 // get category
 export const fetchCategory = async (search?: string) => {
-  const token = getCookie('tokenData');
+  const token = await ensureAccessToken();
   if (!token) return { success: false, message: 'Вы не авторизованы' };
 
   const url = search
@@ -79,11 +75,8 @@ export const fetchCategory = async (search?: string) => {
     : `${process.env.REACT_APP_API_SETTINGS}/categories?page=1&pageSize=20`;
 
   try {
-    const response = await fetch(url, {
+    const response = await apiFetch(url, {
       method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
 
     console.log('fetchCategory', response);

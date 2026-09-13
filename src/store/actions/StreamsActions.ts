@@ -42,6 +42,10 @@ export const fetchUserOnlineStreams =
     if (error || !data) {
       if (!silent) {
         dispatch(StreamsSliceFetchError(error || 'Не удалось получить стримы'));
+      } else {
+        // При silent polling мы не показываем баннер ошибки, но обязаны
+        // сбросить "старое" состояние isError.
+        dispatch(StreamsSliceFetchError(null));
       }
       return;
     }

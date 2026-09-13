@@ -74,4 +74,29 @@ describe('ContentWrapperSwitch', () => {
     expect(screen.queryByTestId('empty')).not.toBeInTheDocument();
     expect(screen.queryByTestId('error')).not.toBeInTheDocument();
   });
+
+  test('рендерит EmptyBlock, если data не массив', () => {
+    render(<ContentWrapperSwitch {...baseProps} data={{} as any} children={<Сhild />} onRetry={jest.fn()} />);
+    expect(screen.getByTestId('empty')).toBeInTheDocument();
+    expect(screen.queryByTestId('child')).not.toBeInTheDocument();
+  });
+
+  test('рендерит EmptyBlock, если data=null', () => {
+    render(<ContentWrapperSwitch {...baseProps} data={null as any} children={<Сhild />} onRetry={jest.fn()} />);
+    expect(screen.getByTestId('empty')).toBeInTheDocument();
+    expect(screen.queryByTestId('child')).not.toBeInTheDocument();
+  });
+
+  test('рендерит EmptyBlock, если data=undefined', () => {
+    render(<ContentWrapperSwitch {...baseProps} data={undefined as any} children={<Сhild />} onRetry={jest.fn()} />);
+    expect(screen.getByTestId('empty')).toBeInTheDocument();
+    expect(screen.queryByTestId('child')).not.toBeInTheDocument();
+  });
+
+  test('рендерит ErrorBlock, если isError=true (unexpected truthy)', () => {
+    render(<ContentWrapperSwitch {...baseProps} isError={true as any} children={<Сhild />} onRetry={jest.fn()} />);
+
+    expect(screen.getByTestId('error')).toBeInTheDocument();
+    expect(screen.getByText('true')).toBeInTheDocument();
+  });
 });
