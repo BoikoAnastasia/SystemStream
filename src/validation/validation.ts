@@ -53,6 +53,9 @@ export const validationRegist = Yup.object({
   username: username,
   email: email,
   password: passwordSchema,
+  confirmPassword: Yup.string()
+    .required('Повторите пароль')
+    .oneOf([Yup.ref('password')], 'Пароли не совпадают'),
 });
 
 export const validationChangeProfile = Yup.object({

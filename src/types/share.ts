@@ -233,6 +233,7 @@ export interface ITabsComponentProps {
 
 export interface IModalRegistForm {
   password: string;
+  confirmPassword: string;
   username: string;
   email?: string;
 }

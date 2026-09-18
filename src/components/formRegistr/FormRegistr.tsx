@@ -41,9 +41,11 @@ export const FormAuth = ({
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { showAlert } = useHeaderModal();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowConfirmPassword = () => setShowConfirmPassword((show) => !show);
   const handleMouseDownPassword = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
@@ -105,7 +107,7 @@ export const FormAuth = ({
 
   return (
     <Formik
-      initialValues={{ username: '', password: '', email: '' }}
+      initialValues={{ username: '', password: '', confirmPassword: '', email: '' }}
       validationSchema={validationRegist}
       onSubmit={regUser}
       enableReinitialize={false}
@@ -150,7 +152,7 @@ export const FormAuth = ({
               value={values.password}
               sx={{ borderRadius: '50px' }}
               id="outlined-adornment-password"
-              autoComplete="false"
+              autoComplete="new-password"
               type={showPassword ? 'text' : 'password'}
               endAdornment={
                 <InputAdornment position="end">
@@ -169,6 +171,36 @@ export const FormAuth = ({
             />
             {touched.password && errors.password && (
               <Box sx={{ color: 'var(--error)', fontSize: '12px', marginTop: '4px' }}>{errors.password}</Box>
+            )}
+          </FormControl>
+          <FormControl variant="outlined" sx={{ width: '100%' }}>
+            <StyledInputLabel htmlFor="outlined-adornment-confirm-password">Повторите пароль</StyledInputLabel>
+            <StyledTextFieldOutlined
+              name="confirmPassword"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.confirmPassword}
+              sx={{ borderRadius: '50px' }}
+              id="outlined-adornment-confirm-password"
+              autoComplete="new-password"
+              type={showConfirmPassword ? 'text' : 'password'}
+              endAdornment={
+                <InputAdornment position="end">
+                  <StyledIconButton
+                    aria-label={showConfirmPassword ? 'hide the password' : 'display the password'}
+                    onClick={handleClickShowConfirmPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    onMouseUp={handleMouseUpPassword}
+                    edge="end"
+                  >
+                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                  </StyledIconButton>
+                </InputAdornment>
+              }
+              label="Confirm password"
+            />
+            {touched.confirmPassword && errors.confirmPassword && (
+              <Box sx={{ color: 'var(--error)', fontSize: '12px', marginTop: '4px' }}>{errors.confirmPassword}</Box>
             )}
             {errorMessage && <Box sx={{ color: 'var(--error)', fontSize: '14px' }}>{errorMessage}</Box>}
           </FormControl>

@@ -65,6 +65,187 @@ export const updateCurrentStream = async (values: FormData) => {
   });
 };
 
+export type LoginHistoryItem = {
+  id: number;
+  loggedInAt: string;
+  ipAddress: string;
+  deviceType: string;
+};
+
+export type LoginHistoryPage = {
+  items: LoginHistoryItem[];
+  total: number;
+  skip: number;
+  take: number;
+  hasMore: boolean;
+};
+
+const mapLoginHistoryRow = (row: any): LoginHistoryItem => ({
+  id: row.id ?? row.Id,
+  loggedInAt: row.loggedInAt ?? row.LoggedInAt,
+  ipAddress: row.ipAddress ?? row.IpAddress,
+  deviceType: row.deviceType ?? row.DeviceType,
+});
+
+export const fetchLoginHistory = async (
+  skip = 0,
+  take = 5
+): Promise<{ success: boolean; data?: LoginHistoryPage; message?: string }> => {
+  const token = await ensureAccessToken();
+  if (!token) return { success: false, message: 'Вы не авторизованы' };
+
+  try {
+    const response = await apiFetch(`${process.env.REACT_APP_API_SETTINGS}/login-history?skip=${skip}&take=${take}`, {
+      method: 'GET',
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      return { success: false, message: error.message || error.error || 'Не удалось загрузить историю входов' };
+    }
+    const data = await response.json();
+    // Backward-compat if API ever returns a bare array.
+    if (Array.isArray(data)) {
+      const items = data.map(mapLoginHistoryRow);
+      return {
+        success: true,
+        data: {
+          items,
+          total: items.length,
+          skip,
+          take,
+          hasMore: false,
+        },
+      };
+    }
+
+    const itemsRaw = data.items ?? data.Items ?? [];
+    const items = (Array.isArray(itemsRaw) ? itemsRaw : []).map(mapLoginHistoryRow);
+    const total = data.total ?? data.Total ?? items.length;
+    const hasMore = data.hasMore ?? data.HasMore ?? skip + items.length < total;
+
+    return {
+      success: true,
+      data: {
+        items,
+        total,
+        skip: data.skip ?? data.Skip ?? skip,
+        take: data.take ?? data.Take ?? take,
+        hasMore: Boolean(hasMore),
+      },
+    };
+  } catch (error: any) {
+    return { success: false, message: error?.message || 'Не удалось загрузить историю входов' };
+  }
+};
+
+export type AuthSession = {
+  id: number;
+  deviceLabel: string;
+  deviceCategory: string;
+  createdAt: string;
+  lastSeenAt: string;
+  isCurrent: boolean;
+};
+
+const mapAuthSession = (row: any): AuthSession => ({
+  id: row.id ?? row.Id,
+  deviceLabel: row.deviceLabel ?? row.DeviceLabel ?? 'Неизвестно',
+  deviceCategory: row.deviceCategory ?? row.DeviceCategory ?? 'Unknown',
+  createdAt: row.createdAt ?? row.CreatedAt,
+  lastSeenAt: row.lastSeenAt ?? row.LastSeenAt,
+  isCurrent: Boolean(row.isCurrent ?? row.IsCurrent),
+});
+
+export const fetchAuthSessions = async (): Promise<{
+  success: boolean;
+  data?: AuthSession[];
+  message?: string;
+}> => {
+  const token = await ensureAccessToken();
+  if (!token) return { success: false, message: 'Вы не авторизованы' };
+
+  try {
+    const response = await apiFetch(`${process.env.REACT_APP_API_SETTINGS}/sessions`, { method: 'GET' });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      return { success: false, message: error.message || error.error || 'Не удалось загрузить сеансы' };
+    }
+    const data = await response.json();
+    const raw = data.sessions ?? data.Sessions ?? [];
+    return { success: true, data: (Array.isArray(raw) ? raw : []).map(mapAuthSession) };
+  } catch (error: any) {
+    return { success: false, message: error?.message || 'Не удалось загрузить сеансы' };
+  }
+};
+
+export const revokeAuthSession = async (
+  sessionId: number
+): Promise<{ success: boolean; currentRevoked?: boolean; message?: string }> => {
+  const token = await ensureAccessToken();
+  if (!token) return { success: false, message: 'Вы не авторизованы' };
+
+  try {
+    const response = await apiFetch(`${process.env.REACT_APP_API_SETTINGS}/sessions/${sessionId}`, {
+      method: 'DELETE',
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      return { success: false, message: body.message || body.error || 'Не удалось завершить сеанс' };
+    }
+    return {
+      success: true,
+      currentRevoked: Boolean(body.currentRevoked ?? body.CurrentRevoked),
+      message: body.message,
+    };
+  } catch (error: any) {
+    return { success: false, message: error?.message || 'Не удалось завершить сеанс' };
+  }
+};
+
+export const revokeOtherAuthSessions = async (): Promise<{ success: boolean; message?: string }> => {
+  const token = await ensureAccessToken();
+  if (!token) return { success: false, message: 'Вы не авторизованы' };
+
+  try {
+    const response = await apiFetch(`${process.env.REACT_APP_API_SETTINGS}/sessions/revoke-others`, {
+      method: 'POST',
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      return { success: false, message: body.message || body.error || 'Не удалось завершить сеансы' };
+    }
+    return { success: true, message: body.message };
+  } catch (error: any) {
+    return { success: false, message: error?.message || 'Не удалось завершить сеансы' };
+  }
+};
+
+export const revokeAllAuthSessions = async (): Promise<{
+  success: boolean;
+  currentRevoked?: boolean;
+  message?: string;
+}> => {
+  const token = await ensureAccessToken();
+  if (!token) return { success: false, message: 'Вы не авторизованы' };
+
+  try {
+    const response = await apiFetch(`${process.env.REACT_APP_API_SETTINGS}/sessions/revoke-all`, {
+      method: 'POST',
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      return { success: false, message: body.message || body.error || 'Не удалось завершить сеансы' };
+    }
+    return {
+      success: true,
+      currentRevoked: Boolean(body.currentRevoked ?? body.CurrentRevoked ?? true),
+      message: body.message,
+    };
+  } catch (error: any) {
+    return { success: false, message: error?.message || 'Не удалось завершить сеансы' };
+  }
+};
+
 // get category
 export const fetchCategory = async (search?: string) => {
   const token = await ensureAccessToken();

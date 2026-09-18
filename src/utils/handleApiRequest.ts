@@ -17,6 +17,7 @@ export const handleApiRequest = async <T = any>(
     if (!response.ok) {
       const message =
         data?.message ||
+        data?.error ||
         (response.status === 429
           ? 'Слишком много запросов. Подождите минуту и попробуйте снова.'
           : `Ошибка сервера (${response.status})`);
