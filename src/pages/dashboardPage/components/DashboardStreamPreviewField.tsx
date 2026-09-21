@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { ImageCropDialog } from '../../../components/imageCrop/ImageCropDialog';
 import { resolveMediaUrl } from '../../../utils/resolveMediaUrl';
 
 const MAX_SIZE = 5 * 1024 * 1024;
@@ -22,6 +23,10 @@ export const DashboardStreamPreviewField = ({
 }: DashboardStreamPreviewFieldProps) => {
   const [dragActive, setDragActive] = useState(false);
   const [localPreview, setLocalPreview] = useState<string | null>(null);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [cropOpen, setCropOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const cropObjectUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!value) {
@@ -34,21 +39,50 @@ export const DashboardStreamPreviewField = ({
     reader.readAsDataURL(value);
   }, [value]);
 
+  useEffect(
+    () => () => {
+      if (cropObjectUrlRef.current) URL.revokeObjectURL(cropObjectUrlRef.current);
+    },
+    []
+  );
+
   const displayUrl = localPreview || resolveMediaUrl(currentUrl) || null;
 
+  const clearCropSrc = () => {
+    if (cropObjectUrlRef.current) {
+      URL.revokeObjectURL(cropObjectUrlRef.current);
+      cropObjectUrlRef.current = null;
+    }
+    setCropSrc(null);
+    setCropOpen(false);
+  };
+
   const applyFile = (file: File | null) => {
-    if (file) {
-      if (file.size > MAX_SIZE) {
-        onError?.('Файл слишком большой (макс. 5 MB)');
-        return;
-      }
-      if (!ALLOWED_TYPES.includes(file.type.toLowerCase())) {
-        onError?.('Разрешены только JPG, PNG и WEBP');
-        return;
-      }
+    onChange(file);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const startCropOrApply = (file: File | null) => {
+    if (!file) {
+      clearCropSrc();
+      applyFile(null);
+      return;
     }
 
-    onChange(file);
+    if (file.size > MAX_SIZE) {
+      onError?.('Файл слишком большой (макс. 5 MB)');
+      return;
+    }
+    if (!ALLOWED_TYPES.includes(file.type.toLowerCase())) {
+      onError?.('Разрешены только JPG, PNG и WEBP');
+      return;
+    }
+
+    if (cropObjectUrlRef.current) URL.revokeObjectURL(cropObjectUrlRef.current);
+    const url = URL.createObjectURL(file);
+    cropObjectUrlRef.current = url;
+    setCropSrc(url);
+    setCropOpen(true);
   };
 
   return (
@@ -56,7 +90,7 @@ export const DashboardStreamPreviewField = ({
       <Box>
         <Typography sx={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.75)' }}>Превью стрима</Typography>
         <Typography sx={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', mt: 0.5 }}>
-          Показывается на карточках эфира. Рекомендуемый формат 16:9, до 5 MB.
+          Показывается на карточках эфира. После выбора можно указать область 16:9, до 5 MB.
         </Typography>
       </Box>
 
@@ -86,7 +120,7 @@ export const DashboardStreamPreviewField = ({
           e.preventDefault();
           setDragActive(false);
           if (disabled) return;
-          applyFile(e.dataTransfer.files[0] || null);
+          startCropOrApply(e.dataTransfer.files[0] || null);
         }}
         sx={{
           p: 2,
@@ -118,18 +152,19 @@ export const DashboardStreamPreviewField = ({
         >
           Загрузить
           <input
+            ref={fileInputRef}
             type="file"
             hidden
             accept="image/jpeg,image/png,image/webp"
             disabled={disabled}
-            onChange={(e) => applyFile(e.currentTarget.files?.[0] || null)}
+            onChange={(e) => startCropOrApply(e.currentTarget.files?.[0] || null)}
           />
         </Box>
         {value && (
           <Typography
             component="button"
             type="button"
-            onClick={() => applyFile(null)}
+            onClick={() => startCropOrApply(null)}
             sx={{
               display: 'block',
               mx: 'auto',
@@ -145,6 +180,21 @@ export const DashboardStreamPreviewField = ({
           </Typography>
         )}
       </Box>
+
+      <ImageCropDialog
+        open={cropOpen}
+        imageSrc={cropSrc}
+        aspect="preview"
+        title="Область превью"
+        onCancel={() => {
+          clearCropSrc();
+          if (fileInputRef.current) fileInputRef.current.value = '';
+        }}
+        onComplete={(file) => {
+          clearCropSrc();
+          applyFile(file);
+        }}
+      />
     </Box>
   );
 };

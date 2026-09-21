@@ -161,12 +161,14 @@ export const SettingsProfileSection = () => {
                 display: 'grid',
                 gap: 2,
                 gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                alignItems: 'stretch',
               }}
             >
               <ProfileImageField
                 label="Аватар"
-                hint="JPEG, PNG или GIF до 5 MB"
+                hint="JPEG, PNG или WEBP до 5 MB"
                 name="profileImage"
+                cropAspect="avatar"
                 currentUrl={resolveMediaUrl(userData?.profileImage)}
                 value={values.profileImage ?? null}
                 setFieldValue={setFieldValue}
@@ -175,8 +177,9 @@ export const SettingsProfileSection = () => {
               />
               <ProfileImageField
                 label="Фон канала"
-                hint="Отображается на странице профиля"
+                hint="JPEG, PNG или WEBP до 5 MB"
                 name="backgroundImage"
+                cropAspect="cover"
                 currentUrl={resolveMediaUrl(userData?.backgroundImage)}
                 value={values.backgroundImage ?? null}
                 setFieldValue={setFieldValue}

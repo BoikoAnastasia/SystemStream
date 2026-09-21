@@ -25,3 +25,5 @@ yarn-debug.log*
 yarn.lock
 yarn-error.log*
 .eslintcache
+# Local Cursor notes (not for GitHub)
+.cursor/

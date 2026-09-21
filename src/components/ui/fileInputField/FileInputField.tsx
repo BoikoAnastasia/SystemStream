@@ -16,7 +16,7 @@ interface IFileInputFieldProps {
 }
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
 export const FileInputField = ({ item, value, setFieldValue, disabled, error, touched }: IFileInputFieldProps) => {
   const [preview, setPreview] = useState<string | null>(null);
@@ -83,7 +83,13 @@ export const FileInputField = ({ item, value, setFieldValue, disabled, error, to
         Перетащите файл сюда или
         <StyleUploadButton>
           Загрузить файл
-          <input type="file" hidden accept="image/*" onChange={handleFile} disabled={disabled} />
+          <input
+            type="file"
+            hidden
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleFile}
+            disabled={disabled}
+          />
         </StyleUploadButton>
         {touched && error && <Box sx={{ color: 'red', fontSize: '12px' }}>{error}</Box>}
       </StyleUploadDrag>

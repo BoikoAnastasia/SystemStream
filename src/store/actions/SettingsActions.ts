@@ -34,13 +34,14 @@ export const postStreamKey = () => async (dispatch: AppDispatch, getState: () =>
     const response = await apiFetch(`${process.env.REACT_APP_API_SETTINGS}/streamKey`, {
       method: 'PUT',
     });
-    console.log(response);
+    const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const error = await response.json();
-      console.error('Не удалось изменить ключ:', error.message || response.statusText);
+      dispatch(
+        SettingsSliceError(data.message || data.error || data.Message || data.Error || 'Не удалось поменять ключ')
+      );
+      return;
     }
 
-    const data = await response.json();
     const prev = getState().settings.data;
     dispatch(
       SettingsSliceSuccess({

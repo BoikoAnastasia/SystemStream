@@ -1,15 +1,19 @@
 import { Box, Typography } from '@mui/material';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
+import { ImageCropDialog } from '../../../components/imageCrop/ImageCropDialog';
+import { ImageCropAspect } from '../../../utils/cropImage';
 import { useSettingsNotice } from '../context/SettingsNoticeContext';
 import { settingsPanelSx } from '../settings.styles';
 
 const MAX_SIZE = 5 * 1024 * 1024;
-const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
 type ProfileImageFieldProps = {
   label: string;
   hint?: string;
   name: string;
+  /** avatar = 1:1, cover = 3:1 */
+  cropAspect?: ImageCropAspect;
   currentUrl?: string | null;
   value: File | null;
   setFieldValue: (field: string, value: File | null) => void;
@@ -21,6 +25,7 @@ export const ProfileImageField = ({
   label,
   hint,
   name,
+  cropAspect = 'avatar',
   currentUrl,
   value,
   setFieldValue,
@@ -30,31 +35,80 @@ export const ProfileImageField = ({
   const { showNotice } = useSettingsNotice();
   const [dragActive, setDragActive] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [cropOpen, setCropOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const cropObjectUrlRef = useRef<string | null>(null);
 
   const displayUrl = preview || currentUrl || null;
+  const isAvatar = cropAspect === 'avatar';
 
-  const applyFile = (file: File | null) => {
-    if (file) {
-      if (file.size > MAX_SIZE) {
-        showNotice('Файл слишком большой (макс. 5MB)', 'error');
-        return;
-      }
-      if (!ALLOWED_TYPES.includes(file.type.toLowerCase())) {
-        showNotice('Неверный формат изображения', 'error');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => setPreview(reader.result as string);
-      reader.readAsDataURL(file);
-    } else {
+  useEffect(() => {
+    if (!value) {
       setPreview(null);
+      return;
     }
+    const reader = new FileReader();
+    reader.onload = () => setPreview(reader.result as string);
+    reader.readAsDataURL(value);
+  }, [value]);
+
+  useEffect(
+    () => () => {
+      if (cropObjectUrlRef.current) URL.revokeObjectURL(cropObjectUrlRef.current);
+    },
+    []
+  );
+
+  const clearCropSrc = () => {
+    if (cropObjectUrlRef.current) {
+      URL.revokeObjectURL(cropObjectUrlRef.current);
+      cropObjectUrlRef.current = null;
+    }
+    setCropSrc(null);
+    setCropOpen(false);
+  };
+
+  const applyFileDirect = (file: File | null) => {
     setFieldValue(name, file);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const startCropOrApply = (file: File | null) => {
+    if (!file) {
+      clearCropSrc();
+      applyFileDirect(null);
+      return;
+    }
+
+    if (file.size > MAX_SIZE) {
+      showNotice('Файл слишком большой (макс. 5MB)', 'error');
+      return;
+    }
+    if (!ALLOWED_TYPES.includes(file.type.toLowerCase())) {
+      showNotice('Неверный формат изображения', 'error');
+      return;
+    }
+
+    if (cropObjectUrlRef.current) URL.revokeObjectURL(cropObjectUrlRef.current);
+    const url = URL.createObjectURL(file);
+    cropObjectUrlRef.current = url;
+    setCropSrc(url);
+    setCropOpen(true);
   };
 
   return (
-    <Box sx={{ ...settingsPanelSx, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-      <Box>
+    <Box
+      sx={{
+        ...settingsPanelSx,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 1.5,
+        height: '100%',
+        minHeight: 0,
+      }}
+    >
+      <Box sx={{ minHeight: 52 }}>
         <Typography sx={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{label}</Typography>
         {hint && (
           <Typography sx={{ fontSize: 12, color: 'rgba(255,255,255,0.42)', mt: 0.5, lineHeight: 1.4 }}>
@@ -63,20 +117,37 @@ export const ProfileImageField = ({
         )}
       </Box>
 
-      {displayUrl && (
-        <Box
-          component="img"
-          src={displayUrl}
-          alt=""
-          sx={{
-            width: '100%',
-            maxHeight: 220,
-            objectFit: 'cover',
-            borderRadius: 1.5,
-            border: '1px solid rgba(255,255,255,0.08)',
-          }}
-        />
-      )}
+      <Box
+        sx={{
+          width: '100%',
+          height: 140,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 1.5,
+          bgcolor: 'rgba(255,255,255,0.02)',
+          border: '1px solid rgba(255,255,255,0.06)',
+          overflow: 'hidden',
+          flexShrink: 0,
+        }}
+      >
+        {displayUrl ? (
+          <Box
+            component="img"
+            src={displayUrl}
+            alt=""
+            sx={{
+              width: isAvatar ? 112 : '100%',
+              height: isAvatar ? 112 : '100%',
+              objectFit: 'cover',
+              borderRadius: isAvatar ? '50%' : 0,
+              border: isAvatar ? '2px solid rgba(142,123,255,0.35)' : 'none',
+            }}
+          />
+        ) : (
+          <Typography sx={{ fontSize: 12, color: 'rgba(255,255,255,0.28)' }}>Нет изображения</Typography>
+        )}
+      </Box>
 
       <Box
         onDragOver={(e) => {
@@ -87,7 +158,7 @@ export const ProfileImageField = ({
         onDrop={(e) => {
           e.preventDefault();
           setDragActive(false);
-          applyFile(e.dataTransfer.files[0] || null);
+          startCropOrApply(e.dataTransfer.files[0] || null);
         }}
         sx={{
           p: 2,
@@ -95,6 +166,7 @@ export const ProfileImageField = ({
           border: `1px dashed ${dragActive ? 'rgba(142,123,255,0.55)' : 'rgba(255,255,255,0.16)'}`,
           bgcolor: dragActive ? 'rgba(142,123,255,0.08)' : 'rgba(255,255,255,0.02)',
           textAlign: 'center',
+          mt: 'auto',
         }}
       >
         <Typography sx={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', mb: 1 }}>
@@ -116,13 +188,19 @@ export const ProfileImageField = ({
           }}
         >
           Загрузить
-          <input type="file" hidden accept="image/*" onChange={(e) => applyFile(e.currentTarget.files?.[0] || null)} />
+          <input
+            ref={fileInputRef}
+            type="file"
+            hidden
+            accept="image/jpeg,image/png,image/webp"
+            onChange={(e) => startCropOrApply(e.currentTarget.files?.[0] || null)}
+          />
         </Box>
         {value && (
           <Typography
             component="button"
             type="button"
-            onClick={() => applyFile(null)}
+            onClick={() => startCropOrApply(null)}
             sx={{
               display: 'block',
               mx: 'auto',
@@ -140,6 +218,21 @@ export const ProfileImageField = ({
       </Box>
 
       {touched && error && <Typography sx={{ fontSize: 12, color: '#ff8a8a' }}>{error}</Typography>}
+
+      <ImageCropDialog
+        open={cropOpen}
+        imageSrc={cropSrc}
+        aspect={cropAspect}
+        title={isAvatar ? 'Область аватара' : 'Область фона'}
+        onCancel={() => {
+          clearCropSrc();
+          if (fileInputRef.current) fileInputRef.current.value = '';
+        }}
+        onComplete={(file) => {
+          clearCropSrc();
+          applyFileDirect(file);
+        }}
+      />
     </Box>
   );
 };

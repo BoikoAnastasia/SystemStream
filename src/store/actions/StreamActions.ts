@@ -19,13 +19,14 @@ export const fetchStreamKey = () => async (dispatch: AppDispatch) => {
     const response = await apiFetch(`${process.env.REACT_APP_API_USER}/stream-key`, {
       method: 'GET',
     });
-    console.log(response);
+    const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const error = await response.json();
-      console.error('Не удалось получить ключ:', error.message || response.statusText);
+      dispatch(
+        SettingsSliceError(data.message || data.error || data.Message || data.Error || 'Не удалось получить ключ')
+      );
+      return;
     }
 
-    const data = await response.json();
     dispatch(
       SettingsSliceSuccess({
         streamKey: data.streamKey ?? data.StreamKey ?? '',
@@ -47,12 +48,13 @@ export const fetchStreamView = (nickname: string) => async (dispatch: AppDispatc
   try {
     dispatch(StreamSliceFetch());
     const response = await fetch(`${process.env.REACT_APP_API_STREAM_VIEW}/${nickname}`);
-    console.log(response);
+    const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const error = await response.json();
-      console.error('Ошибка авторизации:', error.message || response.statusText);
+      dispatch(
+        StreamSliceError(data.message || data.error || data.Message || data.Error || 'Не удалось загрузить стрим')
+      );
+      return;
     }
-    const data = await response.json();
     dispatch(StreamSliceSuccess(data));
   } catch (error) {
     dispatch(StreamSliceError(error));

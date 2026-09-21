@@ -36,7 +36,7 @@ const fileImage = Yup.mixed<File>()
     if (!(value instanceof File)) return true;
     const type = value.type?.toLowerCase();
     if (!type) return false;
-    return ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'].includes(type);
+    return ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(type);
   })
   .test('fileSize', 'Файл слишком большой (макс. 5MB)', (value) => {
     if (!value) return true;
